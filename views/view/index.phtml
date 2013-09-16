@@ -1,0 +1,149 @@
+<?php
+/* =========================================================================
+  MIDAS Server
+  Copyright (c) Kitware SAS. 20 rue de la Villette. All rights reserved.
+  69328 Lyon, FRANCE.
+
+  See Copyright.txt for details.
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notices for more information.
+  ========================================================================= */
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/jquery-share/jquery.share.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/view/view.index.js');
+
+$cssArray = Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_VIEW_CSS', array('item' => $this->resource));
+$jsArray = Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_VIEW_JS', array('item' => $this->resource));
+
+foreach ($jsArray as $module => $list)
+  {
+  foreach ($list as $script)
+    {
+    $this->headScript()->appendFile($script);
+    }
+  }
+foreach ($cssArray as $module => $list)
+  {
+  foreach ($list as $stylesheet)
+    {
+    echo '<link type="text/css" rel="stylesheet" href="' . $stylesheet . '" />';
+    }
+  }
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/view/view.index.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/jquery-share/jquery.share.css" rel="stylesheet" />
+<div class="ContentWithRightPanel">
+  <div class="Panel">
+
+    <h4>Resources</h4>
+    <ul>
+      <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>">Download</a> 
+        (<?php echo MidasLoader::loadComponent("Utility")->formatSize($this->resource->getSizebytes()); ?>)</li>
+    </ul>
+
+
+    <h4>Export citation:</h4> 
+    <!--
+    <form action="" method="post" name="form1" id="form1">
+      <select name="data[Export][select]">
+
+        <option value="bibtex">Bibtex</option>
+        <option value="txt">Text</option>
+        <option value="medline">Medline</option>
+        <option value="xml">XML</option>
+      </select>
+      <input type="submit" name="data[Export][submit]" value="Export"/>
+    </form>
+    -->
+
+
+    <h4>Statistics</h4> 
+    <ul>
+      <li>Views: <?php echo $this->resource->getView() ?></li>
+      <li>Downloads: <?php echo $this->resource->getDownload() ?></li>
+    </ul>
+    <?php
+    echo '<div id="ratingContainer">';
+   // echo $this->element("rating", "ratings");
+    echo '</div>';
+    ?>
+
+    <h4>Information</h4> 
+    <ul>
+      <li>Categories: <?php 
+      $categories = $this->resource->getCategories();
+      foreach($categories as &$category)   
+        {
+        $tmpCat = MidasLoader::loadModel('Category', 'journal')->load($category);
+        if($tmpCat) $category = '<a href="'.$this->webroot.'/journal/?category='.$tmpCat->getKey().'">'.$tmpCat->getName().'</a>';
+        }
+      echo join(', ', $categories) ?></li>
+      <li>Keywords: <?php
+      $tags = $this->resource->getTags();
+      foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=text-journal.tags:'.$tag.'">'.$tag.'</a>';
+      echo join(', ', $tags)
+      ?></li>
+      <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
+    </ul>
+    <h4>Share</h4> 
+
+    <div id="shareDiv"></div>
+
+    <?php
+    if ($this->isAdmin)
+      {
+      echo "<a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit resource</a>";
+      }
+    ?>
+  </div>
+  
+  
+  
+  <div class="MainContent">
+    <div id="publication">
+      <div class="title" >
+        <img class="typeLogo" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/typeIcon/<?php echo $this->resource->getType() ?>.png" />
+        <?php echo $this->resource->getName() ?>       
+      </div>
+      <div class="authors"><?php 
+      $authors = $this->resource->getAuthors();
+      foreach($authors as &$author) $author = '<a href="'.$this->webroot.'/journal/?q=text-journal.authors:'.$author[0].' '.$author[1].'">'.ucfirst($author[1]).' '.ucfirst($author[0][0]).'.</a>';
+      echo join(', ', $authors);
+      ?></div>
+      <div class="institution" > <a href="<?php echo $this->webroot ?>/journal/?q=text-journal.insitution:<?php echo ucfirst($this->resource->getInstitution()) ?>">
+          <?php echo ucfirst($this->resource->getInstitution()) ?></a></div>
+      <center>
+        <?php
+        // TODO logo
+        //TODO handle        
+        ?>
+        Please use this identifier to cite or link to this publication:
+      </center>
+      <br/>
+      <div class="journal">
+        Published in <a href="<?php echo $this->webroot ?>/journal?community=<?php echo $this->community->getKey() ?>"
+                        ><?php echo $this->community->getName(); ?></a> - <a 
+                        href="<?php echo $this->webroot ?>/journal?issue=<?php echo $this->issue->getKey() ?>"><?php echo $this->issue->getName() ?></a>.
+
+      </div>
+      <div class="submittedby">Submitted by <?php echo $this->resource->getRevision()->getUser()->getFullName() ?> on <?php echo date("m-d-Y", strtotime($this->resource->getRevision()->getDate())) ?>.</div>
+      <div class="abstract" style="text-align: justify;"><?php echo str_replace("<br>", "<br/>", nl2br($this->resource->getDescription())) ?></div>
+    </div> <!-- End publication -->
+    
+    <?
+    $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_REVIEW', array('resource' => $this->resource));
+    $element = end($elements);   
+    if(is_array($element))
+      {
+      echo $this->action($element['action'], $element['controller'], $element['module'], $element['params']);
+      }?>
+    <h4>Comments</h4>
+    <?php
+    echo '<div id="commentsContainer">';
+    echo $this->element("comment", "comments");
+    echo '</div>';
+    ?>    
+  </div>  
+</div>
+
+<div style="display:none" id="termFrequency"><?php echo $this->termFrequency ?></div>

@@ -1,0 +1,45 @@
+<?php
+/*=========================================================================
+MIDAS Server
+Copyright (c) Kitware SAS. 20 rue de la Villette. All rights reserved.
+69328 Lyon, FRANCE.
+
+See Copyright.txt for details.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/admin/admin.issues.js');
+?>
+
+<div >   
+  <br/>
+  <div align="center">
+    <font size="+1"><strong>Manage Journals and Issues</strong>
+    </font>
+  </div>
+  <br/>   
+  <a class="createCommunity">Create Journal</a>
+  
+  <h4>Journals (also called communities):</h4>
+  <ul>
+    <?php
+    foreach($this->communities as $community)
+      {
+      echo "<li style='margin-bottom:10px;'>".$community->getName()." <a href='".$this->webroot."/community/manage/?communityId=".$community->getKey()."'>Manage</a>, 
+        <a href='".$this->webroot."/journal/admin/editissue?communityId=".$community->getKey()."'>Create Issue</a>";
+      $folders = $community->getFolder()->getFolders();
+      echo "<ul>";
+      foreach($folders as $folder)
+        {
+        if($folder->getName() != "Public" && $folder->getName() !="Private")
+          {
+          echo "<li>Issue: <a href='".$this->webroot."/journal/admin/editissue?folderId=".$folder->getKey()."'>".$folder->getName()."</a></li>";
+          }
+        }
+      echo "</ul>";
+      echo "</li>";
+      }
+      ?>
+  </ul>
+</div>

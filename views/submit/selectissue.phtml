@@ -1,0 +1,54 @@
+<?php
+/* =========================================================================
+  MIDAS Server
+  Copyright (c) Kitware SAS. 20 rue de la Villette. All rights reserved.
+  69328 Lyon, FRANCE.
+
+  See Copyright.txt for details.
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notices for more information.
+  ========================================================================= */
+$this->headScript()->appendFile($this->webroot . '/privateModules/portalmanager/public/js/submit/submit.index.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/portal/public/js/lib/dynatree/jquery.dynatree.min.js');
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/portalmanager/public/css/submit/submit.index.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/portal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
+
+<div class="viewMain">
+  <h3>Choose a journal where to submit</h3>
+  <div id="submission">
+
+    <br/>
+    You don't know how to submit your paper ? You need some help ? Go to the <a href="<?php echo $this->webroot ?>/journal/help">help page</a> or download  an  <a href="<?php echo $this->webroot ?>/privateModules/journal/public/InsightJournalSubmissionTemplate.tgz">example</a>.
+    <br/>
+    <table width="70%"  border="0">
+      <tr>
+        <td width="85%" ><div align="center"><strong>Title</strong></div></td>
+        <td width="15%" ><div align="center"><strong>Days left</strong></div></td>
+      </tr>
+      <tr>
+        <td height="1" colspan="2"><hr></td>
+      </tr>
+      <?php
+      foreach($this->issues as $key => $issue)
+        {
+        echo"
+        <tr >
+        <td><a href=" . $this->webroot . "/journal/submit/?issue=" . $issue->getKey() . ">" . $issue->getName()."</a>";
+        $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
+        if($community) echo " (".$community->getName().")";
+        $day1 = new Zend_Date(strtotime($issue->getPaperdueDate()));
+        $day2 = new Zend_Date();
+        echo"</td>
+              <td>" . $day2->sub($day1)->toString(Zend_Date::DAY) . "</td>
+
+              </tr>
+             ";
+        }
+      ?>
+
+      <br/>
+    </table>
+    <p>&nbsp;</p>
+  </div>

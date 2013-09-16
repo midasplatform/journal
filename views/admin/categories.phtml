@@ -1,0 +1,51 @@
+<?php
+/*=========================================================================
+MIDAS Server
+Copyright (c) Kitware SAS. 20 rue de la Villette. All rights reserved.
+69328 Lyon, FRANCE.
+
+See Copyright.txt for details.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/admin/admin.categories.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dynatree/jquery.dynatree.min.js');
+?>
+<link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/css/admin/admin.categories.css" rel="stylesheet" />
+
+<div class="viewMain">
+  <h3>Manage Categories</h3>
+
+  <div id="treeWrapper"></div>
+  
+  <br/><br/>
+  <b>Add a new Tree:</b>
+  <form action="" method="POST">
+    <input type="text" name="newtree"/>
+    <input type="submit" value="Save"/>    
+  </form>  
+  
+  <script type="text/template" id="AddCategoryTemplate">
+    <div style="display:none;" class="AddCategory">
+      <b><a href="#" class="deleteCategory">Delete selected(<span class="ParentName"></span>) Category</a></b><br/>
+      <b>Add a Child Category:</b>
+      <form action="" method="POST">
+        <input type="text" name="newCategory"/>
+        <input type="hidden" class="parentCategory" name="parentCategory" value=""/>
+        <input type="submit" value="Save"/>    
+      </form>  
+    </div>
+    <div style="display:none;" class="AddRootCategory">
+      <b>Add a root Category:</b>
+      <form action="" method="POST">
+        <input type="text" name="newCategory"/>
+        <input type="hidden" name="parentCategory" value="{parent}"/>
+        <input type="submit" value="Save"/>    
+      </form>  
+    </div>
+    
+  </script>
+</div>
+

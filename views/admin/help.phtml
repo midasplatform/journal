@@ -1,0 +1,56 @@
+<?php
+/*=========================================================================
+MIDAS Server
+Copyright (c) Kitware SAS. 20 rue de la Villette. All rights reserved.
+69328 Lyon, FRANCE.
+
+See Copyright.txt for details.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/parsley.min.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/admin/admin.help.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib//tinymce/tinymce.min.js');
+?>
+<div >   
+  <br/>
+  <div align="center">
+    <font size="+1"><strong>Edit Help</strong>
+    </font>
+  </div>
+  <br/>   
+
+  <form class="mainForm" action="" method="POST" data-validate="parsley">
+  <table width="100%"  border="0">    
+ 
+    <tr>      
+      <td valign="top">
+        <div align="right"><strong>Main Help Page:</strong>
+        </div></td>      <td>
+          <textarea style="height:400px;"  data-required="true" name="helpcontent" ><?php echo $this->helpcontent?></textarea>
+      </td>    
+    </tr>    
+    <tr>      
+      <td valign="top">
+        <div align="right"><strong>FAQ page:</strong>
+        </div></td>      <td>
+        <textarea style="height:400px;" data-required="true" name="faqcontent" ><?php echo $this->faqcontent?></textarea>
+      </td>    
+    </tr>    
+    <tr>      
+      <td valign="top">
+        <div align="right"><strong>About page:</strong>
+        </div></td>      <td>
+        <textarea style="height:400px;" data-required="true" name="aboutcontent" ><?php echo $this->aboutcontent?></textarea>
+      </td>    
+    </tr>    
+    <tr>         
+    <tr>
+    
+    <td>&nbsp;</td>      <td>
+      <input type="submit" value="Save >>" /></td>    
+    </tr>  
+  </table>  
+  </form>
+</div>

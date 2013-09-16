@@ -1,0 +1,49 @@
+<?php
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/submit/submit.upload.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dynatree/jquery.dynatree.min.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/jQuery-File-Upload-8.4.0/js/jquery.iframe-transport.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/jQuery-File-Upload-8.4.0/js/jquery.fileupload.js');
+?>
+<link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/css/submit/submit.upload.css" rel="stylesheet" />
+<link rel="stylesheet" href="<?php echo $this->webroot?>/privateModules/journal/public/js/lib/jQuery-File-Upload-8.4.0/css/jquery.fileupload-ui.css">
+
+<div class="viewMain">
+  <h3>Manage related files.</h3>
+  <?php
+  if(count($this->bitstreams) != 0)
+    {
+    echo "<h4>Submission's files</h4>";
+    echo "<ul>";
+    foreach($this->bitstreams as $bitstream)
+      {
+      echo "<li key='".$bitstream->getKey()."'>".$bitstream->getName()." (<a href='#' class='deleteLink'>Delete</a>)</li>";
+      }
+    echo "</ul>";
+    }?>
+  
+  <h4>What type of file to you want to upload</h4>
+  <select id="typeFile">
+    <option></option>
+    <option value="">Paper</option>    
+    <option value="">Source Code</option>    
+  </select><br/><br/>
+  <div id='uploadContentBlock' style="display:none;width:700px;">
+    <!-- The fileinput-button span is used to style the file input field as button -->
+    <span class="btn btn-success fileinput-button">
+        <i class="icon-plus icon-white"></i>
+        <span>Select files...</span>
+        <!-- The file input field used as target for the file upload widget -->
+        <input id="fileupload" type="file" name="files[]" multiple>
+    </span>
+    <br>
+    <br>
+    <!-- The global progress bar -->
+    <div id="progress" style="width: 200px;" class="progress progress-success progress-striped">
+        <div class="bar"></div>
+    </div>
+  </div>
+  <br/>
+  <form action="" method="POST">
+    <input type="submit" name="finish" style="margin-left:10px;" value="Save >"/>
+  </form>
+</div> 
