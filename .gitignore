@@ -1,0 +1,7 @@
+/build/*
+/nbproject
+/.project
+/.buildpath
+/.settings
+*~
+.DS_Store
