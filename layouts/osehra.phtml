@@ -1,0 +1,330 @@
+<?php 
+/*=========================================================================
+ *
+ *  Copyright OSHERA Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+echo $this->doctype() 
+?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title><?php echo $this->title ?></title>
+    
+    <meta name="description" content="<?php echo htmlentities($this->metaDescription)?>" /> 
+    <meta name="keywords" content="<?php echo htmlentities($this->metaKeywords)?>" />
+    <meta name="robots" content="index, follow, all" /> 
+    <noscript> 
+    <meta http-equiv="refresh" content="1; URL=<?php echo $this->webroot?>/index/nojs"> 
+    </noscript> 
+    
+    <!--[if lte IE 6]>
+      <meta http-equiv="refresh" content="1; URL=<?php echo $this->webroot?>/index/nobrowser"> 
+    <![endif]-->
+    
+     <!-- Import CSS -->
+    <link rel="shortcut icon" href="<?php echo $this->webroot ?>/privateModules/public/images/favicon.ico" />
+    <?php
+    echo '<link type="text/css" rel="stylesheet" href="'.$this->webroot.'/privateModules/journal/public/css/layout/bootstrap.min.css" />';
+    if (Zend_Registry::get("configGlobal")->smartoptimizer == 1)
+      {
+      echo '<link type="text/css" rel="stylesheet" href="'.$this->coreWebroot.'/public/css/layout/form.css'.
+           'jquery.qtip.min.css" />';
+      }
+    else
+      {
+      echo '<link type="text/css" rel="stylesheet" href="'.$this->coreWebroot.'/public/css/layout/form.css" />';;
+      echo '<link type="text/css" rel="stylesheet" href="'.$this->coreWebroot.'/public/css/layout/jquery.qtip.min.css" />';
+      }
+    echo '<link type="text/css" rel="stylesheet" href="'.$this->webroot.'/privateModules/journal/public/js/lib/jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.min.css"/>';
+    echo '<link type="text/css" rel="stylesheet" href="'.$this->webroot.'/privateModules/journal/public/css/layout/main.css" />';
+    echo '<link type="text/css" rel="stylesheet" href="'.$this->webroot.'/privateModules/journal/public/css/layout/osehra.css" />';
+    
+    ?>
+    <?php
+    $headers = Zend_Registry::get('notifier')->callback("CALLBACK_CORE_GET_FOOTER_HEADER", array());
+    if(!empty($headers))
+      {
+      foreach($headers as $header)
+        {
+        echo $header;
+        }
+      }
+    ?>
+
+    <?php echo $this->headLink();  // import the css ?>
+    <?php echo $this->headStyle(); // import the css ?>
+</head>
+
+<body>
+    
+  <div class="TopDynamicBar" style="display:none;">
+      <div class="dumbBoxOverlay">
+        &nbsp;
+    </div>
+    <div class="vertical-offset">
+        <div class="dumbBox">
+            <div class="TopDynamicClose">
+              <a class="closeButton" onclick="$('.TopDynamicBar').hide();" href="#" ><span><img alt="" src="<?php echo $this->coreWebroot?>/public/images/icons/close.png"/> </a>
+            </div>
+            <div class="TopDynamicContent">
+            </div>
+            <div class="TopDynamicLoading">
+              <img alt="" src="<?php echo  $this->coreWebroot?>/public/images/icons/loading.gif" />
+            </div>
+            <input type="hidden" class="DynamicContentPage"/>
+        </div>
+    </div>
+      
+    </div>
+    <div class="MainDialog" style="display:none;">
+      <div class="MainDialogContent">
+      </div>
+      <div class="MainDialogLoading">
+        <img alt="" src="<?php echo  $this->coreWebroot?>/public/images/icons/loading.gif" />
+      </div>
+      <input type="hidden" class="DialogContentPage"/>
+    </div>
+    
+    <div class="Header ">     
+      <div class="HeaderTopContent panelsBackground">
+          <div id="menu">
+        <div id="topmenu">
+          <a style='border:none;' href="<?php echo $this->webroot?>">
+          <img style='border:none;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/osehra/logo.png" alt="logo" height="50"/>
+          </a>
+        </div>
+        <div id="title">
+          OSEHRA Technical Journal
+        </div>
+        <div id="about">
+        <a href="<?php echo $this->webroot."/journal/help/about"?>">About</a>
+          <?php if(empty($userId[0]))
+            {?>
+          <a href="<?php echo $this->webroot."register/register"?>" class="register">Register</a>
+          <?php } ?>
+          </div>
+        <div id="toplogin">
+        <?php
+        if(!$this->logged)
+          {?>          
+          <form id="loginForm" action="<?php echo $this->webroot?>/user/login" method="POST">
+            Email: <input name="email" type="text"/>
+            Password: <input name="password" type="password"/>
+            <input name="submit"  class="login" type="image" src="<?php echo $this->webroot.'/privateModules/journal/public/images/login.png'?>" alt="login"/>
+          </form>
+        <br/> <div style="position:absolute;right:0px;"><a style="position:relative;top:2px;left:-8px;font-size:12px;color:white;" href='<?php echo $this->webroot?>/googleoauth/user/login'>
+                  Sign in with your Google Account <img style='border:none;position:relative;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/google_icon.png"/></a></div>
+        <?php           
+          }
+        else
+        { ?>
+        Welcome <?php echo $this->userDao->getFullName() ?>  |     <a href="<?php echo $this->webroot ?>/user/logout" class="logout">Logout</a>
+        <?php }?>
+              </div>
+        </div>
+          <div id="topbar"><ul id="Nav" class="nav"><li id='browseLink'><a href="<?php echo $this->webroot ?>/journal">Home</a></li>
+
+        <li>
+             <a  href="<?php echo $this->webroot."/journal/view/journals"?>">Journal</a>
+               
+           </li>
+            <li>
+               <a  href="<?php echo $this->webroot."/journal/submit/selectissue"?>">New Publication</a>               
+            </li>
+             <?php if($this->logged)
+            {?>
+            <li>
+              <a  href="<?php echo $this->webroot."profile/view"?>">My Profile</a>
+               <ul>
+                <li>
+                  <a class="submm" href="<?php echo $this->webroot."profile/publication"?>">My Publications</a>
+                </li>
+                <li>
+                  <a class="submm" href="<?php echo $this->webroot."profile/review"?>">My Reviews</a>
+                </li>
+
+                <li>
+                  <a class="submm" href="<?php echo $this->webroot."profile/view"?>">Edit Profile</a>
+                </li>
+              </ul>
+            </li>
+            <?php }?>
+            <?php if($this->logged && $this->userDao->isAdmin())
+            {?>
+            <li>
+             <a  href="<?php echo $this->webroot."/admin"?>">Admin</a>
+               <ul>
+                <li>
+                <a class="submm" href="<?php echo $this->webroot."/admin"?>">Midas</a>
+                </li>
+                <li>
+                <a class="submm" href="<?php echo $this->webroot."/journal/admin/issues"?>">Journals</a>
+                </li>
+                <li>
+                  <a class="submm" href="<?php echo $this->webroot."/user"?>">Users</a>
+                </li>
+                <li>
+                  <a class="submm" href="<?php echo $this->webroot."/journal/admin/categories"?>">Categories</a>
+                </li>                                   
+                <li>
+                  <a class="submm" href="<?php echo $this->webroot."/journal/admin/help"?>">Help & About</a>
+                </li>   
+                <?
+                $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_ADMIN_MENU', array());
+                $element = end($elements);   
+                if(is_array($element))
+                  {
+                  echo $this->action($element['action'], $element['controller'], $element['module'], $element['params']);
+                  }?>
+              </ul>
+            </li>
+            <?php }?>
+            <li>
+             <a  href="<?php echo $this->webroot."/journal/help"?>">Help</a>
+            <ul >
+              <li>
+                 <a class="submm"  style="width:130px;"  href="<?php echo $this->webroot."/journal/help"?>">Submission and Review</a>
+              </li>
+              <li>
+                <a class="submm" style="width:130px;" href="<?php echo $this->webroot."/journal/help/faq"?>">F.A.Q.</a>
+              </li>
+             
+              <li>
+                <a class="submm"  style="width:130px;" href="<?php echo $this->webroot."/journal/help/feedback"?>">Feedback</a>
+              </li>
+              </ul>
+            </li>
+
+            <?php
+            $hideBlog = true;
+            if(!$hideBlog)
+              {?>
+            <li ><a  href="<?php echo $this->webroot."blog"?>">Blog</a></li>
+            <?php
+              }
+            ?>
+
+          </ul>
+
+     
+    <div class="HeaderSearch">
+          <input type="text" class="panelsBackground" id="live_search" value="<?php echo (isset($this->query))? $this->query:'Search...'; ?>" autocomplete="off" autocorrect="off" autocapitalize="off" />
+          <input type="hidden" id="live_search_value" value="init"  />
+          <div id="searchloading" style="display:none"></div>
+    </div>
+  </div>
+        
+        
+   
+        <div class="HeaderAction">
+          <div class="viewNoticeWrapper">          
+            <div class="viewNotice"></div>
+          </div>
+        </div>
+      </div>
+       
+      
+    
+    </div>
+    
+    <div class="Wrapper"> 
+      <div class="Content">
+        <!-- Content -->
+        <?php echo $this->layout()->content ?>
+        <!-- End Content -->  
+        <div class="clear"/>
+
+      </div>
+      <div class="Footer">
+         <div class="text">
+          - <b><?php //echo $stat[0]
+          ?></b> users, <b><?php //echo $stat[1]
+          ?></b> publications, <b><?php // echo $stat[2];
+          ?></b> reviews -<br/>
+            <a href="<?php echo $this->webroot?>rss/rss.xml"><img border="0" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/feed-icon16x16.png" alt="RSS Feed"/></a>
+           <br/>
+           </div>
+           <div class="copyright">
+           <img src="<?php echo $this->webroot ?>/privateModules/journal/public/images/kitware.gif" alt="Kitware Logo"/><br/>
+           Follow us on <a href="http://www.facebook.com/pages/Kitware/39961762296">Facebook</a>, <a href="http://www.youtube.com/kitware">YouTube</a>, <a href="http://www.flickr.com/kitware">Flickr</a>
+           and <a href="http://www.twitter.com/kitware">Twitter</a><br/>
+           -<br/>
+           MIDAS e-Journal 
+           </div>
+         </div>
+         <?php 
+           echo "<div class='issn'>";
+           echo "ISSN 2327-770X";
+           echo "</div>";
+          ?>
+         <div class="powered">
+           Powered by <a href="http://midasplatform.org/">Midas</a>
+           </div>
+      </div>
+   </div>
+      <hr style="display: none;"/>
+    <?php
+    
+    echo '<script type="text/javascript" src="'.$this->webroot.'/privateModules/journal/public/js/lib/jquery-1.10.1.min.js"></script>';
+    echo '<script type="text/javascript" src="'.$this->webroot.'/privateModules/journal/public/js/lib/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>';
+      if (Zend_Registry::get("configGlobal")->smartoptimizer == 1)
+        {
+        echo '<script type="text/javascript" src="' . $this->coreWebroot.'/public/js/layout/'.
+             'midas.common.js,'.
+             'midas.callback.js,'.
+             'midas.dialog.js,'.
+             'jquery.qtip.min.js"></script>';
+        }
+      else
+        {
+        echo '<script type="text/javascript" src="'.$this->coreWebroot.'/public/js/layout/midas.common.js"></script>';
+        echo '<script type="text/javascript" src="'.$this->coreWebroot.'/public/js/layout/midas.callback.js"></script>';
+        echo '<script type="text/javascript" src="'.$this->coreWebroot.'/public/js/layout/midas.dialog.js"></script>';
+        echo '<script type="text/javascript" src="'.$this->coreWebroot.'/public/js/layout/jquery.qtip.min.js"></script>';
+        }
+        
+     if(!$this->logged)
+       {
+       echo '<script type="text/javascript" src="'.$this->coreWebroot.'/public/js/jquery/jquery.form.js"></script>';
+       }
+     echo '<script type="text/javascript" src="'.$this->webroot.'/privateModules/journal/public/js/layout/layout.js"></script>';          
+     echo '<script type="text/javascript" src="'.$this->webroot.'/modules/api/public/js/common/common.ajaxapi.js"></script>';
+     echo '<script type="text/javascript" src="'.$this->coreWebroot.'/public/js/layout/midas.notice.js"></script>';
+     
+
+     ?>
+      
+      
+    <?php echo $this->headScript() ?>
+    <input type="hidden" class="webroot" value="<?php echo $this->webroot?>" />
+    <script type="text/javascript">
+      var rawJson="<?php echo addslashes(trim($this->json))?>";
+    </script>
+
+  
+  </body>
+  
+  <?php
+  $footers = Zend_Registry::get('notifier')->callback("CALLBACK_CORE_GET_FOOTER_LAYOUT", array());
+  if(!empty($footers))
+    {
+    foreach($footers as $footer)
+      {
+      echo $footer;
+      }
+    }
+  ?>

@@ -1,0 +1,303 @@
+/* Main page */
+body {
+  background-color: #D4D4D4;
+}
+
+.main
+{
+  color: #000000;
+  background:#FFFFFF;
+  -webkit-box-shadow: #FFF 0px 0px 3px;
+  -moz-box-shadow: 0px 0px 2px #FFF;
+  box-shadow: #FFF 0 0 3px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -khtml-border-radius: 6px;
+  border-radius: 6px;
+}
+
+.main a {
+    color: #374E9E; /** main links */
+}
+
+.main a:hover, #h a:focus {
+    color: #52727B;
+    text-decoration: underline;
+}
+
+#footer .text {
+  font-size: 80%;
+  color:#999999;
+}
+
+#footer .copyright {
+  font-size: 80%;
+  color:#999999;
+}
+
+.powered {
+  font-size: 80%;
+  color:#999999;
+  position:relative;
+  float: right;
+  width: 100px;
+  bottom: 15px;
+}
+
+div .graytext{
+  color:#666666;
+  border-bottom-color: #DDDDDD;
+}
+
+/* image in index*/
+.newsimage
+{
+  background:white;
+  border: 1px solid #8797D6 ;
+  -webkit-box-shadow: #CCC 0px 0px 6px;
+  -moz-box-shadow: 0px 0px 6px #CCC;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -khtml-border-radius: 6px;
+  border-radius: 6px;
+  margin-bottom: 2px;
+}
+/*submission */
+
+#submission input,textarea{
+  background-color:#FFFBF0;
+}
+
+
+.submission .title{
+  color: #000000;
+  border-bottom: 1px solid #999999;
+}
+
+.submission .caption{
+  color: #999999;
+  border-bottom: 1px solid #999999;
+}
+
+.subcaption {
+  color: #666666;
+}
+
+#step4 .title{
+  color: #000000;
+}
+
+#step4 .authors{
+  color: #999999;
+}
+
+/* journal */
+
+.journaltitle{
+  color: #777777;
+}
+
+#journal .introductory{
+  color: #666666;
+}
+
+#journal .dates{
+  color: #666666;
+}
+
+#journal .relatedsites{
+  color: #777777;
+}
+
+/* publication */
+.publication_authors {
+  color:#666666;
+ }
+
+ .publication_footer {
+  color:#666666;
+ }
+
+#publication .title {
+  color: #374E9E; /** publication title */
+}
+#publication .title2 {
+  color: #374E9E;  /** publication title */
+}
+#publication .journal {
+  color: #666666;
+}
+.reviews {
+  border-top-color:#DDDDDD;
+}
+.review {
+  border-top-color:#DDDDDD;
+}
+.review_header2 {
+  color: #666666;
+}
+
+.review_header {
+  color: #666666;
+}
+
+
+.helpful {
+  font-size: 80%;
+  color: #666666;
+}
+
+.review_comment {
+  font-size: 80%;
+  color: #666666;
+}
+/*first bloc in index*/
+.info
+{
+  background:#DFE1EB;
+  background-image:url(../../img/osehr/newstop.jpg);
+  background-repeat:no-repeat;
+}
+
+/* background cell (table)*/
+.colortable{
+ background-color : #F2F3F3;
+}
+
+.linedivider {
+
+}
+
+/* menu */
+#topbar
+{
+  background-color: #4b4b4b;
+  background-image: -webkit-gradient(linear,left top,left bottom,from(#4b4b4b),to(#2C2C2C));
+  background-image: -moz-linear-gradient(center top,#4b4b4b 0%,#2C2C2C 100% );
+  -webkit-box-shadow: #666 0 0 3px;
+  box-shadow: #666 0 0 3px;
+  -moz-box-shadow: 0px 0px 3px #666;
+  -moz-border-radius: 0px 0px 6px 6px;
+  -webkit-border-radius: 0px 0px 6px 6px;
+  -khtml-border-radius: 0px 0px 6px 6px;
+  border-radius: 0px 0px 6px 6px;
+}
+
+.nav li a, .nav li a:link, .nav li a:active, .nav li a:visited {
+  font-family: bold Arial, Helvetica, sans-serif;
+  color: #AAAAAA;
+}
+
+.nav li a.submm{
+  background-color: #FFFFFF;
+}
+
+#submm{
+  background-color: #FFFFFF;
+}
+
+a:hover#submm{
+  background-color: #FFFFFF;
+}
+
+.nav li a:hover {
+  color: #FFFFFF;
+}
+
+.nav li ul {
+  background: #AAAAAA;
+}
+
+.nav ul li a {
+  border-top-color: #000;
+  border-right-color: #000;
+  border-bottom-color: #000;
+  border-left-color: #000;
+}
+
+.nav ul li a:hover {
+  background: #ccc;
+  color: #000;
+}
+.nav li a.submm{
+  background-color: #333333; /* yellow */
+  background-image: none;
+}
+
+#searchform2 .search {
+  color: #777777;
+}
+
+#searchform .search {
+  color: #777777;
+}
+
+#menu
+{
+  background:#eff8fd;
+  -webkit-box-shadow: #666 0 0 3px;
+  box-shadow: #666 0 0 3px;
+  -moz-box-shadow: 0px 0px 3px #666;
+}
+
+#menu #title {
+  color: grey;
+  font-style: italic;
+  font-weight: bold;
+  left: 260px!important;
+  top: 33px!important;
+  font-size: 16px!important;
+}
+
+#topmenu a {
+  color: #000000;
+}
+
+#topmenu a:hover {
+  color: #DFE1EB;
+}
+
+#about {
+top: 37px!important;
+left: 600px!important;
+height: 22px!important;
+font-size: 100%!important;
+}
+
+#about a {
+  color: grey;
+  font-size: 12px;
+
+}
+
+#about a:hover {
+  color: #00aaff;
+}
+
+#toplogin {
+  color: black;
+}
+
+#toplogin input {
+  color: #777777;
+}
+
+#toplogin a {
+  color: #005DAA!important;
+}
+
+#toplogin a:hover {
+  color: #DFE1EB; /** */
+  text-decoration: underline;
+}
+/*----end menu */
+.style2 {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.style4 {
+  font-size: 18px;
+  font-weight: bold;
+}

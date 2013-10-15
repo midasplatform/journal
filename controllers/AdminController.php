@@ -1,4 +1,21 @@
 <?php
+/*=========================================================================
+ *
+ *  Copyright OSHERA Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 class Journal_AdminController extends Journal_AppController
 {
@@ -8,13 +25,14 @@ class Journal_AdminController extends Journal_AppController
     parent::init();    
     }
     
-  /** Index (first page) action*/
+  /** Manage journals and issues*/
   function issuesAction()
     {   
     $this->requireAdminPrivileges();
     $this->view->communities = MidasLoader::loadModel('Community')->getAll();
     }
     
+  /** Edit help/faq content */
   function helpAction()
     {
     $this->requireAdminPrivileges();
@@ -41,7 +59,7 @@ class Journal_AdminController extends Journal_AppController
       }      
     }
     
-  /** Index (first page) action*/
+  /** Edit an issue */
   function editissueAction()
     {   
     $this->requireAdminPrivileges();
@@ -91,7 +109,7 @@ class Journal_AdminController extends Journal_AppController
     }
     
     
-    /** Manage the categories*/
+  /** Manage the categories*/
   function categoriesAction()
     {
     // if add a new tree
@@ -131,7 +149,7 @@ class Journal_AdminController extends Journal_AppController
     $this->view->json['trees'] = $this->view->tree;
     }
     
-    
+  /** Migrate */
   function migratemidas2Action()
     {
     $this->requireAdminPrivileges();
