@@ -1,0 +1,127 @@
+<h4>Reviews</h4>
+<?php
+if(empty($this->reviews))
+  {
+  echo "There is no review at this time.<br/>";
+  if($this->logged)
+    {
+    echo "Be the first to <a href=\"".$this->webroot."/reviewosehra/submit/?revision_id=".$this->resource->getRevision()->getKey().
+            "\">review this publication!</a>";
+    } 
+  }
+elseif(false) // TODO
+  {
+  ?>
+  <style>
+    #reviewOsehrTable li{
+      list-style: none;
+    }
+      #reviewOsehrTable li img{
+      position:relative;
+      top:2px;
+    }
+  </style>
+  <b>Current review phase:</b>
+  <?php
+  if($currentPhase == 1)
+    {
+    echo "OSEHRA Software Quality Certification - Peer Review";
+    }
+  elseif($currentPhase == 2)
+    {
+    echo "OSEHRA Software Quality Certification - Final Review";
+    }
+   else
+    {
+    echo "Completed";
+    }
+  $maxPhase = 3;
+  if($currentPhase < $maxPhase && (($currentPhase != 2 &&  $currentPhase != 4) || $userId[2]['editor']==1))
+    {
+    ?>
+    <br/> <b>Number of review in progress:</b> <?php echo count ($osehrReviews[$currentPhase])?>
+    <br/><a href="<?php echo $this->webroot ?>review/step1/<?php echo $pubid ?>">Review this publication!</a>
+
+    <?php
+    if($userId[2]['editor']==1)
+      {
+      ?>
+    <br/><a href="<?php echo $this->webroot ?>certificationosehra/invitereviewer/?pubid=<?php echo $pubid ?>">Send an invitation to review the article.</a>
+    <?php
+      }
+    }
+  else
+    {
+    echo  "<br/>";
+    }
+  for($k = 0; $k < 3; $k++)
+    {
+    if(!isset($osehrReviews[$k]))continue;
+    $showTitle = true;
+    foreach($osehrReviews[$k] as $review)
+      {
+      if($review['completed'] == 1)
+        {
+        $showTitle = true;
+        echo "<div>";
+        if($showTitle && $k == 1) echo "<br/><b>Peer Review by <a href='".$this->webroot."user/view/".$review['user_id']."'>".$review['fullname']."</a>:</b><br/>";
+        if($showTitle && $k == 2) echo "<br/><b>Final Review by <a href='".$this->webroot."user/view/".$review['user_id']."'>".$review['fullname']."</a>:</b><br/>";
+        if($showTitle)echo '<img src="'.$this->webroot.$cssImageDirectory.'backyellow.jpg" width="700" height="2" alt="yellow" />';
+        echo "<br/>";
+        echo "<a style='float:right;font-size:10px;' href='".$this->webroot."Certificationosehra/step1/pubid:".$pubid."/reviewid:".$review['user_id']."?phase=".$k."&revision=".$pub['revision']."'>[details]</a>";
+        foreach($review['statistics'] as $catName => $values)
+          {
+          echo "<span>". ucfirst($catName)."</span>: ";
+          if($values[1] > (0.1 * $values['total']))
+            {
+            echo "<img style='position:relative;top:3px;' src='".$this->webroot."img/close.png'/>";
+            }
+          else if($values[0] > (0.1 * $values['total']))
+            {
+            echo "<img style='position:relative;top:3px;' src='".$this->webroot."img/warn.png'/>";
+            }
+          else
+            {
+            echo "<img style='position:relative;top:3px;' src='".$this->webroot."images/check.gif'/>";
+            }
+
+          echo "<span style=' color:grey;font-size:10px;margin-left:6px;'>";
+            echo "High: ".$values[3].", ";
+            echo "Medium: ". $values[2].", ";
+            echo "Low: ".$values[1].", ";
+            echo "Not set: ".$values[0]." ";
+          echo "</span>";
+          echo "<br/>";
+          }
+        echo "</div>";
+
+        }
+      }
+    }
+
+  $showRevieWInProgress = false;
+  foreach($osehrReviews[$currentPhase] as $currentReview)
+    {
+    if($review['completed'] == 0) $showRevieWInProgress = true;
+    }
+  if(false && $showRevieWInProgress && $userId[2]['editor']==1 && $currentPhase < $maxPhase)
+    {
+    ?>
+    <br/><br/><b/>
+    Reviews in progress:</b>
+    <ul style="margin:0;">
+    <?php
+    foreach($osehrReviews[$currentPhase] as $currentReview)
+      {
+      if($review['completed'] == 0)
+        {
+        echo "<li><a href='".$this->webroot."review/step1/".$pubid."/".$currentReview['user_id']."'>".$currentReview['fullname']."</a></li>";
+        }
+      }
+      ?>
+    </ul>
+    <?php
+    }
+  }
+  
+ 

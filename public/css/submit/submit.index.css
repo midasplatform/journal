@@ -1,0 +1,37 @@
+div#reviewWrapper{
+  border:1px dotted #ccc;
+}
+
+td#tdLeftPanel{
+  vertical-align: top;
+  width:350px;
+  height:550px;
+  border-right:1px dotted #ccc;
+}
+
+td#tdLeftPanel div#divLeftPanel{
+  margin-right: 5px;
+  margin-left: 5px;
+}
+td#tdRightPanel{
+  vertical-align: top;
+  width: 735px;
+  height:550px;
+}
+td#tdRightPanel div#divRightPanel{
+  margin-left: 5px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  height:550px;
+}
+
+div.questionWrapper{
+  display:none;
+}
+div.questionElement{
+  border:1px dotted #ccc;
+  height: 77px;
+}
+
+.selectMultipleWrapper {float:right; display:inline-block; vertical-align:top; overflow:hidden; border:solid #ccc 1px; }
+.selectMultipleWrapper select { padding:10px; margin:-5px -20px -5px -5px; }

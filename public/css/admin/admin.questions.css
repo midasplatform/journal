@@ -1,0 +1,16 @@
+div#questionListWrapper{
+  border:1px dotted #ccc;
+}
+
+div.topicElement{
+  border: 1px dotted #E4E4E4;;
+  margin: 5px;
+  font-weight: bold;
+}
+
+img.iconForm{
+  border:none;
+  width:14px;height:14px;
+  position:relative;
+  top:-2px;
+}

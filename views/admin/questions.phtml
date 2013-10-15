@@ -1,0 +1,160 @@
+<?php
+$this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/public/js/admin/admin.questions.js');
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/css/admin/admin.questions.css" rel="stylesheet" />
+
+<h3>Manage Question lists</h3>
+
+<?php
+if (!empty($this->questionslists))
+  {
+  echo "<label>Select a question list:</label> <select id='selectList'>";
+  echo "<option value='-1'>Please select a list</option>";
+  foreach ($this->questionslists as $list)
+    {
+    echo "<option value='" . $list->getKey() . "' " .
+    (($this->questionlist && $this->questionlist->getKey() == $list->getKey()) ? "selected" : "") .
+    ">" . $list->getName() . "</option>";
+    }
+  echo "</select><br/>";
+  }
+?>
+<a id="newQuestionListLink"><img class="iconForm" src="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/images/new.png" alt=""/>
+  New Question List</a>
+
+<?php
+if($this->questionlist)
+  {
+  ?>
+  <h3>Selected Question List: <?php echo $this->questionlist->getName() ?> <a id="editListLink">
+      <img class="iconForm" src="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/images/edit.png" alt=""/></a></h3> 
+  
+  <div id="questionListWrapper">
+    <table>
+      <tr>
+        <td style="width:250px;vertical-align: top;">
+          <h4>Topics:</h4>
+          <?php 
+          $topics = $this->questionlist->getTopics();
+          foreach($topics as $key => $topic)
+            {
+            if($this->topic && $this->topic->getKey() == $topic->getKey()) echo "<div style='background-color:#eee;' class='topicElement'>";
+            else echo "<div class='topicElement'>";
+            echo "<a href='".$this->webroot."/reviewosehra/admin/questions?topicId=".$topic->getKey()."'>".$topic->getName()."</a>";
+            if($this->topic && $this->topic->getKey() == $topic->getKey())
+              {
+              echo ' <a id="editTopicLink"><img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/edit.png" alt=""/></a>';
+              }
+              
+            if($key != 0) echo ' <a style= "float:right;"  href="'.$this->webroot.'/reviewosehra/admin/questions?moveAction=up&topicId='.$topic->getKey().'">
+              <img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/arrow-up.png" alt=""/></a>';
+            if($key+1 != count($topics))echo ' <a style= "float:right;"  href="'.$this->webroot.'/reviewosehra/admin/questions?moveAction=down&topicId='.$topic->getKey().'">
+              <img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/arrow-down.png" alt=""/></a>';
+              
+            echo "</div>";
+            }
+          ?>
+          
+        </td>
+        <td style="width:865px;vertical-align: top;">
+          <?php
+          if($this->topic)
+            {
+            $questions = $this->topic->getQuestions();
+            echo '<h4>Questions:</h4>';
+            foreach($questions as $key => $question)
+              {
+              echo "<div class='topicElement'>";
+              echo "<a href='".$this->webroot."/reviewosehra/admin/questions?questionId=".$question->getKey()."'>".$question->getDescription()." ".
+                      '<img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/edit.png" alt=""/></a>';
+              
+              if($key != 0) echo ' <a style= "float:right;"  href="'.$this->webroot.'/reviewosehra/admin/questions?moveAction=up&questionId='.$question->getKey().'">
+              <img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/arrow-up.png" alt=""/></a>';
+              if($key+1 != count($questions))echo ' <a style= "float:right;"  href="'.$this->webroot.'/reviewosehra/admin/questions?moveAction=down&questionId='.$question->getKey().'">
+              <img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/arrow-down.png" alt=""/></a>';
+
+              echo "</div>";
+              }
+            }
+            ?>
+          
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+          <a id="newTopicLink"><img class="iconForm" src="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/images/new.png" alt=""/>
+            New Topic</a>
+        </td>
+        <td>
+          <?php if($this->topic) echo '<a id="newQuestionLink">
+            <img class="iconForm" src="'.$this->webroot.'/privateModules/reviewosehra/public/images/new.png" alt=""/>
+            New Question</a>';?>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <?php
+  }
+?>
+
+<!-- Forms -->
+<div id="newQuestionList" style="display:none;">
+  <h3 style="margin-top:0px;">New Question List</h3>
+  <h3 style="margin-top:0px;">Edit Question List</h3>
+  <form action="<?php echo $this->webroot?>/reviewosehra/admin/questions" method="post">
+    <input type="hidden" name="oldlist"/>
+    <label for="newname">Name:</label>
+    <input style="width:270px;" name="newname"/><br/>
+    <label for="newcategory">Category:</label>
+    <select name="newcategory">
+      <?php
+      foreach ($this->categoryTree as $tree)
+        {
+        echo "<optgroup label=\"" . $tree['title'] . "\">";
+        foreach ($tree['children'] as $child)
+          {
+          echo "<option value='" . $child["key"] . "'>" . $child['title'] . "</option>";
+          }
+        echo "</optgroup>";
+        }
+      ?>      
+    </select>
+    <label for="newtype">Type:</label>
+    <select style="width:270px;" name="newtype">
+      <option value="<?php echo OSERHAREVIEW_LIST_PEERREVIEW;?>">Peer Review</option>
+      <option value="<?php echo OSERHAREVIEW_LIST_FINALREVIEW;?>">Final Review</option>
+    <select>
+    <label for="newdescription">Description:<br/>
+      <textarea style="width:270px;" name="newdescription"></textarea><br/><br/>
+      <input type="submit" value="Save"/> <input type="submit" id="cancelNewList" value="Cancel"/> <input type="submit" id="deleteList" value="Delete"/>
+  </form>
+</div>
+<div id="newTopic" style="display:none;">
+  <h3 style="margin-top:0px;">New Topic</h3>
+  <h3 style="margin-top:0px;">Edit Topic</h3>
+  <form action="<?php echo $this->webroot?>/reviewosehra/admin/questions" method="post">
+    <input type="hidden" name="oldtopic"/>
+    <input type="hidden" name="selectedlist" value="<?php echo (($this->questionlist) ? $this->questionlist->getKey() : "")?>"/>
+    <label for="topicname">Name:</label>
+    <input style="width:270px;" name="topicname"/><br/>
+    <label for="topicdescription">Description:<br/>
+      <textarea style="width:270px;" name="topicdescription"></textarea><br/><br/>
+      <input type="submit" value="Save"/> <input type="submit" id="cancelNewTopic" value="Cancel"/> <input type="submit" id="deleteTopic" value="Delete"/>
+  </form>
+</div>
+<div id="newQuestion" style="display:none;">
+  <h3 style="margin-top:0px;">New Question</h3>
+  <h3 style="margin-top:0px;">Edit Question</h3>
+  <form action="<?php echo $this->webroot?>/reviewosehra/admin/questions" method="post">
+    <input type="hidden" name="oldquestion"/>
+    <input type="hidden" name="selectedtopic" value="<?php echo (($this->topic) ? $this->topic->getKey() : "")?>"/>
+    <label for="questiondescription">Question:<br/>
+      <textarea style="width:270px;" name="questiondescription"></textarea><br/>
+    <label for="questioncomment">Allow comments:
+      <input type="checkbox" checked="checked" name="questioncomment" value="1"/><br/>
+    <label for="questionattachfile">Allow file attachements:
+      <input type="checkbox" checked="checked" name="questionattachfile" value="1"/><br/>     <br/>      
+    <input type="submit" value="Save"/> <input type="submit" id="cancelNewQuestion" value="Cancel"/> <input type="submit" id="deleteQuestion" value="Delete"/>
+  </form>
+</div>
