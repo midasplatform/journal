@@ -27,7 +27,10 @@ class Journal_IndexController extends Journal_AppController
    
    
     
-  /** Index (first page) action*/
+  /** Index (first page) action
+   * This is the main page of the website whenre the articles are listed
+   * It is also where the search is done
+   */
   function indexAction()
     {   
     // fetch all the keywords and send them to the view
