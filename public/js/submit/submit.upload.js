@@ -13,7 +13,7 @@ $(document).ready(function(){
             });
         },
         stop: function (e, data) {
-           window.location.href=json.global.webroot+"/journal/submit/upload?processUpload=true&revisionId="+json.revision;
+          window.location.href=json.global.webroot+"/journal/submit/upload?processUpload=true&revisionId="+json.revision+"&type="+$('#typeFile').val();
         },
         progressall: function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);

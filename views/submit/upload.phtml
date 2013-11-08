@@ -31,9 +31,20 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     {
     echo "<h4>Submission's files</h4>";
     echo "<ul>";
+    
+    $typeToString = array(
+        BITSTREAM_TYPE_THUMBNAIL => "Thumbnail",
+        BITSTREAM_TYPE_PAPER => "Paper",
+        BITSTREAM_TYPE_SOURCECODE => "Source Code",
+        BITSTREAM_TYPE_DATA => "Data",
+        BITSTREAM_TYPE_MISC => "Other",
+    );
+    
     foreach($this->bitstreams as $bitstream)
       {
-      echo "<li key='".$bitstream->getKey()."'>".$bitstream->getName()." (<a href='#' class='deleteLink'>Delete</a>)</li>";
+      $type = MidasLoader::loadComponent("Bitstream", "journal")->getType($bitstream);
+      if(!$type) $type = BITSTREAM_TYPE_MISC;
+      echo "<li key='".$bitstream->getKey()."'>(".$typeToString[$type].") ".$bitstream->getName()." (<a href='#' class='deleteLink'>Delete</a>)</li>";
       }
     echo "</ul>";
     }?>
@@ -41,8 +52,11 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
   <h4>What type of file to you want to upload</h4>
   <select id="typeFile">
     <option></option>
-    <option value="">Paper</option>    
-    <option value="">Source Code</option>    
+    <option value="<?php echo BITSTREAM_TYPE_THUMBNAIL ?>">Thumbnail</option>    
+    <option value="<?php echo BITSTREAM_TYPE_PAPER ?>">Paper</option>    
+    <option value="<?php echo BITSTREAM_TYPE_SOURCECODE ?>">Source Code</option>    
+    <option value="<?php echo BITSTREAM_TYPE_DATA ?>">Data</option>    
+    <option value="<?php echo BITSTREAM_TYPE_MIST ?>">Other</option>    
   </select><br/><br/>
   <div id='uploadContentBlock' style="display:none;width:700px;">
     <!-- The fileinput-button span is used to style the file input field as button -->

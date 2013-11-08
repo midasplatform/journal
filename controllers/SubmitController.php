@@ -211,6 +211,7 @@ class Journal_SubmitController extends Journal_AppController
     {
     $revision_id = $this->_getParam('revisionId');  
     $processUpload = $this->_getParam('processUpload');  
+    $type = $this->_getParam('type');  
 
     // load resource if it exists
     $revision = MidasLoader::loadModel("ItemRevision")->load($revision_id);    
@@ -254,6 +255,14 @@ class Journal_SubmitController extends Journal_AppController
           MidasLoader::loadComponent('Upload')->createNewRevision($this->userSession->Dao, $file->name, $filepath,
                                                       "", $item->getKey(), $revision->getRevision(), null,
                                                       '', false);
+          $bitstreams = MidasLoader::loadModel("Item")->getLastRevision($resourceDao)->getBitstreams();
+          foreach($bitstreams as $bitstream)
+            {
+            if(is_numeric($type) && $bitstream->getName() == $file->name && (strtotime($bitstream->getDate()) + 5) >= strtotime(date("c")))
+              {
+              MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstream, $type);
+              }
+            }
           }
         }
       }

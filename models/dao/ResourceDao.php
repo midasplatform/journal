@@ -53,7 +53,7 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("issue", $folder->getKey());
     $this->setMetaDataByQualifier("community", $community->getKey());
     }
-    
+
    /** Get Categories
    * 
    * @return array of ids
