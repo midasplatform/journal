@@ -187,6 +187,45 @@ class Journal_ResourceDao extends ItemDao
     }
     
   /**
+   * Check if the user is an Admin
+   * @param User
+   * @return true or false
+   */
+  public function isAdmin($userDao)
+    {
+    if(!isset($userDao)) return null;
+    if($userDao->isAdmin())
+      {
+      return true;
+      }
+    $issue =  end($this->getFolders());
+    if(MidasLoader::loadModel("Folder")->policyCheck($issue, $userDao, MIDAS_POLICY_ADMIN)) // Issue Editor
+      {
+      return true;
+      }
+    $users = $this->getAdminGroup()->getUsers(); // Journal Editor
+    foreach($users as $user)
+      {
+      if($user->getKey() == $userDao->getKey())
+        {
+        return true;
+        }
+      }
+    return false;
+    }
+    
+  /** 
+   * Get Resource Admin group
+   * @return group
+   */
+  public function getAdminGroup()
+    {
+    $issue =  end($this->getFolders());
+    $community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
+    return $community->getAdminGroup();
+    }
+    
+  /**
    * Get Metadata object
    * @param type $type
    * @return type

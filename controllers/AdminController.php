@@ -87,6 +87,8 @@ class Journal_AdminController extends Journal_AppController
         $issueDao->setName($_POST['name']);
         MidasLoader::loadModel("Folder")->save($issueDao);
         $issueDao->InitValues();
+        $editorGroup = MidasLoader::loadModel("Group")->createGroup($community, "Issue_".$issueDao->getKey());
+        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($editorGroup, $issueDao, MIDAS_POLICY_ADMIN);
         }
         
       if(!isset($_POST['defaultpolicy']) || $_POST['defaultpolicy'] != 1)

@@ -90,18 +90,31 @@ foreach ($cssArray as $module => $list)
       foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=text-journal.tags:'.$tag.'">'.$tag.'</a>';
       echo join(', ', $tags)
       ?></li>
+      <li>Current revision: <?php echo $this->resource->getRevision()->getRevision()?></li>
       <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>
     <h4>Share</h4> 
 
     <div id="shareDiv"></div>
-
+    
     <?php
-    if ($this->isAdmin)
+    if($this->isAdmin || $this->isAuthor)
       {
-      echo "<a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit resource</a>";
+      echo '<h4>Manage</h4>';
+      echo "<ul>";
+      if($this->isAdmin || $this->isAuthor)
+        {
+        echo "<li><a href='" . $this->webroot . "/journal/submit?itemId=" . $this->resource->getKey() . "'>New revision</a></li>";
+        }
+      if($this->isAdmin)
+        {
+        echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit resource</a></li>";
+        echo "<li><a  onclick=\"return confirm('Do you want to delete the resource?');\" href='" . $this->webroot . "/journal/submit/delete?itemId=" . $this->resource->getKey() . "'>Delete resource</a></li>";
+        if($this->resource->getRevision()->getRevision() > 1) echo "<li><a onclick=\"return confirm('Do you want to delete the revision?');\" href='" . $this->webroot . "/journal/submit/delete?revisionId=" . $this->resource->getRevision()->getKey() . "'>Delete current revision</a></li>";
+        }
+      echo "</ul>";
       }
-    ?>
+      ?>
   </div>
   
   

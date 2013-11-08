@@ -82,6 +82,14 @@ $(function() {
     inMenu = false;
   });
 
+
+    // Register link
+  $("a.register").click(function()
+    {
+    midas.showOrHideDynamicBar('register');
+    midas.loadAjaxDynamicBar('register','/user/register');
+    return false;
+    });
 });
 
 

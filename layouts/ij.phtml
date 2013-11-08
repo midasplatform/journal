@@ -112,9 +112,9 @@ echo $this->doctype()
         </div>
         <div id="about">
         <a href="<?php echo $this->webroot."/journal/help/about"?>">About</a>
-          <?php if(empty($userId[0]))
+          <?php if(!$this->logged)
             {?>
-          <a href="<?php echo $this->webroot."register/register"?>" class="register">Register</a>
+          <a href="<?php echo $this->webroot."/register/register"?>" class="register">Register</a>
           <?php } ?>
           </div>
         <div id="toplogin">

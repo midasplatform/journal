@@ -44,6 +44,7 @@ class Journal_SubmitController extends Journal_AppController
     $item_id = $this->_getParam('itemId');  
     $revision_id = $this->_getParam('revisionId');  
     $issueId = $this->_getParam('issue');  
+    
     // New Revision
     if(isset($item_id))
       {
@@ -65,13 +66,14 @@ class Journal_SubmitController extends Journal_AppController
         {
         throw new Zend_Exception("Unable to find revision.");
         }        
-      $item = $revision->getItem();  
-      if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
-        {
-        throw new Zend_Exception("Permissions error.");
-        }        
+      $item = $revision->getItem();      
       $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
       $resourceDao->setRevision($revision);
+      if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE) ||
+              !$resourceDao->isAdmin($this->userSession->Dao))
+        {
+        throw new Zend_Exception("Permissions error.");
+        }    
       $folder = end($item->getFolders());
       $this->view->json['showlicence'] = 0;
       }
@@ -94,22 +96,56 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao->setDescription($_POST['description']);
       $resourceDao->setType($_POST['type']);     
       $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
+      $isNew = !$resourceDao->saved;
       // Create or update resource
       MidasLoader::loadModel("Item")->save($resourceDao);
-            
       $itemRevisionDao = $resourceDao->getRevision();
-      // create first revision
+      
+      // create a new revision
       if(!$itemRevisionDao->saved)
         {        
         $itemRevisionDao->setChanges("");
         $itemRevisionDao->setUser_id($this->userSession->Dao->getKey());
         $itemRevisionDao->setDate(date('c'));
         $itemRevisionDao->setLicenseId(null);
+        $lastExistingRevision = MidasLoader::loadModel("Item")->getLastRevision($resourceDao);
         MidasLoader::loadModel("Item")->addRevision($resourceDao, $itemRevisionDao);
-        }            
-      MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
+        if($lastExistingRevision) // If new revision, copy previous bitstreams
+          {
+          $bitstreams = $lastExistingRevision->getBitstreams();
+          foreach($bitstreams as $bitstream)
+            {
+            $bitstream->saved = false;
+            $bitstream->bitstream_id = null;
+            MidasLoader::loadModel("ItemRevision")->addBitstream($itemRevisionDao, $bitstream);
+            }
+          }
+        }  
+        
       MidasLoader::loadModel('Folder')->addItem($this->view->issueDao, $resourceDao);
       $resourceDao->enable();
+      
+      // Make sure the journal and issue editor and the author can manage the resource
+      if($isNew)
+        {
+        $adminGroup = $resourceDao->getAdminGroup();
+        MidasLoader::loadModel("Itempolicygroup")->createPolicy($adminGroup, $resourceDao, MIDAS_POLICY_ADMIN);
+        MidasLoader::loadModel("Itempolicyuser")->createPolicy($this->userSession->Dao, $resourceDao, MIDAS_POLICY_WRITE);
+        
+        $policies = $this->view->issueDao->getFolderpolicygroup();
+        foreach($policies as $policy)
+          {
+          if($policy->getPolicy() == MIDAS_POLICY_ADMIN)
+            {
+            MidasLoader::loadModel("Itempolicygroup")->createPolicy($policy->getGroup(), $resourceDao, MIDAS_POLICY_ADMIN);
+            }
+          }
+        
+        if($resourceDao->isAdmin($this->userSession->Dao))
+          {
+          MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
+          }
+        }            
       
       $resourceDao->setInstitution($_POST['institution']);     
       $resourceDao->setAuthors(array($_POST['firstname'], $_POST['lastname']));     
@@ -143,7 +179,30 @@ class Journal_SubmitController extends Journal_AppController
       {
       mkdir($this->getTempDirectory()."/uploaded");
       }
-    $upload_handler = new UploadHandler(array('upload_dir' => $this->getTempDirectory()."/uploaded/",  'user_dirs' => true,'orient_image' => false));
+    new UploadHandler(array('upload_dir' => $this->getTempDirectory()."/uploaded/",  'user_dirs' => true,'orient_image' => false));
+    }
+    
+  /** delete a resource */
+  function deleteAction()
+    {
+    $this->requireAdminPrivileges();
+    $item_id = $this->_getParam('itemId');  
+    $revision_id = $this->_getParam('revisionId');  
+    
+    if(isset($item_id))
+      {
+      $item = MidasLoader::loadModel("Item")->load($item_id);      
+      MidasLoader::loadModel("Item")->delete($item);
+      $this->_redirect("/");
+      }
+    elseif(isset($revision_id))
+      {
+      $revision = MidasLoader::loadModel("ItemRevision")->load($revision_id);      
+      $item = $revision->getItem();
+      MidasLoader::loadModel("ItemRevision")->delete($revision);
+      $revisionOld = MidasLoader::loadModel("Item")->getLastRevision($item);
+      $this->_redirect("/journal/view/".$revisionOld->getKey());
+      }
     }
     
   /** Page where the user select what to upload */
@@ -155,20 +214,31 @@ class Journal_SubmitController extends Journal_AppController
     // load resource if it exists
     $revision = MidasLoader::loadModel("ItemRevision")->load($revision_id);    
     if(!$revision)
-        {
-        throw new Zend_Exception("Unable to find revision.");
-        }        
+      {
+      throw new Zend_Exception("Unable to find revision.");
+      }        
     $item = $revision->getItem(); 
     if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
-        {
-        throw new Zend_Exception("Permissions error.");
-        }       
+      {
+      throw new Zend_Exception("Permissions error.");
+      }       
     if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
       {
       throw new Zend_Exception("Permissions error.");
       }        
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
     $resourceDao->setRevision($revision);
+    
+    // Check if public or private (If private, it means it requires approval
+    $private = true;
+    foreach($resourceDao->getItempolicygroup() as $policy)
+      {
+      if($policy->getGroupId() == MIDAS_GROUP_ANONYMOUS_KEY)
+        {
+        $private = false;
+        break;
+        }
+      }
     
     if(isset($processUpload))
       {
@@ -204,26 +274,23 @@ class Journal_SubmitController extends Journal_AppController
         }
       if(isset($_POST['finish']))
         {
-        // We make sure Midas didn't create a new revision. If it did, we delete them
-        $revisions = $resourceDao->getRevisions();
-        foreach($revisions as $revision)
+        if($private && $resourceDao->isAdmin($this->userSession->Dao)) // Approve
           {
-          if($revision->getRevision() != 1)
-            {
-            foreach($revision->getBitstreams() as $b)
-              {
-              $b->setItemrevisionId($resourceDao->getRevision()->getKey());
-              MidasLoader::loadModel("Bitstream")->save($b);
-              }
-            MidasLoader::loadModel("ItemRevision")->delete($revision);
-            }
+          $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
+          MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
+          }
+        elseif($private) // Send for approval
+          {
+          MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
           }
         $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
         return;
         }
       }
-    
+      
     // sent to theview
+    $this->view->isPrivate = $private;
+    $this->view->isAdmin = $resourceDao->isAdmin($this->userSession->Dao);
     $this->view->resource = $resourceDao;
     $this->view->bitstreams = $bitstreams;
     $this->view->json['resource'] = $resourceDao->toArray();
