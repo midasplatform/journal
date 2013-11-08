@@ -148,17 +148,13 @@ echo $this->doctype()
              <?php if($this->logged)
             {?>
             <li>
-              <a  href="<?php echo $this->webroot."profile/view"?>">My Profile</a>
+              <a  href="<?php echo $this->webroot."/journal/user/settings"?>">My Profile</a>
                <ul>
                 <li>
-                  <a class="submm" href="<?php echo $this->webroot."profile/publication"?>">My Publications</a>
-                </li>
+                  <a class="submm" href="<?php echo $this->webroot."/journal/?q=text-journal.submitter:".$this->userDao->getKey()?>">My Publications</a>
+                </li>           
                 <li>
-                  <a class="submm" href="<?php echo $this->webroot."profile/review"?>">My Reviews</a>
-                </li>
-
-                <li>
-                  <a class="submm" href="<?php echo $this->webroot."profile/view"?>">Edit Profile</a>
+                  <a class="submm" href="<?php echo $this->webroot."/journal/user/settings"?>">Edit Profile</a>
                 </li>
               </ul>
             </li>

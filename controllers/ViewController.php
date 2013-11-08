@@ -66,7 +66,7 @@ class Journal_ViewController extends Journal_AppController
     $this->view->community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot( $this->view->issue));
     $this->view->creationDate = MidasLoader::loadComponent("Date")->formatDate(strtotime($resourceDao->getDateCreation()));
     $this->view->termFrequency = file_get_contents("http://localhost:8983/solr/admin/luke?fl=text-journal.tags&wt=json&numTerms=200&reportDocCount=false");
-    $this->view->isAuthor = MidasLoader::loadModel("Item")->policyCheck($resourceDao, $this->userSession->Dao, MIDAS_POLICY_ADMIN);
+    $this->view->isAuthor = MidasLoader::loadModel("Item")->policyCheck($resourceDao, $this->userSession->Dao, MIDAS_POLICY_WRITE);
     $this->view->isAdmin = $resourceDao->isAdmin($this->userSession->Dao);
 
     // Send to javascript

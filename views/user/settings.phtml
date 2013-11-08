@@ -16,30 +16,13 @@
  *  limitations under the License.
  *
  *=========================================================================*/
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/user/user.settings.js');
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/user/user.settings.css" rel="stylesheet" />
 
-class Journal_UserController extends Journal_AppController
-{
-  // Initialization method. Called before every Action
-  function init()
-    {
-    parent::init();    
-    }
-    
-  // Show setting
-  function settingsAction()
-    {
-    $this->view->userId = $this->_getParam('userId');
-    }
-    
-  // Show notification setting
-  function notificationAction()
-    {
-    $this->disableLayout();
-    }
-  
-  /** Register a new user */
-  function registerAction()
-    {
+<h3>Profile</h3>
 
-    }      
-}//end class
+<?php
+if(isset($this->userId))echo $this->action("settings", "user-core", "journal", array("userId" => $this->userId));
+else echo $this->action("settings", "user-core", "journal", array("userId" => $this->userId));
+?>

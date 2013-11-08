@@ -149,6 +149,25 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("insitution", $institution);
     }
     
+  /** Get Submitter
+   * 
+   * @return UserDao
+   */
+  function getSubmitter()
+    {
+    $metadata = $this->getMetaDataByQualifier("submitter");
+    if(!$metadata) return false;
+    return MidasLoader::loadModel("User")->load($metadata->getValue());
+    }
+
+   /* Set Submitter
+   * @param 
+   */
+  function setSubmitter($userDao)
+    {
+    if($userDao) $this->setMetaDataByQualifier("submitter", $userDao->getKey());
+    }
+    
     
   /**
    * Get Revision

@@ -26,6 +26,7 @@ class Journal_AppController extends MIDAS_GlobalModule
    */
   public function preDispatch()
     {
+
     parent::preDispatch();
     
     // Select the module's layout

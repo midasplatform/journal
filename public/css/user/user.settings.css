@@ -1,0 +1,7 @@
+div#tabsSettings {
+width: auto!important;
+}
+
+div#tabsSettings .ui-tabs-panel {
+width: 96%!important;
+}
