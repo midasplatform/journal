@@ -19,14 +19,6 @@ $(function() {
 
   // Init Dynamic help ---------------
   InitHelpQtip();
-  if(json.global.dynamichelpAnimate)
-    {
-    TimerQtip();
-    }
-  else
-    {
-    StopTimerQtip();
-    }
 
   // Search Bar -----------------------
   // Live search

@@ -29,4 +29,27 @@ class Journal_LayoutComponent extends AppComponent
     $modulesConfig = Zend_Registry::get('configsModules');  
     return $modulesConfig['journal']->layout;
     }
+    
+  /**
+   * Get the url of the main log (RSS feed)
+   * @return string
+   */
+  public function getLogoUrl()
+    {    
+    $modulesConfig = Zend_Registry::get('configsModules');  
+    $fc = Zend_Controller_Front::getInstance();
+
+    if($modulesConfig['journal']->layout == "ij")
+      {
+      return UtilityComponent::getServerURL().$fc->getBaseUrl()."/privateModules/journal/public/images/logo.png";
+      }
+    else if($modulesConfig['journal']->layout == "osehra")
+      {
+      return UtilityComponent::getServerURL().$fc->getBaseUrl()."/privateModules/journal/public/images/osehra/logo.png";
+      }
+    else
+      {
+      return "";
+      }
+    }
 } // end class

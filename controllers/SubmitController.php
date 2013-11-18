@@ -27,7 +27,11 @@ class Journal_SubmitController extends Journal_AppController
   /** The first step of the submission process is  to select an issue */
   function selectissueAction()
     {
-    if(!$this->logged)$this->haveToBeLogged();
+    if(!$this->logged)
+      {
+      $this->renderScript("login.phtml");
+      return;
+      }
     $this->view->issues = MidasLoader::loadModel("Issue", 'journal')->findActiveIssues();
     foreach($this->view->issues as $key => $issue)
       {
@@ -39,7 +43,11 @@ class Journal_SubmitController extends Journal_AppController
   /** Form allowing the user to submit an article*/
   function indexAction()
     {    
-    if(!$this->logged)$this->haveToBeLogged();
+    if(!$this->logged)
+      {
+      $this->renderScript("login.phtml");
+      return;
+      }
     // load resource if it exists
     $item_id = $this->_getParam('itemId');  
     $revision_id = $this->_getParam('revisionId');  

@@ -250,11 +250,8 @@ echo $this->doctype()
       </div>
       <div class="Footer">
          <div class="text">
-          - <b><?php //echo $stat[0]
-          ?></b> users, <b><?php //echo $stat[1]
-          ?></b> publications, <b><?php // echo $stat[2];
-          ?></b> reviews -<br/>
-            <a href="<?php echo $this->webroot?>rss/rss.xml"><img border="0" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/feed-icon16x16.png" alt="RSS Feed"/></a>
+           <b><?php echo join(", ", $this->footerStats)?><br/>
+            <a href="<?php echo $this->webroot?>/jouranl/rss"><img border="0" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/feed-icon16x16.png" alt="RSS Feed"/></a>
            <br/>
            </div>
            <div class="copyright">

@@ -33,6 +33,27 @@ class Journal_AppController extends MIDAS_GlobalModule
     $this->_helper->layout->setLayoutPath(dirname(__FILE__)."/layouts");
     $this->_helper->layout->setLayout(MidasLoader::loadComponent("Layout", 'journal')->getLayoutName());
     $this->view->json['dynamicHelp'] = array();
+    
+    // Create footer stats
+    $cacheFile = UtilityComponent::getTempDirectory()."/mainStats.json";
+    if(file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
+      {
+      $cache = JsonComponent::decode(file_get_contents($cacheFile));
+      }
+    else
+      {
+      $items = count(MidasLoader::loadModel('Item')->getAll());
+      $users = count(MidasLoader::loadModel('User')->getAll());
+      $cache = array( (($items >1)? $items." items":$items." item"),
+              (($users >1)? $users." users":$users." user"));
+      $modulesReturns = Zend_Registry::get('notifier')->callback("CALLBACK_JOURNAL_GET_STATS", array());
+      foreach($modulesReturns as $return)
+        {
+        $cache = array_merge($cache, $return);
+        }      
+      file_put_contents($cacheFile, JsonComponent::encode($cache));
+      }
+    $this->view->footerStats = $cache;    
     }
   
   } //end class

@@ -250,26 +250,18 @@ echo $this->doctype()
       </div>
       <div class="Footer">
          <div class="text">
-          - <b><?php //echo $stat[0]
-          ?></b> users, <b><?php //echo $stat[1]
-          ?></b> publications, <b><?php // echo $stat[2];
-          ?></b> reviews -<br/>
-            <a href="<?php echo $this->webroot?>rss/rss.xml"><img border="0" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/feed-icon16x16.png" alt="RSS Feed"/></a>
+          <b><?php echo join(", ", $this->footerStats)?><br/>
+            <a href="<?php echo $this->webroot?>/journal/rss"><img border="0" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/feed-icon16x16.png" alt="RSS Feed"/></a>
            <br/>
            </div>
            <div class="copyright">
-           <img src="<?php echo $this->webroot ?>/privateModules/journal/public/images/kitware.gif" alt="Kitware Logo"/><br/>
-           Follow us on <a href="http://www.facebook.com/pages/Kitware/39961762296">Facebook</a>, <a href="http://www.youtube.com/kitware">YouTube</a>, <a href="http://www.flickr.com/kitware">Flickr</a>
-           and <a href="http://www.twitter.com/kitware">Twitter</a><br/>
-           -<br/>
+             <a href="http://osehra.org"><img src="<?php echo $this->webroot ?>/privateModules/journal/public/images/osehra/big-logo.jpg" alt="Kitware Logo"/></a><br/>
+         
+           <br/>
            MIDAS e-Journal 
            </div>
          </div>
-         <?php 
-           echo "<div class='issn'>";
-           echo "ISSN 2327-770X";
-           echo "</div>";
-          ?>
+         
          <div class="powered">
            Powered by <a href="http://midasplatform.org/">Midas</a>
            </div>
