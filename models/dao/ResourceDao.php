@@ -149,6 +149,101 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("insitution", $institution);
     }
     
+  /** Get Dislcaimer Id
+   * 
+   * @return 
+   */
+  function getDisclaimer()
+    {
+    $metadata = $this->getMetaDataByQualifier("disclaimer");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Dislcaimer Id
+   * @param 
+   */
+  function setDisclaimer($disclaimer)
+    {
+    $this->setMetaDataByQualifier("disclaimer", $disclaimer);
+    }
+    
+  /** Get Copyright
+   * 
+   * @return 
+   */
+  function getCopyright()
+    {
+    $metadata = $this->getMetaDataByQualifier("copyright");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Dislcaimer Id
+   * @param 
+   */
+  function setCopyright($copyright)
+    {
+    $this->setMetaDataByQualifier("copyright", $copyright);
+    }
+    
+  /** Get Related
+   * 
+   * @return 
+   */
+  function getRelated()
+    {
+    $metadata = $this->getMetaDataByQualifier("related_work");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Related work
+   * @param 
+   */
+  function setRelated($value)
+    {
+    $this->setMetaDataByQualifier("related_work", $value);
+    }
+    
+  /** Get Grant
+   * 
+   * @return 
+   */
+  function getGrant()
+    {
+    $metadata = $this->getMetaDataByQualifier("grant");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Grant
+   * @param 
+   */
+  function setGrant($value)
+    {
+    $this->setMetaDataByQualifier("grant", $value);
+    }
+    
+  /** Get Logo
+   * 
+   * @return 
+   */
+  function getLogo()
+    {
+    $metadata = $this->getMetaDataByQualifier("logo");
+    if(!$metadata) return '';
+    return MidasLoader::loadModel("Bitstream")->load($metadata->getValue());
+    }
+
+   /* Set Logo
+   * @param 
+   */
+  function setLogo($value)
+    {
+    $this->setMetaDataByQualifier("logo", $value->getKey());
+    }
+    
   /** Get Submitter
    * 
    * @return UserDao
@@ -179,6 +274,7 @@ class Journal_ResourceDao extends ItemDao
     return $this->_revision;
     }
     
+
   /**
    * Set Revision
    * @param ItemRevision

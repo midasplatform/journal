@@ -26,8 +26,8 @@ class Journal_ViewController extends Journal_AppController
     if(isset($actionName) && is_numeric($actionName))
       {
       $this->_forward('index', null, null, array('revisionId' => $actionName));
-      }
-    parent::init();    
+      }      
+    parent::init();   
     }    
         
   /** List all the journals */
@@ -35,6 +35,70 @@ class Journal_ViewController extends Journal_AppController
     {   
     $this->view->communities = MidasLoader::loadModel('Community')->getAll();
     }    
+    
+  function logoAction()
+    {
+    $revisionId = $this->_getParam("revisionId");
+    if(!isset($revisionId) || !is_numeric($revisionId))
+      {
+      throw new Zend_Exception("revisionId should be a number");
+      }
+    $revisionDao = MidasLoader::loadModel("ItemRevision")->load($revisionId);
+    if($revisionDao === false)
+      {
+      throw new Zend_Exception("This item doesn't exist.", 404);
+      }
+    $itemDao = $revisionDao->getItem();    
+    if(!MidasLoader::loadModel("Item")->policyCheck($itemDao, $this->userSession->Dao, MIDAS_POLICY_READ))
+      {
+      throw new Zend_Exception('Read permission required', 403);
+      }
+
+    $this->disableLayout();
+    $this->disableView();
+    header('Content-Type: image/jpeg');
+    header("Content-Disposition: attachment; filename=journal_".$revisionId.".jpg");
+      
+    $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
+    $resourceDao->setRevision($revisionDao);
+    $logo = $resourceDao->getLogo();
+    $img_src_resource = null;
+    $extension = strtolower(end(explode(".", $logo->getName())));
+    switch ( $extension ) {
+      case "jpg":
+      case "peg": 
+        $img_src_resource = imagecreatefromjpeg($logo->getFullPath());
+        break;
+      case "gif":
+        $img_src_resource = imagecreatefromgif($logo->getFullPath());
+        break;
+      case "png":
+        $img_src_resource = imagecreatefrompng($logo->getFullPath());
+        break;
+      default:
+        return;
+      }
+    list ($x, $y) = getimagesize($logo->getFullPath());  //--- get size of img ---
+    if(isset($_GET['size']) && is_numeric($_GET['size'])) $thumb = $_GET['size'];
+    else $thumb = 50;  //--- max. size of thumb ---
+    if($x > $y)
+      {
+      $tx = $thumb;  //--- landscape ---
+      $ty = round($thumb / $x * $y);
+      }
+    else
+      {
+      $tx = round($thumb / $y * $x);  //--- portrait ---
+      $ty = $thumb;
+      }
+
+    $thb = imagecreatetruecolor($tx, $ty);  //--- create thumbnail ---
+    imagecopyresampled($thb, $img_src_resource, 0, 0, 0, 0, $tx, $ty, $x, $y);
+    ob_start(); // start a new output buffer
+    imagejpeg( $thb, NULL, 100 );
+    ob_end_clean; // stop this output buffer
+    exit;
+    }
     
   /** Display a resource*/
   function indexAction()
@@ -59,6 +123,14 @@ class Journal_ViewController extends Journal_AppController
     $resourceDao->setRevision($revisionDao);
     
     MidasLoader::loadModel("Item")->incrementViewCount($resourceDao);
+    
+    if(isset($_POST['exportType']))
+      {
+      $this->disableLayout();
+      $this->disableView();
+      MidasLoader::loadComponent("Export", "journal")->citation($resourceDao, $_POST['exportType']);
+      return;
+      }
 
     // Send resource to the view
     $this->view->resource = $resourceDao;
@@ -76,4 +148,5 @@ class Journal_ViewController extends Journal_AppController
     $this->view->json['item']['isModerator'] = $this->view->isModerator;
     $this->view->json['modules'] = Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_VIEW_JSON', array('item' => $itemDao));
     }
+    
 }//end class

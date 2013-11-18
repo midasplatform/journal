@@ -144,9 +144,10 @@ function searchDatabase()
           {
           total = value.total;
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
-            'id':value.revisionId, 'title': value.title,
+            'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
             'authors': value.authors})
+
           })
                
           if(total > 1)
@@ -174,11 +175,17 @@ function addAndFormatResult(container, values) {
    {
    str = str.replace("{"+key+"}", value);
    str = str.replace("{"+key+"}", value);
+   str = str.replace("{"+key+"}", value);
    }
   );
   container.append(str);
   var newElement = $('div.SearchResultEntry:last');
   newElement.find('.ResultTitle').dotdotdot( {'height': 20});
+            
+  if(values.logo == "")
+    {
+    newElement.find('.ResultLogo').remove();
+    }
   newElement.find('.ResultDescription').dotdotdot();
   return str; 
 };

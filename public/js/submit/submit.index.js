@@ -9,7 +9,12 @@ $(document).ready(function(){
             closeBtn:false
         }]);
     }
-    
+   
+  $('select[name=disclaimer]').change(function(){
+    $('.disclaimer_description').hide();
+    $('#disclaimer_description_'+$(this).val()).show();    
+  })
+   
   $("#authors").dynamiclist();
   $("#tags").dynamiclist();
 
@@ -20,7 +25,6 @@ $(document).ready(function(){
     var i = 0;
      $('.categoryTree').each(function(){
        $.each($(this).dynatree("getSelectedNodes"), function(index, value){
-         console.log(value);
          if(!value.hasSubSel)
            {
            html += "<input name='category["+i+"]' type='hidden' value='"+value.data.key+"'/>";

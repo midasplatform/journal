@@ -24,8 +24,6 @@ class Journal_IndexController extends Journal_AppController
     {
     parent::init();    
     }
-   
-   
     
   /** Index (first page) action
    * This is the main page of the website whenre the articles are listed
@@ -44,8 +42,13 @@ class Journal_IndexController extends Journal_AppController
       $selectedIssueDao = MidasLoader::loadModel ('Folder')->load($_GET['issue']);
       $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($selectedIssueDao));
       }
+    else
+      {
+      $modulesConfig = Zend_Registry::get('configsModules');  
+      $community = MidasLoader::loadModel("Community")->load($modulesConfig['journal']->defaultcommunity);
+      }
     
-    if(isset($community))
+    if(isset($community) && $community)
       {
       $communityIssues = MidasLoader::loadModel ('Folder')->getChildrenFoldersFiltered($community->getFolder(), null, MIDAS_POLICY_READ,
                                                          "date_update", "asc", 100000, 0);
@@ -62,6 +65,7 @@ class Journal_IndexController extends Journal_AppController
         
         $this->view->issues[] = $issueDao;
         }
+
       }
     // send the tree to the JS files
     $this->view->json['trees'] = $this->view->tree;

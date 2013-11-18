@@ -103,6 +103,19 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         <tr>
           <td>
             <div class="submission">
+              <div class="title">Related work </div>
+              <div class="caption">Describe if your article has some references to previously published papers by other</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <textarea class="bigInput" data-required="true" name="related"><?php echo $this->resource->getRelated() ?></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="submission">
               <div class="title">Type of submission <span style="color:#A60000;">*</span></div>
               <div class="caption"></div>
             </div>
@@ -120,6 +133,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
             </select>
           </td>
         </tr>
+        
         <tr>
           <td>
             <div class="submission">
@@ -164,7 +178,52 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
               <a href="#" class="list-add">Add a tag</a>
             </div>
           </td>
-        </tr>        
+        </tr>   
+        <tr>
+          <td>
+            <div class="submission">
+              <div class="title">Copyright and Disclaimer</div>
+              <div class="caption"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td id="copyrightWrapper">            
+            <?php
+            if(!$this->resource->saved)
+              {?>
+              <span>Do you have the permission to submit the content of this article? <span style="color:#A60000;">*</span></span>
+                  <input type="radio" data-required="true" name="permission" id="PubPermissionsYes" value="yes"><label style="" for="PubPermissionsYes">Yes</label>
+                  <input type="radio" data-required="true" name="permission" id="PubPermissionsNo" value="no"><label for="PubPermissionsNo">No</label>
+              <br/>
+              <span>Do you accept the <a href="http://www.osehra.org/document/individual-contributor-licensing-agreement-v2" target="_blank">Contributor Licensing Agreement</a>? <span style="color:#A60000;">*</span></span>
+                  <input type="radio" data-required="true" name="cla" id="PubClaYes" value="yes"><label style="" for="PubClaYes">Yes</label>
+                  <input type="radio" data-required="true" name="cla" id="PubClaNo" value="no"><label for="PubClaNo">No</label><br/>
+             <?php
+              }?>
+            <span>Copyright holder:</span>
+            <textarea class="smallInput" style ="width:400px;" name="copyright"><?php echo $this->resource->getCopyright() ?></textarea><br/>
+            <span>Grant/Tracking number:</span>
+            <textarea class="smallInput" style ="width:400px;" name="grant"><?php echo $this->resource->getGrant() ?></textarea><br/>
+            <span>Select a disclaimer:</span>
+            <select name="disclaimer">
+              <option value="-1" <?php if ($this->resource->getDisclaimer() == -1) echo "selected"; ?>>No disclaimer</option>
+              <?php
+              foreach($this->disclaimers as $diclaimer)
+                {
+                echo '<option value="'.$diclaimer->getKey().'" ';
+                if ($this->resource->getDisclaimer() == $diclaimer->getKey()) echo "selected"; 
+                echo ">".$diclaimer->getName()."</option>";
+                }?>
+            </select>
+            <br/>
+            <?php
+            foreach($this->disclaimers as $diclaimer)
+              {
+              echo '<textarea class="disclaimer_description" style="display:none;width:895px;height:50px" id="disclaimer_description_'.$diclaimer->getKey().'">'.$diclaimer->getDescription().'</textarea>';
+              }?>
+          </td>
+        </tr>
 
         <tr>
           <td>

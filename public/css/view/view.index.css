@@ -174,5 +174,10 @@ div.Panel {
 }
 div.Panel h4{
   margin-bottom: 0px;
-  
+  border-bottom: 1px solid grey;
+}
+
+.share-icon {
+opacity: 0.5!important;
+filter: Alpha(Opacity=50)!important;
 }

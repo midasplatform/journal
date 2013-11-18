@@ -21,6 +21,11 @@ class Journal_NotificationComponent extends AppComponent
 {  
   public function sendForApproval($resourceDao)
     {
-    //TODO
+    //TODO & make sur note multiple notification
+    }
+    
+  public function newArticle($resourceDao)
+    {
+    
     }
 } // end class

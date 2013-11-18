@@ -50,19 +50,15 @@ foreach ($cssArray as $module => $list)
 
 
     <h4>Export citation:</h4> 
-    <!--
+    <ul><li>
     <form action="" method="post" name="form1" id="form1">
-      <select name="data[Export][select]">
-
-        <option value="bibtex">Bibtex</option>
-        <option value="txt">Text</option>
-        <option value="medline">Medline</option>
-        <option value="xml">XML</option>
+     <select name="exportType">
+      <option value="bibtex">Bibtex</option>
+      <option value="xml">XML</option>
       </select>
-      <input type="submit" name="data[Export][submit]" value="Export"/>
+      <input type="submit"  value="Export"/>
     </form>
-    -->
-
+    </li></ul>
 
     <h4>Statistics</h4> 
     <ul>
@@ -77,6 +73,14 @@ foreach ($cssArray as $module => $list)
 
     <h4>Information</h4> 
     <ul>
+      <?php
+      $articleType = array(RESOURCE_TYPE_SOFTWARE => "Software",
+         RESOURCE_TYPE_PLUGIN => "Plugin",
+         RESOURCE_TYPE_PUBLICATION => "Publication",
+         RESOURCE_TYPE_TUTORIAL => "Tutorial",
+         RESOURCE_TYPE_DATASET => "Dataset");?>
+       
+      <li>Type: <?php echo $articleType[$this->resource->getType()] ?></li>
       <li>Categories: <?php 
       $categories = $this->resource->getCategories();
       foreach($categories as &$category)   
@@ -94,8 +98,9 @@ foreach ($cssArray as $module => $list)
       <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>
     <h4>Share</h4> 
-
+    <ul style="list-style: none;"><li>
     <div id="shareDiv"></div>
+    </li></ul>
     
     <?php
     if($this->isAdmin || $this->isAuthor)
@@ -121,8 +126,8 @@ foreach ($cssArray as $module => $list)
   
   <div class="MainContent">
     <div id="publication">
+      <br/>
       <div class="title" >
-        <img class="typeLogo" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/typeIcon/<?php echo $this->resource->getType() ?>.png" />
         <?php echo $this->resource->getName() ?>       
       </div>
       <div class="authors"><?php 
@@ -134,7 +139,10 @@ foreach ($cssArray as $module => $list)
           <?php echo ucfirst($this->resource->getInstitution()) ?></a></div>
       <center>
         <?php
-        // TODO logo
+        if($this->resource->getLogo())
+          {
+          echo '<br/><img class="ResultLogo" src="'.$this->webroot.'/journal/view/logo/?revisionId='.$this->resource->getRevision()->getKey().'&size=300" /><br/>';
+          }
         //TODO handle        
         ?>
         Please use this identifier to cite or link to this publication:
@@ -151,7 +159,7 @@ foreach ($cssArray as $module => $list)
     </div> <!-- End publication -->
     
     <?
-    $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_REVIEW', array('resource' => $this->resource));
+    $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_REVIEW', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
     $element = end($elements);   
     if(is_array($element))
       {

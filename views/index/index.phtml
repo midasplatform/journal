@@ -65,18 +65,20 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
       <div class="SearchResultEntry box" id="{id}">
         <div class="ResultTop">
           <a class="resourceLink" href="<?php echo $this->webroot?>/journal/view/{id}"></a>
-          <img class="ResultLogo" src="<?php echo $this->webroot?>/privateModules/journal/public/images/typeIcon/{type}.png" />
+          
           <span class="ResultTitle">{title}</span>          
         </div>
         <div class="ResultAuthors">
           {authors}
         </div>
+        
         <div class="ResultDescription">
           {description}
         </div>
         <div class="ResultSubDescription">
-          {statistics}, {rating} stars
+          {statistics}
         </div>
+        <img class="ResultLogo" src="<?php echo $this->webroot?>/journal/view/logo/?revisionId={id}&size=64" />
       </div>
     </script>
   </div>  

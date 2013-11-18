@@ -151,7 +151,11 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao->setInstitution($_POST['institution']);     
       $resourceDao->setAuthors(array($_POST['firstname'], $_POST['lastname']));     
       $resourceDao->setCategories($_POST['category']);     
+      $resourceDao->setCopyright($_POST['copyright']);     
+      $resourceDao->setDisclaimer($_POST['disclaimer']);     
       $resourceDao->setTags($_POST['tag']);     
+      $resourceDao->setRelated($_POST['related']);     
+      $resourceDao->setGrant($_POST['grant']);     
               
       // Update search index
       Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_SAVED', array(
@@ -164,6 +168,7 @@ class Journal_SubmitController extends Journal_AppController
       
     // send the variables to the view 
     $this->view->resource = $resourceDao;
+    $this->view->disclaimers = MidasLoader::loadModel("Disclaimer", "journal")->getAll();
     
     // fetch all the keywords and send them to the view
     $this->view->json['trees'] = MidasLoader::loadComponent("Tree", "journal")->getAllTrees(false, $resourceDao->getCategories());
@@ -261,6 +266,7 @@ class Journal_SubmitController extends Journal_AppController
             if(is_numeric($type) && $bitstream->getName() == $file->name && (strtotime($bitstream->getDate()) + 5) >= strtotime(date("c")))
               {
               MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstream, $type);
+              if($type == BITSTREAM_TYPE_THUMBNAIL) $resourceDao->setLogo($bitstream);
               }
             }
           }
@@ -288,12 +294,17 @@ class Journal_SubmitController extends Journal_AppController
           {
           $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
           MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
+          MidasLoader::loadComponent("Notification", "journal")->newArticle($resourceDao);
           }
         elseif($private) // Send for approval
           {
           MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
           }
-        $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
+        else
+          {
+          MidasLoader::loadComponent("Notification", "journal")->newArticle($resourceDao);
+          $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
+          }
         return;
         }
       }

@@ -27,22 +27,52 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     </font>
   </div>
   <br/>   
-  <a class="createCommunity">Create Journal</a>
+  
+  <?php 
+  if($this->isAdmin)
+    {
+    echo '<a class="createCommunity">Create Journal</a>';
+    }
+    ?>
   
   <h4>Journals (also called communities):</h4>
   <ul>
     <?php
     foreach($this->communities as $community)
       {
-      echo "<li style='margin-bottom:10px;'>".$community->getName()." <a href='".$this->webroot."/community/manage/?communityId=".$community->getKey()."'>Manage</a>, 
-        <a href='".$this->webroot."/journal/admin/editissue?communityId=".$community->getKey()."'>Create Issue</a>";
+      $isEditor = $this->isAdmin
+              || !MidasLoader::loadModel('Group')->userInGroup($this->userDao, $community->getAdminGroup());
+      
+      $adminGroup = $community->getAdminGroup();
+
+      echo "<li style='margin-bottom:10px;'>".$community->getName();
+      if($this->isAdmin)
+        {
+        echo " <a href='".$this->webroot."/journal/admin/editor?groupId=".$adminGroup->getKey()."&name=".  urldecode("Journal: ".$community->getName())."'>Journal Editors</a>, ";
+        }
+      if($isEditor)
+        {
+        echo "<a href='".$this->webroot."/journal/admin/editissue?communityId=".$community->getKey()."'>Create Issue</a>";
+        }
       $folders = $community->getFolder()->getFolders();
       echo "<ul>";
       foreach($folders as $folder)
         {
         if($folder->getName() != "Public" && $folder->getName() !="Private")
           {
-          echo "<li>Issue: <a href='".$this->webroot."/journal/admin/editissue?folderId=".$folder->getKey()."'>".$folder->getName()."</a></li>";
+          $group = false;
+          foreach($folder->getFolderpolicygroup() as $policy)
+            {
+            if($policy->getPolicy() == MIDAS_POLICY_ADMIN && $adminGroup->getKey() != $policy->getGroupId())
+              {
+              $group = $policy->getGroup();
+              break;
+              }
+            }
+          echo "<li>Issue: ".$folder->getName();
+          if($isEditor && $group) echo " <a href='".$this->webroot."/journal/admin/editor?groupId=".$group->getKey()."&name=".  urldecode("Issue: ".$folder->getName())."'>Issue Editors</a>, ";
+          if($isEditor) echo " <a href='".$this->webroot."/journal/admin/editissue?folderId=".$folder->getKey()."'>Edit</a>";
+          echo "</li>";
           }
         }
       echo "</ul>";

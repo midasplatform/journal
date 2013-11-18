@@ -28,8 +28,35 @@ class Journal_AdminController extends Journal_AppController
   /** Manage journals and issues*/
   function issuesAction()
     {   
-    $this->requireAdminPrivileges();
+    if(!$this->logged)
+      {
+      throw new Zend_Exception("Please log in.", 404);
+      }
     $this->view->communities = MidasLoader::loadModel('Community')->getAll();
+    $this->view->isAdmin = $this->userSession->Dao->isAdmin();
+    }
+    
+  /** Manage journals and issues editors*/
+  function editorAction()
+    {   
+    $groupId = $this->_getParam('groupId');  
+    $group = MidasLoader::loadModel('Group')->load($groupId);
+    if($group === false)
+      {
+      throw new Zend_Exception("This group doesn't exist.", 404);
+      }
+      
+    $community = $group->getCommunity();
+    if(!$this->logged || !$this->userSession->Dao->isAdmin()
+            || !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup()))
+      {
+      throw new Zend_Exception("Permission error.", 404);
+      }
+
+    $this->view->group = $group;
+    $this->view->name = $this->_getParam('name');
+    $this->view->json['group'] = $group->toArray();
+    $this->view->json['community'] = $group->getCommunity()->toArray();
     }
     
   /** Edit help/faq content */
@@ -59,11 +86,48 @@ class Journal_AdminController extends Journal_AppController
       }      
     }
     
+  /** Edit disclaimers */
+  function disclaimerAction()
+    {
+    $this->requireAdminPrivileges();
+    $this->view->disclaimers = MidasLoader::loadModel("Disclaimer", "journal")->getAll();
+    }
+    
+  /** Edit disclaimers */
+  function editdisclaimerAction()
+    {
+    $this->requireAdminPrivileges();
+    $disclaimerId = $this->_getParam("disclaimerId");
+    
+    $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($disclaimerId);
+    if(!$disclaimer || !$disclaimer->saved) 
+      {
+      $disclaimer = MidasLoader::newDao("DisclaimerDao", "journal");
+      $disclaimer->setName("");
+      $disclaimer->setDescription("");
+      }
+            
+    if($this->_request->isPost())
+      {
+      if(isset($_POST['delete']) && !empty($_POST['delete']) && is_numeric($disclaimerId))
+        {
+        MidasLoader::loadModel("Disclaimer", "journal")->delete($disclaimer);
+        }
+      else
+        {
+        $disclaimer->setName($_POST['name']);
+        $disclaimer->setDescription($_POST['description']);
+        MidasLoader::loadModel("Disclaimer", "journal")->save($disclaimer);
+        }
+      $this->_redirect("/journal/admin/disclaimer");
+      }    
+    
+    $this->view->disclaimer = $disclaimer;
+    }
+    
   /** Edit an issue */
   function editissueAction()
-    {   
-    $this->requireAdminPrivileges();
-    
+    {       
     // load resource if it exists
     $folderId = $this->_getParam('folderId');  
     $communityId = $this->_getParam('communityId');  
@@ -71,10 +135,20 @@ class Journal_AdminController extends Journal_AppController
       {
       $folder = MidasLoader::loadModel("Folder")->load($folderId);
       $issueDao = MidasLoader::loadModel("Folder")->initDao("Issue", $folder->toArray(), "journal");
+      $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($folder));
       }   
     else
       {
       $issueDao = MidasLoader::newDao('IssueDao', 'journal');
+      $community = MidasLoader::loadModel("Community")->load($communityId);
+      }
+      
+    
+    if(!$community || !$this->logged 
+            || !$this->userSession->Dao->isAdmin()
+            || !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup()))
+      {
+      throw new Zend_Exception("Permission error.", 404);
       }
       
     if($this->_request->isPost())
@@ -87,6 +161,8 @@ class Journal_AdminController extends Journal_AppController
         $issueDao->setName($_POST['name']);
         MidasLoader::loadModel("Folder")->save($issueDao);
         $issueDao->InitValues();
+        $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
+        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($anonymousGroup, $issueDao, MIDAS_POLICY_READ);        
         $editorGroup = MidasLoader::loadModel("Group")->createGroup($community, "Issue_".$issueDao->getKey());
         MidasLoader::loadModel("Folderpolicygroup")->createPolicy($editorGroup, $issueDao, MIDAS_POLICY_ADMIN);
         }
@@ -114,6 +190,7 @@ class Journal_AdminController extends Journal_AppController
   /** Manage the categories*/
   function categoriesAction()
     {
+    $this->requireAdminPrivileges();
     // if add a new tree
     if($this->_request->isPost() && !empty($_POST['newtree']))
       {

@@ -111,7 +111,7 @@ span.FilterTip{
 
 /* Search Result template*/
 div.SearchResultEntry{
-  width:880px;
+  max-width:880px;
   height:97px;
   margin-left:5px;
   margin-bottom: 4px;
@@ -122,15 +122,17 @@ div.SearchResultEntry:hover{
 }
 
 div.SearchResultEntry img.ResultLogo{
-  float:left;
-  width:24px;
-  height:24px;
+  float: right;
+  max-width: 64px;
+  max-height: 64px;
+  margin-top: 23px;
+  margin-right: 5px;
 }
 div.SearchResultEntry span.ResultTitle{
   font-size: 16px;
   position: absolute;
   top:0px;
-  left:29px;
+  left:5px;
   width:800px;
   color: #374E9E;
   font-weight: bold;
@@ -138,7 +140,7 @@ div.SearchResultEntry span.ResultTitle{
 div.SearchResultEntry div.ResultAuthors{
   position: absolute;
   top:16px;
-  left:29px;
+  left:5px;
   width:800px;
   color: #374E9E;
   font-size: 12px;
@@ -148,7 +150,7 @@ div.SearchResultEntry div.ResultDescription{
   height: 61px;
   width: 880px;
   top:33px;
-  right:-5px;
+  left:5px;
 }
 div.SearchResultEntry div.ResultSubDescription{
   position:absolute;

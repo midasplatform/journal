@@ -1,5 +1,9 @@
 
 $(document).ready(function(){
+    $('#acceptRights').change(function(){
+      $('input[type=submit]').attr('disabled', !$(this).is(':checked'));
+    })
+    
     $('#typeFile').change(function(){$('#uploadContentBlock').show()});
     $('#fileupload').fileupload({
         url: json.global.webroot+"/journal/submit/uploadhandler",
@@ -27,8 +31,10 @@ $(document).ready(function(){
     $('a.deleteLink').click(function(){
       if(confirm("Do you want to delete the file?"))
         {
-        $.post(json.global.webroot+"/journal/submit/upload?revisionId="+json.revision, {deletebitstream: $(this).parent('li').attr('key')});
-        $(this).parent('li').remove();
+        $.post(json.global.webroot+"/journal/submit/upload?revisionId="+json.revision, {deletebitstream: $(this).parents('tr').attr('key')},function(){
+          window.location.reload();
+        });
+        
         }
     })
     

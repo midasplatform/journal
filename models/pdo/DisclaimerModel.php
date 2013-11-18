@@ -17,25 +17,23 @@
  *
  *=========================================================================*/
 
-require_once BASE_PATH.'/privateModules/journal/models/base/IssueBase.php';
+require_once BASE_PATH.'/privateModules/journal/models/base/DisclaimerBase.php';
 
-class Journal_IssueModel extends Journal_IssueModelBase
+class Journal_DisclaimerModel extends Journal_DisclaimerModelBase
 {
   /** 
-   * Return all the active issues which accept articles
-   * @return array of Issue Dao
+   * Get all the categories*
+   * @return array
    */
-  public function findActiveIssues()
-    {    
-    $rowset = $this->database->fetchAll($this->database->select()
-            ->where('paperdue_date > \''.date('c').'\''));
+  function getAll()
+    {
+    $rowset = $this->database->fetchAll($this->database->select());
     $results = array();
     foreach($rowset as $row)
       {
-      $folder = MidasLoader::loadModel("Folder")->load($row['folder_id']);
-      $results[] = MidasLoader::loadModel("Folder")->initDao("Issue", $folder->toArray(), "journal");
+      $results[] = $this->initDao('Disclaimer', $row, 'journal');
       }
     return $results;
     }
-    
+
 }  // end class

@@ -70,15 +70,14 @@ $(function() {
  }
  , function() {
   obj = $(this);
-  setTimeout(
-   "checkHover()",
-   400);
+  
  });
 
  $('#Nav > li > ul ').hover(function() {  
    inMenu = true;
   }
   , function() {
+    $(this).fadeOut('fast');
     inMenu = false;
   });
 

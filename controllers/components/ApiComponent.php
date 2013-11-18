@@ -76,7 +76,7 @@ class Journal_ApiComponent extends AppComponent
         $authors = join(", ", $resourceDao->getAuthorsFullNames());
         $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
         $items[] = array('total' => $totalResults, 'title' => $item->getName(), 'rating' => (float)$rating['average'],
-            'type' => $item->getType(), 'id' => $item->getKey(), 'description' => $item->getDescription(), 'authors' => $authors,
+            'type' => $item->getType(), 'logo' => $resourceDao->getLogo(), 'id' => $item->getKey(), 'description' => $item->getDescription(), 'authors' => $authors,
             'view' => $item->getView() ,'downloads' => $item->getDownload(), 'statistics' => $statistics,
             'revisionId' =>  $resourceDao->getRevision()->getKey());
         $count++;

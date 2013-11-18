@@ -10,6 +10,13 @@ div#info_title{
   width:400px;
 }
 
+#copyrightWrapper label{
+  display:inline;  
+}
+#copyrightWrapper input{
+  width:15px!important;  
+}
+
 .submission{
   position:relative;
   padding-top:30px;
@@ -30,7 +37,7 @@ div#info_title{
   position:absolute;
   bottom:0;
   right:-1;
-  width:700px;
+  width:900px;
   font-size: 80%;
   text-align: right;
   color: #999999;
@@ -38,15 +45,15 @@ div#info_title{
 }
 
 #submission input{
-  width:695px;
+  width:895px;
 }
 
 textarea.smallInput{
-  width:695px;
+  width:895px;
   height:16px;
 }
 textarea.bigInput{
-  width:695px;
+  width:895px;
   height:45px;
 }
 

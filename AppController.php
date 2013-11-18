@@ -16,7 +16,6 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-
 class Journal_AppController extends MIDAS_GlobalModule
   {
   public $moduleName='journal';
@@ -26,8 +25,9 @@ class Journal_AppController extends MIDAS_GlobalModule
    */
   public function preDispatch()
     {
-
+    ob_start(); 
     parent::preDispatch();
+    ob_clean(); 
     
     // Select the module's layout
     $this->_helper->layout->setLayoutPath(dirname(__FILE__)."/layouts");
@@ -36,4 +36,3 @@ class Journal_AppController extends MIDAS_GlobalModule
     }
   
   } //end class
-?>
