@@ -15,12 +15,42 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
       <td id="tdLeftPanel">
         <div id="divLeftPanel">
           <h4><?php echo ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW) ? "Peer Review": "Final Review"?></h4>
-          <p>
-            <?php echo $this->listArray['list']['description'] ?>
+          <p id="descriptionQuestionList">
+
           </p>
-          <p>
+          <p >
             Text about the certifications levels.
           </p>
+          <h4>Summary</h4>
+          <table id="summaryTable">
+            <thead>
+              <tr>
+                <th>Topic</th>
+                <th>Completed</th>
+                <th>Certification level</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            </tbody>
+            <tfoot>
+              <tr id="summaryProgress">
+                <td colspan="3">
+                  <progress value="0" max="100"></progress>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+          <h4>Comments</h4>
+          <textarea 
+            <?php
+            if(!$this->isEditable)echo 'readonly';
+            ?> 
+            id="globalComment"></textarea>
+          
+          <?php
+          if($this->isEditable)echo ' <input id="saveReview" type="button" value="Save"/>';
+          ?>
         </div>
       </td>
       <td id="tdRightPanel">
@@ -30,16 +60,15 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
           </select></h4>
           <div id="templateQuestion" style="display:none;">
             <div class="selectMultipleWrapper">
-              <select multiple size=4>
+              <select <?php   if(!$this->isEditable)echo 'disabled="disabled"';  ?> multiple size=4>
                 <option value="<?php echo OSERHAREVIEW_REVIEW_LOW ?>">Low</option>
                 <option value="<?php echo OSERHAREVIEW_REVIEW_MEDIUM ?>">Medium</option>
                 <option value="<?php echo OSERHAREVIEW_REVIEW_HIGH ?>">High</option>
                 <option value="<?php echo OSERHAREVIEW_REVIEW_NA ?>">N/A</option>
               </select>
             </div>
-            {description}<br/>
-            Comment: <textarea></textarea><br/>
-            Attach a file: <input type="file"/>
+            <span class="questionDescription">{description}</span><br/>
+            Comment: <textarea <?php   if(!$this->isEditable)echo 'readonly';  ?> ></textarea><br/>
           </div>
         </div>        
       </td>

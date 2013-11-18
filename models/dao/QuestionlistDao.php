@@ -15,6 +15,7 @@ class Reviewosehra_QuestionlistDao extends AppDao
   public function toArray()
     {    
     $array = array('list' => parent::toArray(), 'topics' => array());
+    $array['list']['comment'] = "";
     $topics = $this->getTopics();
     foreach($topics as $topic)
       {
@@ -27,9 +28,9 @@ class Reviewosehra_QuestionlistDao extends AppDao
         $questionArrayTmp['attachfileValue'] = "";
         $questionArrayTmp['commentValue'] = "";
         $questionArrayTmp['value'] = "0";
-        $topicArray['questions'][] = $questionArrayTmp;
+        $topicArray['questions'][(string) $question->getkey()] = $questionArrayTmp;
         }
-      $array['topics'][] = $topicArray;
+      $array['topics'][(string) $topic->getkey()] = $topicArray;
       }
     return $array;
     }

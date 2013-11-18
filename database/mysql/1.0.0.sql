@@ -30,10 +30,9 @@ CREATE TABLE IF NOT EXISTS `reviewosehra_review` (
   `review_id` int(11) NOT NULL AUTO_INCREMENT,
   `revision_id` int(11) NOT NULL ,
   `user_id` int(11) NOT NULL,
-  `comment` text NOT NULL,
-  `name` varchar(512) NOT NULL,
-  `descripion` text NOT NULL,
+  `type` int(11) NOT NULL,
   `content` text NOT NULL,
+  `cache_summary` text NOT NULL,
   `complete` tinyint(4) NOT NULL,
   PRIMARY KEY (`review_id`)
 )   DEFAULT CHARSET=utf8;

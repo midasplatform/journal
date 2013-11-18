@@ -16,7 +16,7 @@ class Reviewosehra_Notification extends ApiEnabled_Notification
     $return['action'] = "index";
     $return['controller'] = "index";
     $return['module'] = "reviewosehra";
-    $return['params'] = array('reviewId' => $params['resource']->getRevision()->getKey());
+    $return['params'] = array('revisionId' => $params['resource']->getRevision()->getKey(), "isAdmin" => $params['isAdmin']);
     return $return;
     }
     
