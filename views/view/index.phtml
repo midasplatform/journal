@@ -17,6 +17,7 @@
  *
  *=========================================================================*/
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/jquery-share/jquery.share.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.pack.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/view/view.index.js');
 
 $cssArray = Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_VIEW_CSS', array('item' => $this->resource));
@@ -39,6 +40,7 @@ foreach ($cssArray as $module => $list)
 ?>
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/view/view.index.css" rel="stylesheet" />
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/jquery-share/jquery.share.css" rel="stylesheet" />
+<LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
 <div class="ContentWithRightPanel">
   <div class="Panel">
 
@@ -167,11 +169,31 @@ foreach ($cssArray as $module => $list)
       }?>
     <h4>Comments</h4>
     <?php
-    echo '<div id="commentsContainer">';
+    echo '<div id="commentsContainer" >';
     echo $this->element("comment", "comments");
     echo '</div>';
     ?>    
   </div>  
 </div>
 
-<div style="display:none" id="termFrequency"><?php echo $this->termFrequency ?></div>
+
+<?php
+if($this->resource->getDisclaimer() != -1)
+  {
+  $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($this->resource->getDisclaimer());
+  if($disclaimer)
+    {
+    echo '<div id="disclaimerWrapper" style="display:none;width:700px;"><h4>Disclaimer</h4>';
+    echo "<pre>".$disclaimer->getDescription().'</pre>';
+    echo "<br>
+      <table style='width:140px;margin:auto;'>
+        <tbody><tr>
+           <td> <a href='#' onclick='$.fancybox.close();'>Agree</a></td>
+              <td>|</td>
+               <td><div align='center'><a href='".$this->webroot."/journal'>Decline</a></div></td>
+            
+          </tr>
+        </tbody></table>";
+    echo "</div>";
+    }  
+  }

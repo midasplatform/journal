@@ -2,13 +2,16 @@
 $(document).ready(function(){
   
   if(json.showlicence == 1)
-    {
+  {
     $.fancybox.open([
-        {
-            href : '#licenseWrapper',
-            closeBtn:false
-        }]);
-    }
+    {
+      href : '#licenseWrapper',
+      closeBtn:false,
+      keys : {
+        close  : null
+      }
+    }]);
+  }
    
   $('select[name=disclaimer]').change(function(){
     $('.disclaimer_description').hide();
@@ -18,26 +21,26 @@ $(document).ready(function(){
   $("#authors").dynamiclist();
   $("#tags").dynamiclist();
 
-   $('#submitForm').submit(function(){      
+  $('#submitForm').submit(function(){      
     // Convert tree selection to html form
     $('div#treeInputs').html()
     var html = '';
     var i = 0;
-     $('.categoryTree').each(function(){
-       $.each($(this).dynatree("getSelectedNodes"), function(index, value){
-         if(!value.hasSubSel)
-           {
-           html += "<input name='category["+i+"]' type='hidden' value='"+value.data.key+"'/>";
-           i++;
-           }
-       });
-     })
-   $('div#treeInputs').html(html);
+    $('.categoryTree').each(function(){
+      $.each($(this).dynatree("getSelectedNodes"), function(index, value){
+        if(!value.hasSubSel)
+        {
+          html += "<input name='category["+i+"]' type='hidden' value='"+value.data.key+"'/>";
+          i++;
+        }
+      });
+    })
+    $('div#treeInputs').html(html);
     return true;
   });
   // Create the root html element of each tree
   $.each(json.trees, function(key, tree)
-    {
+  {
     tree = FixTreeObjects(tree);
     $('#treeWrapper').append('<div class="TreeEntry"><b>'+tree.title+' </b><br/><div id="categoryTree-'+tree.key+'" class="categoryTree"></div>');    
     /* Init trees */
@@ -47,38 +50,48 @@ $(document).ready(function(){
       children: tree,
       cookieId: "dynatreeEdit-"+key,
       idPrefix: "dynatreeEdit-"+key
-      });
     });
+  });
   
   // Init internal autocomplete search
   $( "#internalResource" ).autocomplete({
-     source: function( request, response ) {
-        var postRequest = {query:"string-portal.enable:true AND name:"+request.term+"*",
-          "displayOffset":0, "solrOffset":0, "limit":10
-       }
-
-        request.term = "enable:true AND "+request.term;
-        var term = request.term;
-       
-        $("#searchloading").show();
-        lastXhr = $.getJSON( $('.webroot').val()+"/solr/advanced/submit", postRequest, function( data, status, xhr ) {
-          $("#searchloading").hide();
-          if ( xhr === lastXhr ) {
-            itemselected = false;
-            var items = data.items;
-            $.each(items, function(index, value){
-              items[index] = {"id": value.id, "label": value.name, "value": value.name};
-            });
-            response( items);
-          }
-          });
-       },
-      minLength: 2,
-      select: function( event, ui ) {
-        json.submit.associated.push({'item_id': ui.item.id, 'name':ui.item.value })
-        initAssociatedResouces();
+    source: function( request, response ) {
+      var postRequest = {
+        query:"string-portal.enable:true AND name:"+request.term+"*",
+        "displayOffset":0, 
+        "solrOffset":0, 
+        "limit":10
       }
-    });
+
+      request.term = "enable:true AND "+request.term;
+      var term = request.term;
+       
+      $("#searchloading").show();
+      lastXhr = $.getJSON( $('.webroot').val()+"/solr/advanced/submit", postRequest, function( data, status, xhr ) {
+        $("#searchloading").hide();
+        if ( xhr === lastXhr ) {
+          itemselected = false;
+          var items = data.items;
+          $.each(items, function(index, value){
+            items[index] = {
+              "id": value.id, 
+              "label": value.name, 
+              "value": value.name
+              };
+          });
+          response( items);
+        }
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      json.submit.associated.push({
+        'item_id': ui.item.id, 
+        'name':ui.item.value
+      })
+      initAssociatedResouces();
+    }
+  });
   
   
   // New resource creation ( reset form and display it)
@@ -89,7 +102,10 @@ $(document).ready(function(){
   
   // New external resource
   $("input#saveResource").click(function(){
-    json.submit.associated.push({'item_id': $('#urlResource').val()+";;"+$('#typeResource').val()+";;"+$('#nameResource').val(), 'name': $('#nameResource').val()})
+    json.submit.associated.push({
+      'item_id': $('#urlResource').val()+";;"+$('#typeResource').val()+";;"+$('#nameResource').val(), 
+      'name': $('#nameResource').val()
+      })
     initAssociatedResouces();
     return false;
   })
@@ -103,35 +119,35 @@ $(document).ready(function(){
     return split( term ).pop();
   } 
   $( "#tags" )
-    // don't navigate away from the field on tab when selecting an item
-    .bind( "keydown", function( event ) {
-      if ( event.keyCode === $.ui.keyCode.TAB &&
-          $( this ).data( "ui-autocomplete" ).menu.active ) {
-        event.preventDefault();
-      }
-    })
-    .autocomplete({
-      minLength: 0,
-      source: function( request, response ) {
-        // delegate back to autocomplete, but extract the last term
-        response( $.ui.autocomplete.filter(
-          json.submit.keywords, extractLast( request.term ) ) );
-      },
-      focus: function() {
-        // prevent value inserted on focus
-        return false;
-      },
-      select: function( event, ui ) {
-        var terms = split( this.value );
-        // remove the current input
-        terms.pop();
-        // add the selected item
-        terms.push( ui.item.value );
-        // add placeholder to get the comma-and-space at the end
-        terms.push( "" );
-        this.value = terms.join( ", " );
-        return false;
-      }
-    });
+  // don't navigate away from the field on tab when selecting an item
+  .bind( "keydown", function( event ) {
+    if ( event.keyCode === $.ui.keyCode.TAB &&
+      $( this ).data( "ui-autocomplete" ).menu.active ) {
+      event.preventDefault();
+    }
+  })
+  .autocomplete({
+    minLength: 0,
+    source: function( request, response ) {
+      // delegate back to autocomplete, but extract the last term
+      response( $.ui.autocomplete.filter(
+        json.submit.keywords, extractLast( request.term ) ) );
+    },
+    focus: function() {
+      // prevent value inserted on focus
+      return false;
+    },
+    select: function( event, ui ) {
+      var terms = split( this.value );
+      // remove the current input
+      terms.pop();
+      // add the selected item
+      terms.push( ui.item.value );
+      // add placeholder to get the comma-and-space at the end
+      terms.push( "" );
+      this.value = terms.join( ", " );
+      return false;
+    }
+  });
   
 });
