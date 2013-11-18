@@ -52,13 +52,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
           <textarea name="short_description" ><?php echo $this->issue->getShortDescription()?></textarea>
       </td>    
     </tr>    
-    <tr>      
-      <td valign="top">
-        <div align="right"><strong>Introductory Text:</strong>
-        </div></td>      <td>
-        <textarea name="introductory_text" ><?php echo $this->issue->getIntroductoryText()?></textarea>
-      </td>    
-    </tr>    
+    
     <tr>         
     </tr>    
     <tr>      
@@ -93,17 +87,17 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
               return $results;
               }
 
-            $licenses = dirList("licenses");
+            $licenses = dirList(BASE_PATH."/privateModules/journal/licenses");
             foreach($licenses as $license)
                 {
-                $text = file_get_contents("licenses/".$license);
+                $text = file_get_contents(BASE_PATH."/privateModules/journal/licenses/".$license);
                 echo "<option value=\"".htmlentities($text)."\"";
                 echo ">".str_replace(".txt","",$license)."</option>";
                 }
                 ?> 
           </select> 
          <br/> or modify the following text:<br/>
-         <textarea name="authorLicense"><?php echo $this->issue->getAuthorLicense()?></textarea>
+         <textarea name="authorLicense" id="authorLicense"><?php echo $this->issue->getAuthorLicense()?></textarea>
        </td>
     </tr>
     
@@ -115,17 +109,17 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         <select onchange="ChangeReaderLicense(this.value)" name="copyrightmenu">
         <option>Choose...</option>
         <?php
-            $licenses = dirList("licenses/copyrights");
+            $licenses = dirList(BASE_PATH."/privateModules/journal/licenses/copyrights");
             foreach($licenses as $license)
                 {
-                $text = file_get_contents("licenses/copyrights/".$license);
+                $text = file_get_contents(BASE_PATH."/privateModules/journal/licenses/copyrights/".$license);
                 echo "<option value=\"".htmlentities($text)."\"";
                 echo ">".str_replace(".txt","",$license)."</option>";
                 }
                 ?> 
           </select> 
           <br/>or modify the following text:<br/>
-          <textarea name="readerLicense" ><?php echo $this->issue->getRedearLicense()?></textarea>
+          <textarea name="readerLicense" id="readerLicense"><?php echo $this->issue->getReaderLicense()?></textarea>
      </td>
     </tr>
     

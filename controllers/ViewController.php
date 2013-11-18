@@ -36,6 +36,15 @@ class Journal_ViewController extends Journal_AppController
     $this->view->communities = MidasLoader::loadModel('Community')->getAll();
     }    
     
+  /** Show issue information (ajax) */
+  function issueAction()
+    {
+    $this->disableLayout();
+    $folderId = $this->_getParam('folderId');  
+    $folder = MidasLoader::loadModel("Folder")->load($folderId);
+    $this->view->issue = MidasLoader::loadModel("Folder")->initDao("Issue", $folder->toArray(), "journal");
+    }
+    
   function logoAction()
     {
     $revisionId = $this->_getParam("revisionId");

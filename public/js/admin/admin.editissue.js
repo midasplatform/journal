@@ -13,3 +13,13 @@ $(document).ready(function(){
     formatSubmit: 'yyyy-mm-dd'
   })
 });
+
+function ChangeAuthorLicense(value)
+  { 
+  $('#authorLicense').val(value);
+  }
+  
+function ChangeReaderLicense(value)
+  {
+  $('#readerLicense').val(value);
+  }  

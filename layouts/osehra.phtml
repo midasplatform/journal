@@ -110,13 +110,7 @@ echo $this->doctype()
         <div id="title">
           OSEHRA Technical Journal
         </div>
-        <div id="about">
-        <a href="<?php echo $this->webroot."/journal/help/about"?>">About</a>
-          <?php if(!$this->logged)
-            {?>
-          <a href="<?php echo $this->webroot."/register/register"?>" class="register">Register</a>
-          <?php } ?>
-          </div>
+
         <div id="toplogin">
         <?php
         if(!$this->logged)
@@ -126,15 +120,28 @@ echo $this->doctype()
             Password: <input name="password" type="password"/>
             <input name="submit"  class="login" type="image" src="<?php echo $this->webroot.'/privateModules/journal/public/images/login.png'?>" alt="login"/>
           </form>
-        <br/> <div style="position:absolute;right:0px;"><a style="position:relative;top:2px;left:-8px;font-size:12px;color:white;" href='<?php echo $this->webroot?>/googleoauth/user/login'>
-                  Sign in with your Google Account <img style='border:none;position:relative;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/google_icon.png"/></a></div>
-        <?php           
+        <br/> <div style="position:absolute;right:0px;">          
+           
+
+          <div style="position:relative;top:7px;left:-8px;font-size:11px;color:white;">
+          <a href="<?php echo $this->webroot."/journal/help/about"?>">About</a>
+           <a style="margin-left: 7px;padding-left: 7px;border-left: 1px solid grey;" href="<?php echo $this->webroot."/register/register"?>" class="register">Register</a>
+          <a style="margin-left: 7px;padding-left: 7px;border-left: 1px solid grey;"  href='<?php echo $this->webroot?>/googleoauth/user/login'>
+                  Sign in with your Google Account <img style='top:-2px;border:none;position:relative;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/google_icon.png"/></a></div>
+         </div>
+      <?php           
           }
         else
         { ?>
         Welcome <?php echo $this->userDao->getFullName() ?>  |     <a href="<?php echo $this->webroot ?>/user/logout" class="logout">Logout</a>
+          <div style="position:absolute;right:0px;">          
+            <div style="position:relative;top:7px;left:-8px;font-size:11px;color:white;">
+            <a href="<?php echo $this->webroot."/journal/help/about"?>">About</a>
+            </div>
+          </div>
         <?php }?>
-              </div>
+        
+           </div>
         </div>
           <div id="topbar"><ul id="Nav" class="nav"><li id='browseLink'><a href="<?php echo $this->webroot ?>/journal">Home</a></li>
 

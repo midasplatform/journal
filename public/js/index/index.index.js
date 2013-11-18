@@ -17,6 +17,8 @@ $(document).ready(function(){
     );
   });
   
+  $('.issuePage').fancybox({type: 'ajax'});
+  
   // Create the root html element of each tree
   $.each(json.trees, function(key, tree)
     {
@@ -44,11 +46,13 @@ $(document).ready(function(){
     var key = parseInt($(this).attr('key'));
     $('.issueSelected').each(function(){
       $(this).removeClass('issueSelected');
+      $(this).find('.issueDetails').hide();
     })
     if(selectIssue == key) selectIssue = false;
     else
       {
       $(this).addClass('issueSelected');
+      $(this).find('.issueDetails').show();
       selectIssue = key;
       }
     searchDatabase();
@@ -136,6 +140,7 @@ function searchDatabase()
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
         args: "query="+fullQuery,
+        log: true,
         success: function (retVal) {
           $('img#searchLoadingImg').hide();
           var total = 0;

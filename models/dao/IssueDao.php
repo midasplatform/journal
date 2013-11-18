@@ -114,7 +114,7 @@ class Journal_IssueDao extends FolderDao
   function getIntroductoryText(){$this->initValues();return $this->introductory_text;}
   function getRelatedLink(){$this->initValues();return $this->related_link;}
   function getAuthorLicense(){$this->initValues();return $this->authorLicense;}
-  function getRedearLicense(){$this->initValues();return $this->readerLicense;}
+  function getReaderLicense(){$this->initValues();return $this->readerLicense;}
   
   function setPaperdueDate($v){$this->initValues();$this->paperdue_date = $v;}
   function setDefaultPolicy($v){$this->initValues();$this->defaultpolicy = $v;}
@@ -125,7 +125,7 @@ class Journal_IssueDao extends FolderDao
   function setShortDescription($v){$this->initValues();$this->short_description = $v;}
   function setIntroductoryText($v){$this->initValues();$this->introductory_text = $v;}
   function setAuthorLicense($v){$this->initValues();$this->authorLicense = $v;}
-  function setRedearLicense($v){$this->initValues();$this->readerLicense = $v;}
+  function setReaderLicense($v){$this->initValues();$this->readerLicense = $v;}
   }
 
   

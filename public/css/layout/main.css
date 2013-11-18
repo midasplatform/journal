@@ -300,7 +300,7 @@ HEADER
   position:relative;
   font-weight:bold;
   padding: 0px;
-  height: 24px;
+  height: 26px;
   padding-right:3px;
   background-repeat:no-repeat;
   background-position:bottom left;
@@ -588,11 +588,19 @@ div.Header div.HeaderSearch a#advancedSearchLink{
 }
 
 div.Header div.HeaderSearch input#live_search{
-  background: white url(../../images/layout/search.png) no-repeat scroll 3px 2px;
+  color:white;
+  background: black url(../../images/layout/search.png) no-repeat scroll 3px 5px;
   font-size: 12px;
   opacity: 0.9;
-  padding: 0px 10px 3px 24px;
-  width: 250px;
+  border:none;
+  padding: 6px 10px 5px 24px;
+  width: 150px;
+  position:relative;
+  right:-3px;
+  -moz-border-radius: 0px 0px 0px 6px;
+  -webkit-border-radius: 0px 0px 0px 6px;
+  -khtml-border-radius: 0px 0px 0px 6px;
+  border-radius: 0px 0px 6px 0px;
 }
 
 #searchloading{

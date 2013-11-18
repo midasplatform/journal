@@ -19,9 +19,11 @@
 
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/index/index.index.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dynatree/jquery.dynatree.min.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.pack.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dodotdot.1.5.9.js');
 ?>
 <link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/css/index/index.index.css" rel="stylesheet" />
+<LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
 <link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
 <div class="ContentWithLeftPanel">
   <div class="Panel box">
@@ -39,13 +41,20 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         if($issue->active)
           {
           echo "<div qtipconditionnal=\"".$issue->getName()."\" class='issueTitle issueActive'>".$issue->getName()."</div>";
-          echo "<div class='issueSubTitle'>Active: ".date("m.d.y", strtotime($issue->getPaperdueDate()))." (Paperdue)</div>";
+          echo "<div class='issueSubTitle'><b>Active: ".date("m.d.y", strtotime($issue->getPaperdueDate()))." (Paperdue)</b></div>";
           }
         else
           {
           echo "<div qtipconditionnal=\"".$issue->getName()."\" class='issueTitle'>".$issue->getName()."</div>";
           echo "<div class='issueSubTitle'>Completed</div>";
           }
+        echo "<div class='issueDetails'>";
+        echo "<a class='issuePage' href='".$this->webroot."/journal/view/issue?folderId=".$issue->getKey()."'>Show details</a><br/>";
+        if($issue->active)
+          {
+          echo "<a href='".$this->webroot . "/journal/submit/?issue=" . $issue->getKey()."'>Submit a new article</a>";
+          }
+        echo "</div>";
         echo "</div>";
         }
       }

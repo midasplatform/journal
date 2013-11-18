@@ -1,0 +1,45 @@
+<?php
+/*=========================================================================
+ *
+ *  Copyright OSHERA Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+
+?>
+<div style="width:700px;">   
+  <h2><?php echo $this->issue->getName()?></h2>
+  <?php
+  $description = $this->issue->getShortDescription();
+  if(!empty($description)) echo '<pre>'.$description.'</pre>';?>
+  
+  <h3 style="margin-bottom: 0px;">Dates:</h3>
+  <p>
+    <b>Paper due</b>: <?php echo str_replace(" 00:00:00", "",$this->issue->getPaperdueDate())?><br/>
+    <b>Decision</b>: <?php echo str_replace(" 00:00:00", "",$this->issue->getDecisionDate())?><br/>
+    <b>Publication</b>: <?php echo str_replace(" 00:00:00", "",$this->issue->getPublicationDate())?><br/>
+  </p>
+       
+  <?php
+  $author = $this->issue->getAuthorLicense();
+  $reader = $this->issue->getReaderLicense();
+  if(!empty($author)) echo "<b>Publisher license</b><br/><textarea readonly style='width:95%;height:50px;'>".$author."</textarea><br/>";
+    if(!empty($reader)) echo "<b>Author license</b><br/><textarea readonly style='width:95%;height:50px;'>".$reader."</textarea><br/>";
+  ?>
+  
+  
+  
+  <h3 style="margin-bottom: 0px;">More Information:</h3>
+  <p><?php echo $this->issue->getRelatedLink()?></p>
+</div>
