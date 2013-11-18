@@ -16,7 +16,9 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-
+function makeClickableLinks($s) {
+  return preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $s);
+}
 ?>
 <div style="width:700px;">   
   <h2><?php echo $this->issue->getName()?></h2>
@@ -39,7 +41,13 @@
   ?>
   
   
+  <?php 
+  $related = $this->issue->getRelatedLink();
+  if(!empty($related))
+    {
+    echo '  <h3 style="margin-bottom: 0px;">More Information:</h3>';
+    echo "<p>".makeClickableLinks($related)."</p>";
+    }
+    ?>
   
-  <h3 style="margin-bottom: 0px;">More Information:</h3>
-  <p><?php echo $this->issue->getRelatedLink()?></p>
 </div>
