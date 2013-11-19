@@ -48,7 +48,8 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
       echo "<li style='margin-bottom:10px;'>".$community->getName();
       if($this->isAdmin)
         {
-        echo " <a href='".$this->webroot."/journal/admin/editor?groupId=".$adminGroup->getKey()."&name=".  urldecode("Journal: ".$community->getName())."'>Journal Editors</a>, ";
+        echo " <a href='".$this->webroot."/journal/admin/groupusers?groupId=".$adminGroup->getKey()."&showmembers=1&name=".  urldecode("Journal: ".$community->getName())."'>Journal Editors and Members</a>, ";
+        echo " <a href='".$this->webroot."/community/manage?communityId=".$community->getKey()."'>Manage Journal (Midas view)</a>, ";
         }
       if($isEditor)
         {
@@ -70,7 +71,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
               }
             }
           echo "<li>Issue: ".$folder->getName();
-          if($isEditor && $group) echo " <a href='".$this->webroot."/journal/admin/editor?groupId=".$group->getKey()."&name=".  urldecode("Issue: ".$folder->getName())."'>Issue Editors</a>, ";
+          if($isEditor && $group) echo " <a href='".$this->webroot."/journal/admin/groupusers?groupId=".$group->getKey()."&name=".  urldecode("Issue: ".$folder->getName())."'>Issue Editors</a>, ";
           if($isEditor) echo " <a href='".$this->webroot."/journal/admin/editissue?folderId=".$folder->getKey()."'>Edit</a>";
           echo "</li>";
           }

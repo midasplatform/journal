@@ -75,6 +75,12 @@ foreach ($cssArray as $module => $list)
 
     <h4>Information</h4> 
     <ul>
+       <?php
+      if($this->isPrivate)
+        {
+        echo "<li>Private article</li>";
+        }
+        ?>
       <?php
       $articleType = array(RESOURCE_TYPE_SOFTWARE => "Software",
          RESOURCE_TYPE_PLUGIN => "Plugin",
@@ -147,7 +153,13 @@ foreach ($cssArray as $module => $list)
           }
         //TODO handle        
         ?>
-        Please use this identifier to cite or link to this publication:
+        Please use this identifier to cite or link to this publication: <br/>
+        <?php
+        if(!$this->isApproved)
+          {
+          echo "<span style='font-weight:bold;color:red;'>This article is waiting for approval</span>";
+          }
+          ?>
       </center>
       <br/>
       <div class="journal">

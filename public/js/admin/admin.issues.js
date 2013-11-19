@@ -9,14 +9,19 @@ $(document).ready(function(){
                   $('div.MainDialogContent').html(data);
                   $('div.MainDialogLoading').hide();
                   $('.dialogTitle').hide();
-                  $('div.MainDialogContent .radioElement').hide();
+                  $('div.MainDialogContent .radioElement #canJoinDiv').hide();
+                  $('div.MainDialogContent .radioElement label').each(function(){
+                    var content = $(this).html();
+                    content = content.replace("community", "journal");
+                    $(this).html(content);
+                  })
                   $('div.MainDialogContent form').submit(function(){
                     $.post($('.webroot').val() + "/community/create",
                       {
                       name : $('div.MainDialogContent input#name').val(),
                       description : $('div.MainDialogContent #description').val(),
-                      privacy: 0,
-                      canJoin: 1                      
+                      privacy: $('input[name=privacy]').val(),
+                      canJoin: 0                      
                       }, function(){
                         window.location.reload();
                       })

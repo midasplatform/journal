@@ -1,16 +1,13 @@
 // When page ready
-$(document).ready(function(){
-  
-   $('input').iCheck({
-    checkboxClass: 'icheckbox_minimal',
-    radioClass: 'iradio_minimal',
-    increaseArea: '20%' // optional
-  });
-  
+$(document).ready(function(){  
   $('.datepicker').pickadate({
     clear: 'Clear selection',
     format: 'yyyy-mm-dd',
     formatSubmit: 'yyyy-mm-dd'
+  })
+  
+  $('form').submit(function(){
+    $("input").attr('disabled', false);
   })
 });
 

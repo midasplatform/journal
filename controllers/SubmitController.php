@@ -37,6 +37,10 @@ class Journal_SubmitController extends Journal_AppController
       {
       $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
       if(isset($_GET['community']) && $community->getKey() !=  $_GET['community']) unset($this->view->issues[$key]);
+      if(!$community || !MidasLoader::loadModel("Community")->policyCheck($community, $this->userSession->Dao))
+        {
+        unset($this->view->issues[$key]);
+        }
       }
     }
     
@@ -149,11 +153,6 @@ class Journal_SubmitController extends Journal_AppController
             MidasLoader::loadModel("Itempolicygroup")->createPolicy($policy->getGroup(), $resourceDao, MIDAS_POLICY_ADMIN);
             }
           }
-        
-        if($resourceDao->isAdmin($this->userSession->Dao))
-          {
-          MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
-          }
         }            
       
       $resourceDao->setInstitution($_POST['institution']);     
@@ -244,11 +243,15 @@ class Journal_SubmitController extends Journal_AppController
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
     $resourceDao->setRevision($revision);
     
+    $issue =  end($resourceDao->getFolders());
+    $community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
+    $memberGroup = $community->getMemberGroup();
+    
     // Check if public or private (If private, it means it requires approval
     $private = true;
     foreach($resourceDao->getItempolicygroup() as $policy)
       {
-      if($policy->getGroupId() == MIDAS_GROUP_ANONYMOUS_KEY)
+      if($policy->getGroupId() == $memberGroup->getKey())
         {
         $private = false;
         break;
@@ -301,18 +304,18 @@ class Journal_SubmitController extends Journal_AppController
         if($private && $resourceDao->isAdmin($this->userSession->Dao)) // Approve
           {
           $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
-          MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
+          if($community->getPrivacy() != MIDAS_COMMUNITY_PRIVATE) 
+            {
+            MidasLoader::loadModel("Itempolicygroup")->createPolicy($anonymousGroup, $resourceDao, MIDAS_POLICY_READ);
+            }
+          MidasLoader::loadModel("Itempolicygroup")->createPolicy($memberGroup, $resourceDao, MIDAS_POLICY_READ);
           MidasLoader::loadComponent("Notification", "journal")->newArticle($resourceDao);
           }
         elseif($private) // Send for approval
           {
           MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
           }
-        else
-          {
-          MidasLoader::loadComponent("Notification", "journal")->newArticle($resourceDao);
-          $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
-          }
+        $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
         return;
         }
       }

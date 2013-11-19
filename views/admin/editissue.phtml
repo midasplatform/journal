@@ -18,7 +18,6 @@
  *=========================================================================*/
 
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/admin/admin.editissue.js');
-$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/iCheck-master/jquery.icheck.min.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/parsley.min.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/pickadate.js-3.0.4/picker.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/pickadate.js-3.0.4/picker.date.js');
@@ -148,17 +147,23 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
       <td valign="top">
         <div align="right"><strong>Private:</strong>
         </div></td>      <td>
-            <input type="checkbox" name="defaultpolicy" value="1" <?php echo $this->issue->getDefaultPolicy() == 1? "checked":""?>/>
+            <input type="checkbox" name="defaultpolicy" <?php if($this->disablePolicySelector) echo "disabled='disabled'";?> value="1" <?php echo $this->issue->getDefaultPolicy() == 1? "checked":""?>/>
        </td>    
     </tr>
     
-    <!-- 
-       0 means code and data
-       1 means code only
-       2 means data only
-       3 means none -->        <td>&nbsp;</td>      <td>
+    <td>&nbsp;</td>      <td>
       <input type="submit" name="data[Admin][cancel]" value="<< Cancel" />  
-      <input type="submit" name="data[Admin][add]" value="Update Journal >>" /></td>    
+      <?php
+      if($this->isNew)
+        {
+        echo '<input type="submit" name="data[Admin][add]" value="Create >>" />';
+        }
+      else 
+        {        
+        echo '<input type="submit" onclick="return confirm(\'Do you want to delete the issue?\');" name="deleteIssue" value="Delete >>" />';
+        echo '<input type="submit" name="data[Admin][add]" value="Update >>" />';
+        }?>
+      </td>    
     </tr>  
   </table>  
   </form>

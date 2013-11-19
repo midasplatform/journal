@@ -34,10 +34,8 @@ function makeClickableLinks($s) {
   </p>
        
   <?php
-  $author = $this->issue->getAuthorLicense();
   $reader = $this->issue->getReaderLicense();
-  if(!empty($author)) echo "<b>Publisher license</b><br/><textarea readonly style='width:95%;height:50px;'>".$author."</textarea><br/>";
-    if(!empty($reader)) echo "<b>Author license</b><br/><textarea readonly style='width:95%;height:50px;'>".$reader."</textarea><br/>";
+    if(!empty($reader)) echo "<b>License</b><br/><textarea readonly style='width:95%;height:50px;'>".$reader."</textarea><br/>";
   ?>
   
   

@@ -42,8 +42,9 @@ $(document).ready(function(){
     }
   );  
     
-  $('.issueButton').click(function(){
-    var key = parseInt($(this).attr('key'));
+  $('.issueButton .issueTitle, .issueButton .issueSubTitle').click(function(){
+    var container = $(this).parents('.issueButton');
+    var key = parseInt(container.attr('key'));
     $('.issueSelected').each(function(){
       $(this).removeClass('issueSelected');
       $(this).find('.issueDetails').hide();
@@ -51,8 +52,8 @@ $(document).ready(function(){
     if(selectIssue == key) selectIssue = false;
     else
       {
-      $(this).addClass('issueSelected');
-      $(this).find('.issueDetails').show();
+      container.addClass('issueSelected');
+      container.find('.issueDetails').show();
       selectIssue = key;
       }
     searchDatabase();

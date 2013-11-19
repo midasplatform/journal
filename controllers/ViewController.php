@@ -32,8 +32,16 @@ class Journal_ViewController extends Journal_AppController
         
   /** List all the journals */
   function journalsAction()
-    {   
-    $this->view->communities = MidasLoader::loadModel('Community')->getAll();
+    {  
+    $communities = MidasLoader::loadModel("Community")->getAll();
+    foreach($communities as $key => $community)
+      {
+      if(!MidasLoader::loadModel("Community")->policyCheck($community, $this->userSession->Dao, MIDAS_POLICY_READ))
+        {
+        unset($communities[$key]);
+        }
+      }
+    $this->view->communities = $communities;
     }    
     
   /** Show issue information (ajax) */
@@ -130,6 +138,24 @@ class Journal_ViewController extends Journal_AppController
       
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $resourceDao->setRevision($revisionDao);
+    $issue = end($resourceDao->getFolders());
+    $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot( $issue));
+    $memberGroup = $community->getMemberGroup();
+    
+    // Check if public or private (If private, it means it requires approval
+    $private = true;
+    $isApproved = false;
+    foreach($resourceDao->getItempolicygroup() as $policy)
+      {
+      if($policy->getGroupId() == $memberGroup->getKey())
+        {
+        $isApproved = true;
+        }
+      if($policy->getGroupId() == MIDAS_GROUP_ANONYMOUS_KEY)
+        {
+        $private = false;
+        }
+      }
     
     MidasLoader::loadModel("Item")->incrementViewCount($resourceDao);
     
@@ -142,9 +168,11 @@ class Journal_ViewController extends Journal_AppController
       }
 
     // Send resource to the view
+    $this->view->isPrivate = $private;
+    $this->view->isApproved = $isApproved;
     $this->view->resource = $resourceDao;
-    $this->view->issue =  end($resourceDao->getFolders());
-    $this->view->community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot( $this->view->issue));
+    $this->view->issue =  $issue;
+    $this->view->community =  $community;
     $this->view->creationDate = MidasLoader::loadComponent("Date")->formatDate(strtotime($resourceDao->getDateCreation()));
     $this->view->termFrequency = file_get_contents("http://localhost:8983/solr/admin/luke?fl=text-journal.tags&wt=json&numTerms=200&reportDocCount=false");
     $this->view->isAuthor = MidasLoader::loadModel("Item")->policyCheck($resourceDao, $this->userSession->Dao, MIDAS_POLICY_WRITE);

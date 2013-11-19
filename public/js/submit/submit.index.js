@@ -21,7 +21,8 @@ $(document).ready(function(){
   $("#authors").dynamiclist();
   $("#tags").dynamiclist();
 
-  $('#submitForm').submit(function(){      
+  $('#submitForm').submit(function(){    
+       
     // Convert tree selection to html form
     $('div#treeInputs').html()
     var html = '';
@@ -47,7 +48,7 @@ $(document).ready(function(){
     $("div.categoryTree:last").dynatree({
       checkbox: true,
       selectMode: 3,
-      children: tree,
+      children: tree.children,
       cookieId: "dynatreeEdit-"+key,
       idPrefix: "dynatreeEdit-"+key
     });

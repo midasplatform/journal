@@ -36,27 +36,64 @@ class Journal_AdminController extends Journal_AppController
     $this->view->isAdmin = $this->userSession->Dao->isAdmin();
     }
     
-  /** Manage journals and issues editors*/
-  function editorAction()
+  /** Manage journals and issues editors and members*/
+  function groupusersAction()
     {   
     $groupId = $this->_getParam('groupId');  
+    $showUsers = $this->_getParam("showmembers");
     $group = MidasLoader::loadModel('Group')->load($groupId);
     if($group === false)
       {
       throw new Zend_Exception("This group doesn't exist.", 404);
-      }
-      
+      }      
+
     $community = $group->getCommunity();
     if(!$this->logged || !$this->userSession->Dao->isAdmin()
             || !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup()))
       {
       throw new Zend_Exception("Permission error.", 404);
       }
+      
+    if($this->_request->isPost())      
+      {
+      $this->disableLayout();
+      $this->disableView();
 
-    $this->view->group = $group;
+      $remove = $this->_getParam('remove');
+      $add = $this->_getParam('add');
+      $groupId = $this->_getParam('groupId');
+      $userId = $this->_getParam('userId');
+      $group = MidasLoader::loadModel('Group')->load($groupId);
+      $user = MidasLoader::loadModel('User')->load($userId);
+      if(!$user || !$group)
+        {
+        throw new Zend_Exception('Invalid user or group parameter');
+        }
+
+      if(isset($remove))
+        {
+        MidasLoader::loadModel('Group')->removeUser($group, $user);
+        echo JsonComponent::encode(array(true, 'Removed user '.$user->getFullName().' from group '.$group->getName()));
+        }
+      
+      if(isset($add))
+        {
+        MidasLoader::loadModel('Group')->addUser($group, $user);
+        if($group->getKey() == $community->getAdminGroup()->getKey())
+          {
+          MidasLoader::loadModel('Group')->addUser($community->getMemberGroup(), $user);
+          }
+        echo JsonComponent::encode(array(true, $this->t('Changes saved')));
+        }
+      }
+
+    $this->view->showMember = isset($showUsers) && $showUsers == 1 && $group->getKey() == $community->getAdminGroup()->getKey();
+    $this->view->editorgroup = $group;
+    $this->view->membergroup = $community->getMemberGroup();
     $this->view->name = $this->_getParam('name');
-    $this->view->json['group'] = $group->toArray();
-    $this->view->json['community'] = $group->getCommunity()->toArray();
+    $this->view->json['editorgroup'] = $group->toArray();
+    $this->view->json['membergroup'] = $this->view->membergroup ->toArray();
+    $this->view->json['community'] = $community->toArray();
     }
     
   /** Edit help/faq content */
@@ -127,7 +164,8 @@ class Journal_AdminController extends Journal_AppController
     
   /** Edit an issue */
   function editissueAction()
-    {       
+    {  
+    $this->view->disablePolicySelector = false;
     // load resource if it exists
     $folderId = $this->_getParam('folderId');  
     $communityId = $this->_getParam('communityId');  
@@ -141,6 +179,11 @@ class Journal_AdminController extends Journal_AppController
       {
       $issueDao = MidasLoader::newDao('IssueDao', 'journal');
       $community = MidasLoader::loadModel("Community")->load($communityId);
+      if($community->getPrivacy() == 1)
+        {
+        $this->view->disablePolicySelector = true;
+        $issueDao->setDefaultPolicy(1);
+        }
       }
       
     
@@ -153,6 +196,12 @@ class Journal_AdminController extends Journal_AppController
       
     if($this->_request->isPost())
       {
+      $deleteIssue = $this->_getParam("deleteIssue");
+      if(isset($deleteIssue))
+        {
+        $issueDao->delete();
+        $this->_redirect("/journal/admin/issues");
+        }
       if(isset($communityId) && !$issueDao->saved)
         {
         $community  = MidasLoader::loadModel("Community")->load($communityId);
@@ -183,6 +232,8 @@ class Journal_AdminController extends Journal_AppController
       $issueDao->save();
       $this->_redirect("/journal/admin/issues");
       }
+    
+    $this->view->isNew = !isset($folderId);
     $this->view->issue = $issueDao;
     }
     

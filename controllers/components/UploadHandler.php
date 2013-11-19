@@ -207,8 +207,9 @@ class UploadHandler
         if (empty($version)) {
             $version_path = '';
         } else {
-            $version_url = @$this->options['image_versions'][$version]['upload_url'];
-            if ($version_url) {
+            
+            if (isset($this->options['image_versions'][$version]['upload_url'])) {
+                $version_url = $this->options['image_versions'][$version]['upload_url'];
                 return $version_url.$this->get_user_path().rawurlencode($file_name);
             }
             $version_path = rawurlencode($version).'/';

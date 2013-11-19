@@ -47,6 +47,13 @@ class Journal_IndexController extends Journal_AppController
       $modulesConfig = Zend_Registry::get('configsModules');  
       $community = MidasLoader::loadModel("Community")->load($modulesConfig['journal']->defaultcommunity);
       }
+      
+    if($community === false || !MidasLoader::loadModel("Community")->policyCheck($community, $this->userSession->Dao))
+      {
+      echo "This journal doesn't exist or you don't have the permissions.";
+      $this->disableView();
+      return;
+      }
     
     if(isset($community) && $community)
       {

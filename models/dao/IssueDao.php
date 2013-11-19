@@ -103,6 +103,18 @@ class Journal_IssueDao extends FolderDao
     }
     
   /**
+   * Custom delete method
+   */
+  function delete()
+    {
+    $key = $this->getKey();
+    MidasLoader::loadModel("Folder")->delete($this);
+    $db = Zend_Registry::get('dbAdapter');
+    $sql = "DELETE FROM journal_folder where folder_id=".$key;
+    $db->query($sql);
+    }
+    
+  /**
    * Define getter and setters.
    */
   function getPaperdueDate(){$this->initValues();return $this->paperdue_date;}

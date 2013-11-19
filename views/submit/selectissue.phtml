@@ -16,10 +16,12 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-$this->headScript()->appendFile($this->webroot . '/privateModules/portalmanager/public/js/submit/submit.index.js');
-$this->headScript()->appendFile($this->webroot . '/privateModules/portal/public/js/lib/dynatree/jquery.dynatree.min.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/submit/submit.selectissue.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dynatree/jquery.dynatree.min.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.pack.js');
 ?>
-<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/portalmanager/public/css/submit/submit.index.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/submit/submit.index.css" rel="stylesheet" />
+<LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/portal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
 
 <div class="viewMain">
@@ -31,27 +33,36 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/portal/public/
     <br/>
     <table width="70%"  border="0">
       <tr>
-        <td width="85%" ><div align="center"><strong>Title</strong></div></td>
-        <td width="15%" ><div align="center"><strong>Days left</strong></div></td>
+        <td width="15%" ><div align="left"><strong>Journal</strong></div></td>
+        <td width="50%" ><div align="left"><strong>Title</strong></div></td>
+        <td width="10%" ><div align="left"><strong>Days left</strong></div></td>
+        <td width="20%" ><div align="left"><strong>Actions</strong></div></td>
       </tr>
       <tr>
-        <td height="1" colspan="2"><hr></td>
+        <td height="1" colspan="4"><hr></td>
       </tr>
       <?php
       foreach($this->issues as $key => $issue)
         {
+        $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
+       $day1 = new Zend_Date(strtotime($issue->getPaperdueDate()));
+        $day2 = new Zend_Date();
         echo"
         <tr >
+        <td>".$community->getName()."</td>
         <td><a href=" . $this->webroot . "/journal/submit/?issue=" . $issue->getKey() . ">" . $issue->getName()."</a>";
-        $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
-        if($community) echo " (".$community->getName().")";
-        $day1 = new Zend_Date(strtotime($issue->getPaperdueDate()));
-        $day2 = new Zend_Date();
-        echo"</td>
-              <td>" . $day2->sub($day1)->toString(Zend_Date::DAY) . "</td>
+        if($issue->getDefaultPolicy() == 1)
+          {
+          echo " (Private issue)";
+          }          
+        echo "</td>";
+        echo"<td>" . $day2->sub($day1)->toString(Zend_Date::DAY) . "</td>";
+        echo "<td>";
+        echo "<a href=" . $this->webroot . "/journal/submit/?issue=" . $issue->getKey() . ">Select issue</a>, ";
+        echo "<a class='issuePage' href='".$this->webroot."/journal/view/issue?folderId=".$issue->getKey()."'>Show details</a>";
+        echo "</td>";
 
-              </tr>
-             ";
+        echo "</tr>";
         }
       ?>
 
