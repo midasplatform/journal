@@ -10,7 +10,7 @@ class Reviewosehra_IndexController extends Reviewosehra_AppController
    
     
   /** Index (first page) action*/
-  function indexAction($arg)
+  function indexAction()
     {   
     $revisionId = $this->_getParam("revisionId");
     $isAdmin = $this->_getParam("isAdmin");

@@ -15,7 +15,19 @@ class Reviewosehra_ReviewModel extends Reviewosehra_ReviewModelBase
     $results = array();
     foreach ($rowset as $row)
       {
-      $results[] = $this->initDao('Revision', $row, 'reviewosehra');
+      $results[] = $this->initDao('Review', $row, 'reviewosehra');
+      }
+    return $results;
+    }
+    
+  function getAll()
+    {
+    $rowset = $this->database->fetchAll(
+            $this->database->select());
+    $results = array();
+    foreach ($rowset as $row)
+      {
+      $results[] = $this->initDao('Review', $row, 'reviewosehra');
       }
     return $results;
     }
