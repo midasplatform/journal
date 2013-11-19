@@ -125,6 +125,8 @@ foreach ($cssArray as $module => $list)
         echo "<li><a  onclick=\"return confirm('Do you want to delete the resource?');\" href='" . $this->webroot . "/journal/submit/delete?itemId=" . $this->resource->getKey() . "'>Delete resource</a></li>";
         if($this->resource->getRevision()->getRevision() > 1) echo "<li><a onclick=\"return confirm('Do you want to delete the revision?');\" href='" . $this->webroot . "/journal/submit/delete?revisionId=" . $this->resource->getRevision()->getKey() . "'>Delete current revision</a></li>";
         }
+      $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_MANAGE', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
+      echo join(' ', $elements);
       echo "</ul>";
       }
       ?>

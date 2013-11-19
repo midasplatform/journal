@@ -250,7 +250,7 @@ echo $this->doctype()
       </div>
       <div class="Footer">
          <div class="text">
-           <b><?php echo join(", ", $this->footerStats)?><br/>
+           <b><?php if(is_array($this->footerStat)) echo join(", ", $this->footerStats)?><br/>
             <a href="<?php echo $this->webroot?>/jouranl/rss"><img border="0" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/feed-icon16x16.png" alt="RSS Feed"/></a>
            <br/>
            </div>

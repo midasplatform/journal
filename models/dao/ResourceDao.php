@@ -345,7 +345,7 @@ class Journal_ResourceDao extends ItemDao
    * @param type $type
    * @return type
    */
-  private function getMetaDataByQualifier($type)
+  function getMetaDataByQualifier($type)
     {
     $metadata = $this->getMetadata();
     foreach($metadata as $m)
@@ -363,7 +363,7 @@ class Journal_ResourceDao extends ItemDao
    * @param string $value
    * @return MetadataDao
    */
-  private function setMetaDataByQualifier($type, $value)
+  function setMetaDataByQualifier($type, $value)
     {
     // Gets the metadata
     $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", $type);
