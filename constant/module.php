@@ -11,6 +11,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 define("OSERHAREVIEW_LIST_PEERREVIEW", 1);
 define("OSERHAREVIEW_LIST_FINALREVIEW", 2);
+define("OSERHAREVIEW_LIST_COMPLETE", 3);
 
 define("OSERHAREVIEW_REVIEW_YES", 1);
 define("OSERHAREVIEW_REVIEW_NO", 2);

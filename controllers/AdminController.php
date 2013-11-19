@@ -7,7 +7,68 @@ class Reviewosehra_AdminController extends Reviewosehra_AppController
     {
     parent::init();    
     }
-   
+    
+  /** Manage an article reviews */
+  function manageAction()
+    {
+    $itemId = $this->_getParam("itemId");
+    $itemDao = MidasLoader::loadModel("Item")->load($itemId);   
+    $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
+     if(!$this->logged || !$resourceDao->isAdmin($this->userSession->Dao)
+            || !MidasLoader::loadModel("Item")->policyCheck($itemDao, $this->userSession->Dao, MIDAS_POLICY_READ))
+      {
+      throw new Zend_Exception('Read permission required', 403);
+      }
+      
+    $reviewsByRevisions = array();
+    $revisions = $itemDao->getRevisions();
+    foreach($revisions as $revision)
+      {
+      $reviewsByRevisions[$revision->getRevision()] = MidasLoader::loadModel("Review", "reviewosehra")->getByRevision($revision);
+      }
+      
+    if(isset($_GET['deleteReview']) && is_numeric($_GET['deleteReview']))
+      {
+      $review = MidasLoader::loadModel("Review", "reviewosehra")->load($_GET['deleteReview']);
+      if($review) MidasLoader::loadModel("Review", "reviewosehra")->delete($review);
+      $this->_redirect("/reviewosehra/admin/manage?itemId=".$itemId);
+      }
+
+    if(isset($_GET['moveReview']) && is_numeric($_GET['moveReview']) &&
+       isset($_GET['moveTo']) && is_numeric($_GET['moveTo'])      )
+      {
+      $review = MidasLoader::loadModel("Review", "reviewosehra")->load($_GET['moveReview']);
+      foreach($revisions as $revision)
+        {
+        if($revision->getRevision() == $_GET['moveTo'])
+          {
+          $review-> setRevisionId($revision->getKey());
+          MidasLoader::loadModel("Review", "reviewosehra")->save($review);
+          }
+        }
+      $this->_redirect("/reviewosehra/admin/manage?itemId=".$itemId);
+      }
+      
+    if(isset($_GET['phaseReview']) && is_numeric($_GET['phaseReview']) &&
+       isset($_GET['setPhase']) && is_numeric($_GET['setPhase'])      )
+      {
+      foreach($revisions as $revision)
+        {
+        if($revision->getRevision() == $_GET['phaseReview'])
+          {
+          $resourceDao->_metadata = false;
+          $resourceDao->setRevision($revision);
+          $resourceDao->setMetaDataByQualifier("reviewPhase", $_GET['setPhase']);
+          }
+        }
+      $this->_redirect("/reviewosehra/admin/manage?itemId=".$itemId);
+      }
+      
+    $this->view->reviewsByRev = $reviewsByRevisions;
+    $this->view->resource = $resourceDao;
+    }
+    
+  /** Create/Edit question lists */
   function questionsAction()
     {   
     $this->requireAdminPrivileges();

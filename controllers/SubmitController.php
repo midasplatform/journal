@@ -41,6 +41,10 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $resourceDao->setRevision($revision);
     
+    $reviewPhase = $resourceDao->getMetaDataByQualifier("reviewPhase");
+    if($reviewPhase) $reviewPhase = $reviewPhase->getValue();
+    else $reviewPhase = OSERHAREVIEW_LIST_PEERREVIEW;
+    
     if($this->_request->isPost())
       {
       $this->disableLayout();
@@ -76,7 +80,7 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       $reviewDao->setCacheSummary($cacheSummary);
       $reviewDao->setComplete($is_complete);
       MidasLoader::loadModel("Review", 'reviewosehra')->save($reviewDao);
-      echo JsonComponent::encode($this->view->webroot."/reviewosehra/submit/?review_id=".$reviewDao->getKey());
+      echo JsonComponent::encode($this->view->webroot."/journal/view/?revisionId=".$reviewDao->getRevisionId());
       return;
       }
       
@@ -95,13 +99,18 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
     else
       {
       $categories = $resourceDao->getCategories();
-      $mainListTmp = end($questionslists);
+      $mainListTmp = false;
       foreach($categories as $cat)
         {
         foreach($questionslists as $list)
           {
-          if($cat == $list->getCategoryId())   $mainListTmp = $list;
+          if($cat == $list->getCategoryId() && $list->getType() == $reviewPhase)   $mainListTmp = $list;
           }
+        }
+        
+      if(!$mainListTmp)
+        {
+        throw new Zend_Exception("Unable to match a question list for this article. Please contact an administrator.");
         }
       $mainList = $mainListTmp->toArray();
       }

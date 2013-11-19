@@ -18,6 +18,13 @@ class Reviewosehra_IndexController extends Reviewosehra_AppController
     $revision = MidasLoader::loadModel("ItemRevision")->load($revisionId);
     $reviews = MidasLoader::loadModel("Review", "reviewosehra")->getByRevision($revision);
     
+    $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $revision->getItem()->toArray(), "journal");
+    $resourceDao->setRevision($revision);
+    
+    $this->view->reviewPhase = $resourceDao->getMetaDataByQualifier("reviewPhase");
+    if($this->view->reviewPhase) $this->view->reviewPhase = $this->view->reviewPhase->getValue();
+    else $this->view->reviewPhase = OSERHAREVIEW_LIST_PEERREVIEW;
+    
     $this->view->reviews = array(OSERHAREVIEW_LIST_PEERREVIEW =>  array('complete' => array(), "notcomplete"=> array())
         , OSERHAREVIEW_LIST_FINALREVIEW => array('complete' => array(), "notcomplete"=> array()));
     

@@ -17,7 +17,8 @@ abstract class Reviewosehra_ReviewModelBase extends Reviewosehra_AppModel
         'cache_summary' => array('type' => MIDAS_DATA),
         'content' => array('type' => MIDAS_DATA),
         'complete' => array('type' => MIDAS_DATA),
-        'user' => array('type' => MIDAS_MANY_TO_ONE, 'model' => 'User', 'parent_column' => 'user_id', 'child_column' => 'user_id')
+        'user' => array('type' => MIDAS_MANY_TO_ONE, 'model' => 'User', 'parent_column' => 'user_id', 'child_column' => 'user_id'),
+        'revision' => array('type' => MIDAS_MANY_TO_ONE, 'model' => 'ItemRevision', 'parent_column' => 'revision_id', 'child_column' => 'itemrevision_id')
       );
     $this->initialize(); // required
     } // end __construct()    

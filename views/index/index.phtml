@@ -1,5 +1,17 @@
+<?php
+$this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/public/js/index/index.index.js');
+?>
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/css/index/index.index.css" rel="stylesheet" />
-<h4>Reviews</h4>
+<?php
+  $phaseConvert = array(OSERHAREVIEW_LIST_PEERREVIEW => "Peer",
+       OSERHAREVIEW_LIST_FINALREVIEW => "Final",
+       OSERHAREVIEW_LIST_COMPLETE => "Complete");
+
+  $phase = $phaseConvert[$this->reviewPhase];
+  $hasSubmitterAReview = false;
+?>
+
+<h4>Reviews (Phase: <?php echo $phase?>)</h4>
 <?php
 if (empty($this->reviews))
   {
@@ -17,23 +29,39 @@ if (empty($this->reviews))
 else
   {
   foreach ($this->reviews as $key => $review)
-    {    
+    {   
     foreach ($review['complete'] as $r)
       {
+      if($this->logged && $r->getType() == $this->reviewPhase && $r->getUserId() == $this->userDao->getKey())
+        {
+        $hasSubmitterAReview = true;
+        }
+      if($r->getType() != $this->reviewPhase) echo "<div class='hiddenReview'>";
       showReviews($r, $this->webroot);
+      if($r->getType() != $this->reviewPhase) echo "</div>";
       }
     foreach ($review['notcomplete'] as $r)
       {
+      if($this->logged && $r->getType() == $this->reviewPhase && $r->getUserId() == $this->userDao->getKey())
+        {
+        $hasSubmitterAReview = true;
+        }
+      if($r->getType() != $this->reviewPhase) echo "<div class='hiddenReview'>";
       showReviews($r, $this->webroot);
+      if($r->getType() != $this->reviewPhase) echo "</div>";
       }
     }
+    
+  echo "<a id='hiddenReviewlink'></a>";
 
-  if ($this->logged)
+  if(!$hasSubmitterAReview && $this->logged && (
+          $this->reviewPhase == OSERHAREVIEW_LIST_PEERREVIEW
+          || $this->isAdmin))
     {
     echo "<p><a href=\"" . $this->webroot . "/reviewosehra/submit/?revision_id=" . $this->resource->getRevision()->getKey() .
     "\">Review this publication!</a></p>";
     }
-  else
+  elseif(!$hasSubmitterAReview && $this->reviewPhase == OSERHAREVIEW_LIST_PEERREVIEW)
     {
     echo "<p>To submit a review, please log in.</p>";
     }
@@ -41,7 +69,7 @@ else
 
 function showReviews($review, $webroot)
   {
-  echo "<p><a href='".$webroot."/reviewosehra/submit?review_id=".$review->getKey()."'>".(($review->getType() == OSERHAREVIEW_LIST_PEERREVIEW)? "Peer":"Final")." review by ".$review->getUser()->getFullName()."</a>:</p>";
+  echo "<p style='margin:0;'><a href='".$webroot."/reviewosehra/submit?review_id=".$review->getKey()."'>".(($review->getType() == OSERHAREVIEW_LIST_PEERREVIEW)? "Peer":"Final")." review by ".$review->getUser()->getFullName()."</a>:</p>";
   echo "<table class='reviewTable'>";
   echo $review->getCacheSummary();
   echo "</table><br/>";

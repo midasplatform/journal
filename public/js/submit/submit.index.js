@@ -1,6 +1,5 @@
 $(document).ready(function(){
   
-  
   processQuestionUpdate(true);
   $("div#questionWrapper_"+$("select#listTopics").val()).show();
   $("select#listTopics").change(function(){

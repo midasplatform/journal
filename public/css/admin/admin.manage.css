@@ -1,9 +1,10 @@
-div#reviewWrapper{
-  border:1px dotted #ccc;
+div.reviewWrapper{
+  margin: 5x;
+  padding: 5px;
+  border: 1px solid #ccc;
 }
-
-.hiddenReview{
-  display:none;
+div.reviewWrapper a{
+  color:#005DAA;
 }
 
 table.reviewTable {
@@ -36,7 +37,6 @@ table.reviewTable input {
 }
 table.reviewTable progress {
 	width: 100%;
-  display:none;
 }
 
 table.reviewTable td {

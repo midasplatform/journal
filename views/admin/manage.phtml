@@ -1,0 +1,78 @@
+<?php
+$this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/public/js/admin/admin.manage.js');
+
+$phaseConvert = array(OSERHAREVIEW_LIST_PEERREVIEW => "Peer",
+       OSERHAREVIEW_LIST_FINALREVIEW => "Final",
+       OSERHAREVIEW_LIST_COMPLETE => "Complete");
+
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/css/admin/admin.manage.css" rel="stylesheet" />
+
+<h3>Manage Reviews</h3>
+
+<a href="<?php echo $this->webroot?>/journal/view/?revisionId=<?php echo $this->resource->getRevision()->getKey()?>">Back to article</a>
+
+<div id="tabs">
+  <ul>
+    <?php
+    foreach($this->reviewsByRev as $number => $notUsed)
+      {
+      echo '<li><a href="#tabs-'.$number.'">Revision '.$number.'</a></li>';
+      }
+      ?>
+  </ul>
+  <?php
+    foreach($this->reviewsByRev as $number => $reviews)
+      {
+      echo '<div class="tabsWrapper" id="tabs-'.$number.'">';
+      if(empty($reviews))
+        {
+        echo "No review.";
+        }
+      else
+        {
+        $this->resource->_metadata = false;
+        $this->resource->setRevision($reviews[0]->getRevision());
+        $reviewStep = $this->resource->getMetaDataByQualifier("reviewPhase");
+        if($reviewStep) $reviewStep = $reviewStep->getValue();
+        else $reviewStep = OSERHAREVIEW_LIST_PEERREVIEW;
+        echo "<h4>Current Review Phase: ".$phaseConvert[$reviewStep]."</h4>";
+        
+        echo "Set revision phase to:";
+        echo "<select class='selectPhase'>";
+        foreach($phaseConvert as $step => $name)
+          {
+          if($step != $reviewStep) echo "<option value='".$step."'>".$name."</option>";
+          }
+        echo "</select><input type='button' href='".$this->webroot."/reviewosehra/admin/manage?itemId=".$this->resource->getKey()."&phaseReview=".$number."&setPhase=' class='buttomPhase' value='Change'/>";
+        echo "<br/>";
+        echo "<br/>";
+        
+        foreach($reviews as $review)
+          {
+          echo "<div class='reviewWrapper' key='".$review->getKey()."'>";
+          echo "<p><a href='".$this->webroot."/reviewosehra/submit?review_id=".$review->getKey()."'>".(($review->getType() == OSERHAREVIEW_LIST_PEERREVIEW)? "Peer":"Final")." review by ".$review->getUser()->getFullName()."</a>:</p>";
+          echo "<table class='reviewTable'>";
+          echo $review->getCacheSummary();
+          echo "</table><br/>";
+          echo "<p>";
+          echo "<a href='".$this->webroot."/reviewosehra/submit?review_id=".$review->getKey()."'>Edit</a>, ";
+          echo "<a onclick=\"return confirm('Do you want to delete the review?');\" href='".$this->webroot."/reviewosehra/admin/manage?itemId=".$this->resource->getKey()."&deleteReview=".$review->getKey()."'>Delete review</a>";
+          if(count($this->reviewsByRev) != 1)
+            {
+            echo "<br/>Move to revision:";
+            echo "<select class='selectMove'>";
+            foreach($this->reviewsByRev as $i => $notUsed)
+              {
+              if($i != $number) echo "<option value='".$i."'>".$i."</option>";
+              }
+            echo "</select><input type='button' href='".$this->webroot."/reviewosehra/admin/manage?itemId=".$this->resource->getKey()."&moveReview=".$review->getKey()."&moveTo=' class='buttomMove' value='Move'/>";
+            }
+          echo "</p>";
+          echo "</div>";
+          }
+        }
+      echo "</div>";
+      }
+      ?>
+</div>
