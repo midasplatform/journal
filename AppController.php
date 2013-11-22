@@ -29,9 +29,15 @@ class Journal_AppController extends MIDAS_GlobalModule
     parent::preDispatch();
     ob_clean(); 
     
+    $fc = Zend_Controller_Front::getInstance();
+    $controller = $fc->getRequest()->getControllerName();
+    
     // Select the module's layout
-    $this->_helper->layout->setLayoutPath(dirname(__FILE__)."/layouts");
-    $this->_helper->layout->setLayout(MidasLoader::loadComponent("Layout", 'journal')->getLayoutName());
+    if($controller != "config")
+      {
+      $this->_helper->layout->setLayoutPath(dirname(__FILE__)."/layouts");
+      $this->_helper->layout->setLayout(MidasLoader::loadComponent("Layout", 'journal')->getLayoutName());
+      }
     $this->view->json['dynamicHelp'] = array();
     
     // Create footer stats

@@ -103,8 +103,7 @@ class Journal_HelpController extends Journal_AppController
         return;
         }
         
-      $modulesConfig = Zend_Registry::get('configsModules');  
-      $adminEmail = $modulesConfig['journal']->adminemail;
+      $adminEmail = MidasLoader::loadModel("Setting")->getValueByName('adminEmail', "journal");
         
       $headers  = "From: ".$adminEmail."\n";
       $from = $forms['email'];

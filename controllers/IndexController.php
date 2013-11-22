@@ -44,8 +44,8 @@ class Journal_IndexController extends Journal_AppController
       }
     else
       {
-      $modulesConfig = Zend_Registry::get('configsModules');  
-      $community = MidasLoader::loadModel("Community")->load($modulesConfig['journal']->defaultcommunity);
+      $communityId = MidasLoader::loadModel("Setting")->getValueByName('defaultJournal', "journal");
+      $community = MidasLoader::loadModel("Community")->load($communityId);
       }
       
     if($community === false || !MidasLoader::loadModel("Community")->policyCheck($community, $this->userSession->Dao))

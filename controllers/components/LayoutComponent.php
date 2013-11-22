@@ -26,8 +26,15 @@ class Journal_LayoutComponent extends AppComponent
    */
   public function getLayoutName()
     {    
-    $modulesConfig = Zend_Registry::get('configsModules');  
-    return $modulesConfig['journal']->layout;
+    $layout = MidasLoader::loadModel("Setting")->getValueByName('defaultLayout', "journal");
+
+    if($layout == null) 
+      {
+      $fc = Zend_Controller_Front::getInstance();
+      echo 'Please set the Journal Module configuration <a href="'.$fc->getBaseUrl().'/journal/config">here</a>';
+      exit;
+      }
+    return $layout;
     }
     
   /**
@@ -36,14 +43,14 @@ class Journal_LayoutComponent extends AppComponent
    */
   public function getLogoUrl()
     {    
-    $modulesConfig = Zend_Registry::get('configsModules');  
+    $layout = getLayoutName();
     $fc = Zend_Controller_Front::getInstance();
 
-    if($modulesConfig['journal']->layout == "ij")
+    if($layout == "ij")
       {
       return UtilityComponent::getServerURL().$fc->getBaseUrl()."/privateModules/journal/public/images/logo.png";
       }
-    else if($modulesConfig['journal']->layout == "osehra")
+    else if($layout == "osehra")
       {
       return UtilityComponent::getServerURL().$fc->getBaseUrl()."/privateModules/journal/public/images/osehra/logo.png";
       }

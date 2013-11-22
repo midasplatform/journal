@@ -169,11 +169,8 @@ echo $this->doctype()
             <?php if($this->logged && $this->userDao->isAdmin())
             {?>
             <li>
-             <a  href="<?php echo $this->webroot."/admin"?>">Admin</a>
+             <a  href="<?php echo $this->webroot."/journal/admin/issues"?>">Admin</a>
                <ul>
-                <li>
-                <a class="submm" href="<?php echo $this->webroot."/admin"?>">Midas</a>
-                </li>
                 <li>
                 <a class="submm" href="<?php echo $this->webroot."/journal/admin/issues"?>">Journals</a>
                 </li>
@@ -189,6 +186,9 @@ echo $this->doctype()
                 <li>
                   <a class="submm" href="<?php echo $this->webroot."/journal/admin/help"?>">Help & About</a>
                 </li>   
+                 <li>
+                  <a class="submm" href="<?php echo $this->webroot."/journal/config"?>">Midas</a>
+                </li>
                 <?
                 $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_ADMIN_MENU', array());
                 $element = end($elements);   

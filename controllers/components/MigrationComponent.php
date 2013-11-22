@@ -36,7 +36,7 @@ define("MIDAS2_POLICY_ADD", 3);
 define("MIDAS2_POLICY_REMOVE", 4);
 
 /** Migration tool*/
-class MigrationComponent extends AppComponent
+class Journal_MigrationComponent extends AppComponent
 {
   /** These variables should be set by the UI */
   var $midas2User = "midas";
