@@ -62,7 +62,7 @@ echo $this->element('serversidefilechooser', 'default', array('id' => 'midas2_as
 
 
 <div id="newassetstore-form" style="display:none">
-  <form id="assetstoreForm" enctype="application/x-www-form-urlencoded" action="<?php echo $this->webroot?>/assetstore/add" method="post" class="assetstoreForm"><dl class="zend_form">
+  <form id="assetstoreForm" enctype="application/x-www-form-urlencoded" action="<?php echo $this->webroot ?>/assetstore/add" method="post" class="assetstoreForm"><dl class="zend_form">
       <dt id="assetstorename-label"><label for="assetstorename" class="required">Give a name</label></dt>
       <dd id="assetstorename-element">
         <input type="text" name="name" id="assetstorename" value=""></dd>
@@ -77,7 +77,8 @@ echo $this->element('serversidefilechooser', 'default', array('id' => 'midas2_as
         </select>
         <div class="assetstoreLoading" style="display:none"><img src="/Midas/Midas3/core/public/images/icons/loading.gif"></div></dd>
       <dt id="addassetstore-label">&nbsp;</dt><dd id="addassetstore-element">
-        <input type="submit" name="addassetstore" id="addassetstore" value="Add this assetstore"></dd></dl></form></div>
+        <input type="submit" name="addassetstore" id="addassetstore" value="Add this assetstore"></dd></dl></form>
+</div>
 
 <script language="javascript">
   var assetstores = eval(<?php echo json_encode($this->assetstores) ?>);

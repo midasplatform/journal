@@ -187,6 +187,26 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("copyright", $copyright);
     }
     
+    
+  /** Get Copyright
+   * 
+   * @return 
+   */
+  function getHandle()
+    {
+    $metadata = $this->getMetaDataByQualifier("handle");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Dislcaimer Id
+   * @param 
+   */
+  function setHandle($copyright)
+    {
+    $this->setMetaDataByQualifier("handle", $copyright);
+    }
+    
   /** Get Related
    * 
    * @return 

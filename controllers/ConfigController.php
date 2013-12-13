@@ -52,10 +52,6 @@ class Journal_ConfigController extends Journal_AppController
       $this->disableLayout();
       $this->disableView();
       
-      // To delete
-      echo json_encode(array('error' => "Work in progress"));
-      return false;
-
       if(empty($_POST['midas2_hostname']) || empty($_POST['midas2_user'])
               || empty($_POST['midas2_assetstore']) || empty($_POST['midas2_database']))
         {
@@ -94,7 +90,6 @@ class Journal_ConfigController extends Journal_AppController
       $component->midas2Port = $midas2_port;
       $component->midas2Assetstore = $midas2_assetstore;
       $component->assetstoreId = $midas3_assetstore;
-
       try
         {
         $component->migrate($this->userSession->Dao->getUserId());
@@ -110,6 +105,63 @@ class Journal_ConfigController extends Journal_AppController
 
     // Display the form
     }
+
+    
+    /** Migrate from midas 2 version of the journal */
+  function migrate2Action()
+    {
+    $this->requireAdminPrivileges();
+    $this->disableLayout();
+    $this->disableView();
+    $this->assetstores = MidasLoader::loadModel("Assetstore")->getAll();
+
+
+      
+    $midas2_hostname = "localhost";
+    $midas2_port = 5432;
+    $midas2_user = "midas";
+    $midas2_password ="1997";
+    $midas2_database = "ij";
+    $midas2_assetstore = "/docs/WEBS/Midas/IJAssetstore/assetstore/";
+    $midas3_assetstore = 1;
+
+    // Check that the assetstore is accessible
+    if(!file_exists($midas2_assetstore))
+      {
+      echo json_encode(array('error' => $this->t('MIDAS2 assetstore is not accessible.')));
+      return false;
+      }
+
+    // Remove the last slashe if any
+    if($midas2_assetstore[strlen($midas2_assetstore) - 1] == '\\'
+       || $midas2_assetstore[strlen($midas2_assetstore) - 1] == '/')
+      {
+      $midas2_assetstore = substr($midas2_assetstore, 0, strlen($midas2_assetstore) - 1);
+      }
+
+    $component = MidasLoader::loadComponent("Migration", 'journal');
+
+    $component->midas2User = $midas2_user;
+    $component->midas2Password = $midas2_password;
+    $component->midas2Host = $midas2_hostname;
+    $component->midas2Database = $midas2_database;
+    $component->midas2Port = $midas2_port;
+    $component->midas2Assetstore = $midas2_assetstore;
+    $component->assetstoreId = $midas3_assetstore;
+    try
+      {
+      $component->migrate($this->userSession->Dao->getUserId());
+      }
+    catch(Zend_Exception $e)
+      {
+        echo $e->getMessage();
+        echo $e->getTraceAsString();
+        return false;
+      }
+
+    echo json_encode(array('message' => $this->t('Migration sucessful.')));
+    }
+
 
 
 } // end class
