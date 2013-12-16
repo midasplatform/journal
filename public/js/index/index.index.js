@@ -52,6 +52,12 @@ $(document).ready(function(){
         cookieId: "dynatreeEdit-"+key,
         idPrefix: "dynatreeEdit-"+key
       });
+      
+    if(tree.children.length > 4)
+      {
+      var tree = $(this).parent('div.TreeEntry').find('div.categoryTree');
+      $(this).attr('src', json.global.webroot+'/privateModules/journal/public/images/arrow-right.png');
+      }
     }
   );  
     
