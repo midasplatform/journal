@@ -102,7 +102,24 @@ foreach ($cssArray as $module => $list)
       foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=text-journal.tags:'.$tag.'">'.$tag.'</a>';
       echo join(', ', $tags)
       ?></li>
-      <li>Current revision: <?php echo $this->resource->getRevision()->getRevision()?></li>
+      <?php
+      if(count($this->revisions) != 1)
+        {?>
+        <li>Current revision: 
+          <a id='revisionSelector' onclick="$('#revisionSelec').show();$(this).hide();"><?php echo $this->resource->getRevision()->getRevision()?></a>
+          <select onchange="window.location.href='<?php echo $this->webroot?>/journal/view/'+$(this).val();" id="revisionSelec" style='display:none;'>
+            <?php
+            $this->revisions  = array_reverse($this->revisions);
+            foreach($this->revisions as $revision)
+              {
+              if($revision->getRevision() == $this->resource->getRevision()->getRevision()) echo "<option selected='selected' value ='".$revision->getKey()."'>".$revision->getRevision()."</option>";
+              else echo "<option value ='".$revision->getKey()."'>".$revision->getRevision()."</option>";
+              }
+              ?>
+          </select>
+        </li>
+        <?php
+        }?>
       <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>
     <h4>Share</h4> 

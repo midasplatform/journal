@@ -1,10 +1,11 @@
 // When page ready
 var selectIssue = false;
+var resizeEvent;
 
 $(document).ready(function(){  
   $('.issueTitle').each(function(){
     $(this).dotdotdot({
-		callback	: function( isTruncated, orgContent ) {
+    callback	: function( isTruncated, orgContent ) {
       if(isTruncated)
         {
         $(this).qtip({
@@ -15,8 +16,20 @@ $(document).ready(function(){
         }
     }}
     );
-  });
+ });  
+
   
+  resizeEvent = function(){
+    $.each($('.SearchResultEntry'),function(){
+      var descriptionWidth = $(this).width() - $(this).find('.ResultLogo').width();
+      $(this).find('.ResultDescription').css('width', descriptionWidth+"px");
+      $(this).find('.ResultDescription').trigger("update");
+    })
+
+  }
+  
+  $(window).resize(resizeEvent);
+
   $('.issuePage').fancybox({type: 'ajax'});
   
   // Create the root html element of each tree
@@ -164,6 +177,8 @@ function searchDatabase()
             {
             $('.SearchCount').html(total+ " resource available.") 
             }
+            
+          setTimeout(resizeEvent, 200);
         },
         error: function (retVal) {
             midas.createNotice(retVal.message, 3000, 'error');
@@ -192,6 +207,8 @@ function addAndFormatResult(container, values) {
     {
     newElement.find('.ResultLogo').remove();
     }
+    
+    
   newElement.find('.ResultDescription').dotdotdot();
   return str; 
 };

@@ -107,6 +107,7 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao->setName($_POST['title']);
       $resourceDao->setDescription($_POST['description']);
       $resourceDao->setType($_POST['type']);     
+      $resourceDao->setThumbnailId(new Zend_Db_Expr('NULL'));
       $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
       $isNew = !$resourceDao->saved;
       // Create or update resource
@@ -127,14 +128,18 @@ class Journal_SubmitController extends Journal_AppController
           $bitstreams = $lastExistingRevision->getBitstreams();
           foreach($bitstreams as $bitstream)
             {
+            $type = MidasLoader::loadComponent("Bitstream", "journal")->getType($bitstream);
             $bitstream->saved = false;
             $bitstream->bitstream_id = null;
+            if($bitstream->getName() == "")continue;
             MidasLoader::loadModel("ItemRevision")->addBitstream($itemRevisionDao, $bitstream);
+            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstream, $type);
+            if($type == BITSTREAM_TYPE_THUMBNAIL) $resourceDao->setLogo($bitstream);
             }
           }
         }  
         
-      MidasLoader::loadModel('Folder')->addItem($this->view->issueDao, $resourceDao);
+      MidasLoader::loadModel('Folder')->addItem($this->view->issueDao, $resourceDao, false);
       $resourceDao->enable();
       
       // Make sure the journal and issue editor and the author can manage the resource

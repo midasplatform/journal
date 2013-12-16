@@ -507,7 +507,7 @@ class Journal_MigrationComponent extends AppComponent
         {
         if(!isset($this->epersonToUser[$eperson_id]))continue;
         $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$eperson_id]);
-        $userDao->setInstitution($institution);
+        $userDao->setCompany($institution);
         MidasLoader::loadModel("User")->save($userDao);
         $this->ijuserToUser[$id] = $userDao->getKey();
         }
