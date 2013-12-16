@@ -33,6 +33,9 @@ $(document).ready(function(){
   $('#globalComment').change(function(){
     json.listArray.list.comment = $(this).val();
   });
+  $('#certificationLevel').change(function(){
+    json.listArray.list.certificationLevel = $(this).val();
+  });
   
   $('#saveReview').click(function(){
     var url = json.global.webroot+"/reviewosehra/submit?revision_id="+json.listArray.revision_id;
@@ -63,6 +66,7 @@ function processQuestionUpdate(init){
     var template = $('div#templateQuestion').html();
     $('#descriptionQuestionList').html(json.listArray.list.description);
     $('#globalComment').val(json.listArray.list.comment);
+    $('#certificationLevel').val(json.listArray.list.certificationLevel);
     $.each(json.listArray.topics, function(i, v){      
       // Summary
       var html = "";
@@ -70,7 +74,6 @@ function processQuestionUpdate(init){
       else html += "<tr class='even' class='topicSum' id='topicSum_"+i+"'>";
       html += "<td><a class='selectTopic' value='"+i+"'>"+v.name+"</a></td>";
       html += "<td><input type='checkbox' disabled='disabled'/></td>";
-      html += "<td></td>";
       html += "</tr>";
       $('table#summaryTable tbody').append(html);
 
@@ -89,17 +92,14 @@ function processQuestionUpdate(init){
   var totalQuestionAnswered = 0;
   $.each(json.listArray.topics, function(i, v){  
     var isComplete = v.questions.length != 0;   
-    var score = 0;
     $.each(v.questions, function(j, q){
         totalQuestion++;
         if(q.value == 0) isComplete = false;
         if(q.value != 0) totalQuestionAnswered++;
-        score += parseInt(q.value);
         $('#questionElement_'+j+" select").val(parseInt(q.value));
         $('#questionElement_'+j+" textarea").val(q.commentValue);
       });
     $('#topicSum_'+i+" input").attr('checked', isComplete);
-    $('#topicSum_'+i+" td:last").html(score);
     });
   percentage = parseInt(100 * totalQuestionAnswered/totalQuestion);
   $('progress').attr("value", percentage);

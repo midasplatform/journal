@@ -27,7 +27,6 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
               <tr>
                 <th>Topic</th>
                 <th>Completed</th>
-                <th>Certification level</th>
               </tr>
             </thead>
             <tbody>
@@ -47,6 +46,17 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
             if(!$this->isEditable)echo 'readonly';
             ?> 
             id="globalComment"></textarea>
+          <h4>Recommended Certification Level
+          <select id="certificationLevel"
+            <?php
+            if(!$this->isEditable)echo 'readonly';
+            ?> >
+            <option></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+          </h4>
           
           <?php
           if($this->isEditable)echo ' <input id="saveReview" type="button" value="Save"/>';
