@@ -55,8 +55,8 @@ $(document).ready(function(){
       
     if(tree.children.length > 4)
       {
-      var tree = $(this).parent('div.TreeEntry').find('div.categoryTree');
-      $(this).attr('src', json.global.webroot+'/privateModules/journal/public/images/arrow-right.png');
+      $("div.categoryTree:last").hide();
+      $("div.categoryTree:last").parent().find('img.tooggleButton').attr('src', json.global.webroot+'/privateModules/journal/public/images/arrow-right.png');
       }
     }
   );  
