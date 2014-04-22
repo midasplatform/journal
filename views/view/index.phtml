@@ -151,11 +151,12 @@ foreach ($cssArray as $module => $list)
         <?php
         if($this->resource->getLogo())
           {
-          echo '<br/><img class="ResultLogo" src="'.$this->webroot.'/journal/view/logo/?revisionId='.$this->resource->getRevision()->getKey().'&size=300" /><br/>';
+          echo '<br/><img class="ResultLogo" src="'.$this->webroot.'/journal/view/logo/?revisionId='.$this->resource->getRevision()->getKey().'&size=300" /><br/><br/>';
           }
-        //TODO handle        
+        $handleUrl = "http://hdl.handle.net/".$this->baseHandle."/".$this->resource->getHandle();
         ?>
-        Please use this identifier to cite or link to this publication: <br/>
+        
+        <span style="background-color: #F2F3F3;">Please use this identifier to cite or link to this publication: <a href="<?php echo $handleUrl?>"><?php echo $handleUrl?></a></span><br/>
         <?php
         if(!$this->isApproved)
           {
@@ -163,7 +164,7 @@ foreach ($cssArray as $module => $list)
           }
           ?>
       </center>
-      <br/>
+
       <div class="journal">
         Published in <a href="<?php echo $this->webroot ?>/journal?community=<?php echo $this->community->getKey() ?>"
                         ><?php echo $this->community->getName(); ?></a> - <a 

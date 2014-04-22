@@ -1,21 +1,22 @@
 <?php
 /*=========================================================================
- *
- *  Copyright OSHERA Consortium
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0.txt
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- *=========================================================================*/
+ MIDAS Server
+ Copyright (c) Kitware SAS. 26 rue Louis GuÃ©rin. 69100 Villeurbanne, FRANCE
+ All rights reserved.
+ More information http://www.kitware.com
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0.txt
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+=========================================================================*/
 
 require_once BASE_PATH.'/core/models/dao/ItemRevisionDao.php';
 require_once BASE_PATH.'/core/models/dao/BitstreamDao.php';
@@ -46,6 +47,10 @@ class Journal_MigrationComponent extends AppComponent
   var $midas2Port = "5432";
   var $midas2Assetstore = "C:/xampp/midas/assetstore"; // without end slash
   var $assetstoreId = '1';
+  var $epersonToUser = array();
+  var $ijuserToUser = array();
+  var $categoriesReference = array();
+  var $tookitReference = array();
 
   /** Private variables */
   var $userId;
@@ -53,6 +58,7 @@ class Journal_MigrationComponent extends AppComponent
   /** function to create the items */
   private function _createFolderForItem($collectionId, $parentFolderid)
     {
+    $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
     $Folder = MidasLoader::loadModel("Folder");
     $Bitstream = MidasLoader::loadModel("Bitstream");
     $Item = MidasLoader::loadModel("Item");
@@ -74,217 +80,249 @@ class Journal_MigrationComponent extends AppComponent
       {
       $item_id = $colquery_array['item_id'];
       $title = $colquery_array['title'];
+      
+      // Add IJ information
+      $sql = pg_query("SELECT * FROM isj_publication WHERE itemid=".$item_id);
+      $ij_publicationArray = pg_fetch_assoc($sql);
+      if(empty($ij_publicationArray)) continue;
+      $publicationId = $ij_publicationArray['id'];
+      if(!isset($this->ijuserToUser[$ij_publicationArray['authorid']]))continue;
+      $authorid = $this->ijuserToUser[$ij_publicationArray['authorid']];
+      $author = MidasLoader::loadModel('User')->load($authorid);
+      
+      $publicationAuthorList = array();
+      $sqlAuthors = pg_query("SELECT metadata_value_id,text_value FROM metadatavalue
+                                  WHERE item_id='$item_id' AND metadata_field_id='3' ORDER BY place ASC");
+      while($ij_authorsArray = pg_fetch_array($sqlAuthors))
+        {
+        $value = $ij_authorsArray["text_value"];
+        if (strpos($value, ",") !== FALSE)
+          {
+          $firstname = substr($value, strpos($value, ",")+2, strlen($value)-strpos($value, ",")-2);
+          $lastname = substr($value, 0, strpos($value, ","));
+          }
+        else
+          {
+          $firstname = "";
+          $lastname = $value;
+          }
+          
+        $publicationAuthorList[0][] = $firstname;
+        $publicationAuthorList[1][] = $lastname;
+        }
+        
+      $publicationCat = array();
+      $sqlCat = pg_query("SELECT * FROM isj_publication2category where publicationid=".$publicationId);
+      while($ij_cattArray = pg_fetch_array($sqlCat))
+        {
+        $value = $ij_cattArray["categoryid"];
+        if(isset($this->categoriesReference[$value]))
+          {
+          $publicationCat[] = $this->categoriesReference[$value];
+          }
+        }
+      
+      $sqlToolkit = pg_query("SELECT * FROM isj_publication2toolkit where publicationid=".$publicationId);
+      while($ij_toolkitArray = pg_fetch_array($sqlToolkit))
+        {
+        $value = $ij_toolkitArray["toolkitid"];
+        if(isset($this->tookitReference[$value]))
+          {
+          $publicationCat[] = $this->tookitReference[$value];
+          }
+        }     
+        
+      $sqlTags = pg_query("SELECT text_value FROM metadatavalue WHERE item_id='$item_id' AND metadata_field_id='57'
+                                    ORDER BY place ASC");
+      $tags = array();
+      while($tagstArray = pg_fetch_array($sqlTags))
+        {
+        $tags[] = $ij_toolkitArray["text_value"];       
+        }      
+      
+      $institution = $ij_publicationArray['institution'];
 
       // If title is empty we skip this item
       if(empty($title))
         {
         continue;
         }
+        
+      $views = 0;
+      $downloads = 0;
+      $handle = "";
+      $grant = "";
+        
+      $sql = pg_query("SELECT sum(downloads) FROM isj_publication_statistics where publication=".$publicationId);
+      $returnArray = pg_fetch_assoc($sql);
+      if(isset($returnArray['sum'])) $downloads = $returnArray['sum'];
+      $sql = pg_query("SELECT * FROM isj_publication_views where publication=".$publicationId);
+      $returnArray = pg_fetch_assoc($sql);
+      if(isset($returnArray['views'])) $views = $returnArray['views'];
+      $sql = pg_query("SELECT handle FROM handle WHERE resource_id='$item_id' AND resource_type_id='2'");
+      $returnArray = pg_fetch_assoc($sql);
+      if(isset($returnArray['handle'])) $handle = $returnArray['handle'];
+      $sql = pg_query("SELECT text_value FROM metadatavalue WHERE item_id='$item_id' AND metadata_field_id='24'");
+      $returnArray = pg_fetch_assoc($sql);
+      if(isset($returnArray['text_value'])) $grant = $returnArray['text_value'];
 
       $abstract = $colquery_array['abstract'];
-      $folderDao = false;
-      try
+      $parentFolder = $Folder->load($parentFolderid);    
+      
+      $resourceDao = MidasLoader::newDao('ResourceDao', 'journal');
+      $resourceDao->setRevision("New");
+      
+      $resourceDao->setView($views);
+      $resourceDao->setDownload($downloads);
+      $resourceDao->setName($title);
+      $resourceDao->setDescription($abstract);
+      $resourceDao->setType(RESOURCE_TYPE_PUBLICATION);   
+      MidasLoader::loadModel("Item")->save($resourceDao);
+      
+      MidasLoader::loadModel("Folder")->addItem($parentFolder, $resourceDao);
+      
+      $adminGroup = $resourceDao->getAdminGroup();
+      $memberGroup = $resourceDao->getMemberGroup();
+      MidasLoader::loadModel("Itempolicygroup")->createPolicy($adminGroup, $resourceDao, MIDAS_POLICY_ADMIN);
+      MidasLoader::loadModel("Itempolicygroup")->createPolicy($memberGroup, $resourceDao, MIDAS_POLICY_READ);
+      MidasLoader::loadModel("Itempolicyuser")->createPolicy($author, $resourceDao, MIDAS_POLICY_WRITE);
+      
+      $policies = $parentFolder->getFolderpolicygroup();
+      foreach($policies as $policy)
         {
-        // Create the folder for the item
-        $folderDao = $Folder->createFolder($title, $abstract, $parentFolderid);
-
-        // Assign the policies to the folder as the same as the parent folder
-        $folder = $Folder->load($parentFolderid);
-        $policyGroup = $folder->getFolderpolicygroup();
-        $policyUser = $folder->getFolderpolicyuser();
-        foreach($policyGroup as $policy)
+        if($policy->getPolicy() == MIDAS_POLICY_ADMIN)
           {
-          $group = $policy->getGroup();
-          $policyValue = $policy->getPolicy();
-          $Folderpolicygroup->createPolicy($group, $folderDao, $policyValue);
-          }
-        foreach($policyUser as $policy)
-          {
-          $user = $policy->getUser();
-          $policyValue = $policy->getPolicy();
-          $Folderpolicyuser->createPolicy($user, $folderDao, $policyValue);
-          }
-
-        // Add specific MIDAS policies for users (not dealing with groups)
-        $policyquery = pg_query("SELECT max(action_id) AS actionid, eperson.eperson_id, eperson.email
-                                FROM resourcepolicy
-                                LEFT JOIN eperson ON (eperson.eperson_id=resourcepolicy.eperson_id)
-                                 WHERE epersongroup_id IS NULL AND resource_type_id=".MIDAS2_RESOURCE_ITEM.
-                                 " AND resource_id=".$item_id." GROUP BY eperson.eperson_id, email");
-
-        while($policyquery_array = pg_fetch_array($policyquery))
-          {
-          $actionid = $policyquery_array['actionid'];
-          $email = $policyquery_array['email'];
-          if($actionid > 1)
-            {
-            $policyValue = MIDAS_POLICY_ADMIN;
-            }
-          else if($actionid == 1)
-            {
-            $policyValue = MIDAS_POLICY_WRITE;
-            }
-          else
-            {
-            $policyValue = MIDAS_POLICY_READ;
-            }
-          $userDao = $User->getByEmail($email);
-          $Folderpolicyuser->createPolicy($userDao, $folderDao, $policyValue);
+          MidasLoader::loadModel("Itempolicygroup")->createPolicy($policy->getGroup(), $resourceDao, MIDAS_POLICY_ADMIN);
           }
         }
-      catch(Zend_Exception $e)
+        
+      // Create the item from the bitstreams
+      $bitquery = pg_query("SELECT bundle2bitstream.bitstream_id, bitstream.name, bitstream.internal_id, bitstream.type, bitstream.description
+        FROM bundle2bitstream,item2bundle,bitstream
+                                WHERE item2bundle.item_id='$item_id'
+                                AND item2bundle.bundle_id=bundle2bitstream.bundle_id AND
+                                bitstream.bitstream_id=bundle2bitstream.bitstream_id");
+      
+      $bitstreams = array();
+
+      while($bitquery_array = pg_fetch_array($bitquery))
         {
-        $this->getLogger()->info($e->getMessage());
-        Zend_Debug::dump($e);
-        //we continue
+        $filename = $bitquery_array['name'];
+        $internal_id = $bitquery_array['internal_id'];
+        $type = $bitquery_array['type'];
+        $filepath = $this->midas2Assetstore.'/';
+        $filepath .= substr($internal_id, 0, 2).'/';
+        $filepath .= substr($internal_id, 2, 2).'/';
+        $filepath .= substr($internal_id, 4, 2).'/';
+        $filepath .= $internal_id;
+        
+        $newtype = BITSTREAM_TYPE_MISC;        
+        switch ($filepath)
+          {
+          case 1:
+            $newtype = BITSTREAM_TYPE_PAPER;
+            break;
+          case 2:
+          case 4:
+            $newtype = BITSTREAM_TYPE_SOURCECODE;
+            break;
+          case 3:
+            $newtype = BITSTREAM_TYPE_PAPER;
+            break;
+          default:
+            break;
+          }
+        
+        $revision = $this->getBitStreamRevision($bitquery_array['description']);
+        if(empty($revision) || !file_exists($filepath))continue;
+        
+        foreach($revision as $r)
+          {
+          if(!isset($bitstreams[$r])) $bitstreams[$r] = array();
+          $bitstreams[$r][] = array('filename' => $filename,
+              'path' => $filepath,
+              'type' => $newtype);
+          }
         }
 
-      if($folderDao)
+      // Get Logo
+      $logoPath = UtilityComponent::getTempDirectory()."/logo.jpg";
+      unlink($logoPath);
+      $logoFound = false;
+      $res = pg_query("SELECT biglogo as logo from isj_publication WHERE id=".$publicationId);  
+      $raw = pg_fetch_result($res, 'logo');
+      if($raw != null)
         {
-        // Create the item from the bitstreams
-        $bitquery = pg_query("SELECT   b.bitstream_id, b.name, b.description, b.internal_id FROM bitstream AS b, item2bitstream AS i2b ".
-                             "WHERE i2b.bitstream_id = b.bitstream_id AND i2b.item_id=".$item_id);
-        while($bitquery_array = pg_fetch_array($bitquery))
+        $file = fopen($logoPath,"w");
+        fwrite($file, $raw);
+        fclose($file);
+        $logoFound = true;
+        }
+
+      // Convertit en binaire et envoie au navigateur
+      header('Content-type: image/jpeg');
+      echo pg_unescape_bytea($raw);
+        
+      $sqlRevision = pg_query("SELECT * FROM isj_revision WHERE publication ='".$publicationId."' ORDER BY revision ASC ");
+      while($ij_revisionArray = pg_fetch_array($sqlRevision))
+        {
+        $itemRevisionDao = new ItemRevisionDao();
+        $itemRevisionDao->setChanges($ij_revisionArray['comments']);
+        $itemRevisionDao->setUser_id($authorid);
+        $itemRevisionDao->setDate(date('c', strtotime($ij_revisionArray['date'])));
+        $itemRevisionDao->setLicenseId(null);
+        MidasLoader::loadModel("Item")->addRevision($resourceDao, $itemRevisionDao);
+        
+        $resourceDao->setRevision($itemRevisionDao);        
+        
+        $resourceDao->setSubmitter($author);
+        $resourceDao->setInstitution($institution);     
+        $resourceDao->setAuthors($publicationAuthorList);     
+        $resourceDao->setCategories($publicationCat);     
+        $resourceDao->setCopyright("");     
+        $resourceDao->setDisclaimer("");     
+        $resourceDao->setTags($tags);     
+        $resourceDao->setRelated("");     
+        $resourceDao->setGrant($grant);     
+        $resourceDao->setHandle($handle);     
+        
+        $resourceDao->enable();
+        
+        $resourceDao->setMetaDataByQualifier("old_id", $publicationId);
+        
+        $revisionNumber = $itemRevisionDao->getRevision();
+        
+        if($logoFound)
           {
-          $filename = $bitquery_array['name'];
-
-          $itemdao = new ItemDao;
-          $itemdao->setName($filename);
-
-          // Get the number of downloads and set it
-          $itemstatsquery = pg_query("SELECT downloads from midas_resourcelog WHERE
-                                      resource_id_type=".MIDAS2_RESOURCE_ITEM." AND resource_id=".$item_id);
-          $itemstats_array = pg_fetch_array($itemstatsquery);
-          if($itemstats_array)
+          if(!isset($bitstreams[$revisionNumber])) $bitstreams[$revisionNumber] = array();
+          $bitstreams[$revisionNumber][] = array('filename' =>  "logo.jpg",
+              'path' => $logoPath,
+              'type' => BITSTREAM_TYPE_THUMBNAIL);
+          }
+        
+        if(!empty($bitstreams[$revisionNumber]))
+          {
+          foreach($bitstreams[$revisionNumber] as $bitstream)
             {
-            $itemdao->setView($itemstats_array['downloads']);
-            $itemdao->setDownload($itemstats_array['downloads']);
-            }
-
-          $Item->save($itemdao);
-
-          // Just check if the group anonymous can access the item
-          $policyquery = pg_query("SELECT policy_id FROM resourcepolicy WHERE resource_type_id=".MIDAS2_RESOURCE_ITEM.
-                                " AND resource_id=".$item_id." AND epersongroup_id=0");
-          $privacy = MIDAS_COMMUNITY_PRIVATE;
-          if(pg_num_rows($policyquery) > 0)
-            {
-            $anonymousGroup = $Group->load(MIDAS_GROUP_ANONYMOUS_KEY);
-            $Itempolicygroup->createPolicy($anonymousGroup, $itemdao, MIDAS_POLICY_READ);
-            }
-
-          // Add specific MIDAS policies for users
-          $policyquery = pg_query("SELECT max(action_id) AS actionid, eperson.eperson_id, eperson.email
-                                  FROM resourcepolicy
-                                  LEFT JOIN eperson ON (eperson.eperson_id=resourcepolicy.eperson_id)
-                                   WHERE epersongroup_id IS NULL AND resource_type_id=".MIDAS2_RESOURCE_ITEM.
-                                   " AND resource_id=".$item_id." GROUP BY eperson.eperson_id, email");
-
-          while($policyquery_array = pg_fetch_array($policyquery))
-            {
-            $actionid = $policyquery_array['actionid'];
-            $email = $policyquery_array['email'];
-            if($actionid > 1)
-              {
-              $policyValue = MIDAS_POLICY_ADMIN;
-              }
-            else if($actionid == 1)
-              {
-              $policyValue = MIDAS_POLICY_WRITE;
-              }
-            else
-              {
-              $policyValue = MIDAS_POLICY_READ;
-              }
-            $userDao = $User->getByEmail($email);
-            // Set the policy of the item
-            $Itempolicyuser->createPolicy($userDao, $itemdao, $policyValue);
-            }
-
-          // Add the item to the current directory
-          $Folder->addItem($folderDao, $itemdao);
-
-          // Create a revision for the item
-          $itemRevisionDao = new ItemRevisionDao;
-          $itemRevisionDao->setChanges('Initial revision');
-          $itemRevisionDao->setUser_id($this->userId);
-          $Item->addRevision($itemdao, $itemRevisionDao);
-
-          // Add the metadata
-          $MetadataModel = MidasLoader::loadModel("Metadata");
-
-          //
-          $metadataquery = pg_query("SELECT metadata_field_id, text_value FROM metadatavalue WHERE item_id=".$item_id);
-          while($metadata_array = pg_fetch_array($metadataquery))
-            {
-            $text_value = $metadata_array['text_value'];
-            $metadata_field_id = $metadata_array['metadata_field_id'];
-
-            $element = "";
-            $qualifier = "";
-
-            // Do not check 64 and 27 because they are stored as field and not metadata
-            // in MIDAS3
-            switch($metadata_field_id)
-              {
-              case 3:  $element = 'contributor'; $qualifier = 'author'; break;
-              case 11:  $element = 'date'; $qualifier = 'uploaded'; break;
-              case 14:  $element = 'date'; $qualifier = 'created'; break;
-              case 15:  $element = 'date'; $qualifier = 'issued'; break;
-              case 18:  $element = 'identifier'; $qualifier = 'citation'; break;
-              case 25:  $element = 'identifier'; $qualifier = 'uri'; break;
-              case 26:  $element = 'description'; $qualifier = 'general'; break;
-              case 28:  $element = 'description'; $qualifier = 'provenance'; break;
-              case 29:  $element = 'description'; $qualifier = 'sponsorship'; break;
-              case 39:  $element = 'description'; $qualifier = 'publisher'; break;
-              case 57:  $element = 'subject'; $qualifier = 'keyword'; break;
-              case 68:  $element = 'subject'; $qualifier = 'ocis'; break;
-              case 75:  $element = 'identifier'; $qualifier = 'pubmed'; break;
-              case 74:  $element = 'identifier'; $qualifier = 'doi'; break;
-              default: $element = ""; $qualidfier = "";
-              }
-
-            if($element != "")
-              {
-              $MetadataModel->addMetadataValue($itemRevisionDao, MIDAS_METADATA_TEXT,
-                                               $element, $qualifier, $text_value);
-              }
-            }
-
-          // Add bitstreams to the revision
-          $bitstreamDao = new BitstreamDao;
-          $bitstreamDao->setName($filename);
-
-          // Compute the path from the internalid
-          // We are assuming only one assetstore
-          $internal_id = $bitquery_array['internal_id'];
-          $filepath = $this->midas2Assetstore.'/';
-          $filepath .= substr($internal_id, 0, 2).'/';
-          $filepath .= substr($internal_id, 2, 2).'/';
-          $filepath .= substr($internal_id, 4, 2).'/';
-          $filepath .= $internal_id;
-
-          // Check that the file exists
-          if(file_exists($filepath))
-            {
+            // Add bitstreams to the revision
+            $bitstreamDao = new BitstreamDao;
+            $bitstreamDao->setName($bitstream['filename']);
             // Upload the bitstream
             $assetstoreDao = $Assetstore->load($this->assetstoreId);
-            $bitstreamDao->setPath($filepath);
+            $bitstreamDao->setPath($bitstream['path']);
             $bitstreamDao->fillPropertiesFromPath();
             $bitstreamDao->setAssetstoreId($this->assetstoreId);
 
             $UploadComponent = new UploadComponent();
-            $UploadComponent->uploadBitstream($bitstreamDao, $assetstoreDao);
+            $UploadComponent->uploadBitstream($bitstreamDao, $assetstoreDao, true);
 
             // Upload the bitstream ifnecessary (based on the assetstore type)
             $ItemRevision->addBitstream($itemRevisionDao, $bitstreamDao);
+            
+            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, $bitstream['type']);            
             unset($UploadComponent);
             }
           }
-        }
-      else
-        {
-        echo "Cannot create Folder for item: ".$title."<br>";
         }
       }
     } // end _createFolderForItem()
@@ -296,20 +334,54 @@ class Journal_MigrationComponent extends AppComponent
     $User = MidasLoader::loadModel("User");
     $Folderpolicygroup = MidasLoader::loadModel("Folderpolicygroup");
     $Folderpolicyuser = MidasLoader::loadModel("Folderpolicyuser");
-
-    $colquery = pg_query("SELECT collection_id, name, short_description, introductory_text FROM collection WHERE owning_community=".$communityId);
-    while($colquery_array = pg_fetch_array($colquery))
+    $parentFolder = MidasLoader::loadModel("Folder")->load($parentFolderid);
+    $communityDao = MidasLoader::loadModel("Folder")->getCommunity($parentFolder);
+    
+    $colquery = pg_query("SELECT collection_id FROM community2collection   WHERE community_id='$communityId' ORDER BY collection_id");
+    while($collist_array = pg_fetch_array($colquery))
       {
-      $collection_id = $colquery_array['collection_id'];
+      $collection_id = $collist_array['collection_id'];
+      $sql = pg_query("SELECT collection_id, name, short_description, license, introductory_text FROM collection WHERE collection_id=".$collection_id);
+      $colquery_array = pg_fetch_assoc($sql);
+      if(empty($colquery_array)) continue;
       $name = $colquery_array['name'];
       $short_description = $colquery_array['short_description'];
       $introductory_text = $colquery_array['introductory_text'];
-      $folderDao = false;
+      $license = $colquery_array['license'];
+      $issueDao = false;
       try
         {
-        // Create the folder for the community
-        $folderDao = $Folder->createFolder($name, $short_description, $parentFolderid);
+        // Add IJ information
+        $sql = pg_query("SELECT * FROM isj_journal WHERE collectionid=".$collection_id);
+        $ij_journalArray = pg_fetch_assoc($sql);
+        
+        // Create the folder for the community        
+        $community  = MidasLoader::loadModel("Community")->load($communityId);
+        $issueDao = MidasLoader::newDao('IssueDao', 'journal');
+        
+        $issueDao->setParentId($parentFolderid);
+        $issueDao->setName($name);
+        MidasLoader::loadModel("Folder")->save($issueDao);
+        $issueDao->InitValues();
+        
+        $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
+        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($anonymousGroup, $issueDao, MIDAS_POLICY_READ); 
+        
+        $editorGroup = MidasLoader::loadModel("Group")->createGroup($communityDao, "Issue_".$issueDao->getKey());
+        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($editorGroup, $issueDao, MIDAS_POLICY_ADMIN);
+        
 
+        if(isset($ij_journalArray['paperdue_date'])) $issueDao->paperdue_date = $ij_journalArray['paperdue_date'];
+        if(isset($ij_journalArray['decision_date'])) $issueDao->paperdue_date = $ij_journalArray['decision_date'];
+        if(isset($ij_journalArray['publication_date'])) $issueDao->paperdue_date = $ij_journalArray['publication_date'];
+        
+        $issueDao->short_description = $short_description;
+        $issueDao->introductory_text = $introductory_text;
+        $issueDao->readerLicense = $license;
+        
+        $issueDao->initialized = true;
+        $issueDao->save();
+        
         // Assign the policies to the folder as the same as the parent folder
         $folder = $Folder->load($parentFolderid);
         $policyGroup = $folder->getFolderpolicygroup();
@@ -318,13 +390,13 @@ class Journal_MigrationComponent extends AppComponent
           {
           $group = $policy->getGroup();
           $policyValue = $policy->getPolicy();
-          $Folderpolicygroup->createPolicy($group, $folderDao, $policyValue);
+          $Folderpolicygroup->createPolicy($group, $issueDao, $policyValue);
           }
         foreach($policyUser as $policy)
           {
           $user = $policy->getUser();
           $policyValue = $policy->getPolicy();
-          $Folderpolicyuser->createPolicy($user, $folderDao, $policyValue);
+          $Folderpolicyuser->createPolicy($user, $issueDao, $policyValue);
           }
 
         // Add specific MIDAS policies for users (not dealing with groups)
@@ -351,8 +423,8 @@ class Journal_MigrationComponent extends AppComponent
             $policyValue = MIDAS_POLICY_READ;
             }
           $userDao = $User->getByEmail($email);
-          $Folderpolicyuser->createPolicy($userDao, $folderDao, $policyValue);
-          }
+          $Folderpolicyuser->createPolicy($userDao, $issueDao, $policyValue);
+          }         
         }
       catch(Zend_Exception $e)
         {
@@ -361,10 +433,10 @@ class Journal_MigrationComponent extends AppComponent
         //we continue
         }
 
-      if($folderDao)
+      if($issueDao)
         {
         // We should create the item
-        $this->_createFolderForItem($collection_id, $folderDao->getFolderId());
+        $this->_createFolderForItem($collection_id, $issueDao->getFolderId());
         }
       else
         {
@@ -374,107 +446,21 @@ class Journal_MigrationComponent extends AppComponent
     } // end _createFolderForCollection()
 
 
-  /** Recursive function to create the communities */
-  private function _createFolderForCommunity($communityidMIDAS2, $parentFolderid)
-    {
-    $Folder = MidasLoader::loadModel("Folder");
-    $Folderpolicygroup = MidasLoader::loadModel("Folderpolicygroup");
-    $Folderpolicyuser = MidasLoader::loadModel("Folderpolicyuser");
-    $User = MidasLoader::loadModel("User");
-
-    // Create the collections attached to this community
-    $this->_createFolderForCollection($communityidMIDAS2, $parentFolderid);
-
-    // Find the subcommunities
-    $comquery = pg_query("SELECT community_id, name, short_description, introductory_text FROM community WHERE owning_community=".$communityidMIDAS2);
-    while($comquery_array = pg_fetch_array($comquery))
-      {
-      $community_id = $comquery_array['community_id'];
-      $name = $comquery_array['name'];
-      $short_description = $comquery_array['short_description'];
-      $introductory_text = $comquery_array['introductory_text'];
-      $folderDao = false;
-      try
-        {
-        // Create the folder for the community
-        $folderDao = $Folder->createFolder($name, $short_description, $parentFolderid);
-
-        // Assign the policies to the folder as the same as the parent folder
-        $folder = $Folder->load($parentFolderid);
-        $policyGroup = $folder->getFolderpolicygroup();
-        $policyUser = $folder->getFolderpolicyuser();
-        foreach($policyGroup as $policy)
-          {
-          $group = $policy->getGroup();
-          $policyValue = $policy->getPolicy();
-          $Folderpolicygroup->createPolicy($group, $folderDao, $policyValue);
-          }
-        foreach($policyUser as $policy)
-          {
-          $user = $policy->getUser();
-          $policyValue = $policy->getPolicy();
-          $Folderpolicyuser->createPolicy($user, $folderDao, $policyValue);
-          }
-
-        // Add specific MIDAS policies for users (not dealing with groups)
-        $policyquery = pg_query("SELECT max(action_id) AS actionid, eperson.eperson_id, eperson.email
-                                FROM resourcepolicy
-                                LEFT JOIN eperson ON (eperson.eperson_id=resourcepolicy.eperson_id)
-                                 WHERE epersongroup_id IS NULL AND resource_type_id=".MIDAS2_RESOURCE_COMMUNITY.
-                                 " AND resource_id=".$community_id." GROUP BY eperson.eperson_id, email");
-
-        while($policyquery_array = pg_fetch_array($policyquery))
-          {
-          $actionid = $policyquery_array['actionid'];
-          $email = $policyquery_array['email'];
-          if($actionid > 1)
-            {
-            $policyValue = MIDAS_POLICY_ADMIN;
-            }
-          else if($actionid == 1)
-            {
-            $policyValue = MIDAS_POLICY_WRITE;
-            }
-          else
-            {
-            $policyValue = MIDAS_POLICY_READ;
-            }
-          $userDao = $User->getByEmail($email);
-
-          $Folderpolicyuser->createPolicy($userDao, $folderDao, $policyValue);
-          }
-        }
-      catch(Zend_Exception $e)
-        {
-        $this->getLogger()->info($e->getMessage());
-        //Zend_Debug::dump($e);
-        //we continue
-        }
-
-      if($folderDao)  // The folder has been created for the community
-        {
-        // Find the subcommunities
-        $this->_createFolderForCommunity($community_id, $folderDao->getFolderId());
-        }
-      else
-        {
-        echo "Cannot create Folder for community: ".$name."<br>";
-        } // end cannot create folder
-      }  // end find information about the current community
-    } // end _createCommunity()
-
   /** */
-  function migrate($get)
+  function migrate($userid)
     {
-    if(!isset($get['midas2_hostname']) || !isset($get['midas2_port']) || !isset($get['midas2_user']) ||
-            !isset($get['midas2_password']) || !isset($get['midas2_database']) || !isset($get['midas2_assetstore']) || !isset($get['assetstore']))
+    $this->userId = $userid;
+
+    // Check that we are in development mode
+    if(Zend_Registry::get('configGlobal')->environment != 'development')
       {
-      throw  new Zend_Exception("Parameter error.");
+      throw new Zend_Exception("Please set your environment config variable to be 'development'.");
       }
+
     // Connect to the local PGSQL database
     ob_start();  // disable warnings
-    $pgdb = pg_connect("host='".$get['midas2_hostname']."' port='".$get['midas2_port']."' dbname='".$get['midas2_database'].
-                       "' user='".$get['midas2_user']."' password='".$get['midas2_password']."'");
+    $pgdb = pg_connect("host='".$this->midas2Host."' port='".$this->midas2Port."' dbname='".$this->midas2Database.
+                       "' user='".$this->midas2User."' password='".$this->midas2Password."'");
     ob_end_clean();
     if($pgdb === false)
       {
@@ -486,21 +472,23 @@ class Journal_MigrationComponent extends AppComponent
       {
       throw new Zend_Exception("Password prefix cannot be set because MIDAS2 doesn't use salt.");
       }
-
+     
     // STEP 1: Import the users
     $User = MidasLoader::loadModel("User");
     $Group = MidasLoader::loadModel("Group");
-    $query = pg_query("SELECT email, password, firstname, lastname FROM eperson");
+    $query = pg_query("SELECT eperson_id, email, password, firstname, lastname FROM eperson");
     while($query_array = pg_fetch_array($query))
       {
       $email = $query_array['email'];
       $password = $query_array['password'];
       $firstname = $query_array['firstname'];
       $lastname = $query_array['lastname'];
+      $eperson_id = $query_array['eperson_id'];
       try
         {
         $userDao = $User->createUser($email, $password, $firstname, $lastname);
         $User->save($userDao);
+        $this->epersonToUser[$eperson_id] = $userDao->getKey();
         }
       catch(Zend_Exception $e)
         {
@@ -509,10 +497,69 @@ class Journal_MigrationComponent extends AppComponent
         //we continue
         }
       }
+    $query = pg_query("SELECT erperson_id, id, institution FROM isj_user");
+    while($query_array = pg_fetch_array($query))
+      {
+      $id = $query_array['id'];
+      $institution = $query_array['institution'];
+      $eperson_id = $query_array['erperson_id'];
+      try
+        {
+        if(!isset($this->epersonToUser[$eperson_id]))continue;
+        $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$eperson_id]);
+        $userDao->setCompany($institution);
+        MidasLoader::loadModel("User")->save($userDao);
+        $this->ijuserToUser[$id] = $userDao->getKey();
+        }
+      catch(Zend_Exception $e)
+        {
+        $this->getLogger()->info($e->getMessage());
+        //Zend_Debug::dump($e);
+        //we continue
+        }
+      }
+      
+    // STEP 2: Import Categories & tookits
+    $categoryDao = MidasLoader::newDao('CategoryDao', 'journal');
+    $categoryDao->setName("Category");
+    $categoryDao->setParentId(-1);
+    MidasLoader::loadModel("Category", "journal")->save($categoryDao);
 
-    // STEP 2: Import the communities. The MIDAS2 TopLevel communities are communities in MIDAS3
+    
+    $toolkitDao = MidasLoader::newDao('CategoryDao', 'journal');
+    $toolkitDao->setName("Tollkit");
+    $toolkitDao->setParentId(-1);
+    MidasLoader::loadModel("Category", "journal")->save($toolkitDao);
+      
+    $query = pg_query("SELECT * from isj_category");
+    while($query_array = pg_fetch_array($query))
+      {
+      $id = $query_array['id'];
+      $name = $query_array['description'];
+      $c = MidasLoader::newDao('CategoryDao', 'journal');
+      $c->setName($name);
+      $c->setParentId($categoryDao->getKey());
+      MidasLoader::loadModel("Category", "journal")->save($c);
+      
+      $this->categoriesReference[$id] = $c->getKey();
+      }
+
+    $query = pg_query("SELECT * from isj_toolkit");
+    while($query_array = pg_fetch_array($query))
+      {
+      $id = $query_array['id'];
+      $name = $query_array['name'];
+      $c = MidasLoader::newDao('CategoryDao', 'journal');
+      $c->setName($name);
+      $c->setParentId($toolkitDao->getKey());
+      MidasLoader::loadModel("Category", "journal")->save($c);
+      
+      $this->tookitReference[$id] = $c->getKey();
+      }
+      
+    // STEP 3: Import the communities. The MIDAS2 TopLevel communities are communities in MIDAS3
     $Community = MidasLoader::loadModel("Community");
-    $query = pg_query("SELECT community_id, name, short_description, introductory_text FROM community WHERE owning_community = 0");
+    $query = pg_query("SELECT community_id, name, short_description, introductory_text FROM community");
     while($query_array = pg_fetch_array($query))
       {
       $community_id = $query_array['community_id'];
@@ -560,7 +607,6 @@ class Journal_MigrationComponent extends AppComponent
           $userDao = $User->getByEmail($email);
           $Group->addUser($memberGroupDao, $userDao);
           }
-
         }
       catch(Zend_Exception $e)
         {
@@ -577,7 +623,7 @@ class Journal_MigrationComponent extends AppComponent
       if($communityDao)
         {
         $folderId = $communityDao->getFolderId();
-        $this->_createFolderForCommunity($community_id, $folderId);
+        $this->_createFolderForCollection($community_id, $folderId);
         }
       else
         {
@@ -585,8 +631,64 @@ class Journal_MigrationComponent extends AppComponent
         }
       } // end while loop
 
+    // STEP 4:Comments
+    $query = pg_query("SELECT * FROM isj_revision_comment");
+    while($query_array = pg_fetch_array($query))
+      {
+      $item = $this->getItemByAllId($query_array['publication']);
+      $date = date('c', strtotime($query_array['date']));
+      $epersonId = $query_array['eperson_id'];
+      $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$epersonId]);
+      
+      if($item && $userDao)
+        {
+        MidasLoader::loadModel('Itemcomment', 'comments')->addComment($userDao, $item, $query_array['comment']);
+        }
+      }    
+
     // Close the database connection
     pg_close($pgdb);
     } // end function migrate()
+    
+  public function getItemByAllId($id)
+    {
+    $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "old_id");
+    if(!$metadataDao)return false;
+    $db = Zend_Registry::get('dbAdapter');
+    
+    $db = Zend_Registry::get('dbAdapter');
+    $row = $db->fetchRow($db->select()
+              ->from("metadatavalue", array("itemrevision_id"))
+              ->where("value = ?",  $id)
+              ->where("metadata_id = ?",  $metadataDao->getKey())
+          );
+
+    if(!empty($row) && isset($row['itemrevision_id']))
+      {
+      $revision = MidasLoader::loadModel("ItemRevision")->load($row['itemrevision_id']);
+      if(!$revision)return false;
+      return $revision->getItem();    
+      }    
+    return false;
+    }
+    
+  private function getBitStreamRevision($description)
+    {
+    $description=substr($description,11);
+    $description=substr($description,0,-1);
+    $result=array();
+    $revision=array();
+
+    while(!empty($description))
+    {
+    ereg( "[0-9]*", $description, $revision);
+    $description=substr($description,strlen($revision[0])+1);
+    if(!empty($revision[0]))
+      {
+      $result[]=$revision[0];
+      }
+    }
+    return @$result;
+    }
 
 } // end class

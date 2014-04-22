@@ -26,6 +26,7 @@ class Journal_ConfigController extends Journal_AppController
     $this->view->defaultJournal = MidasLoader::loadModel("Setting")->getValueByName('defaultJournal', "journal");
     $this->view->defaultLayout = MidasLoader::loadModel("Setting")->getValueByName('defaultLayout', "journal");
     $this->view->adminEmail = MidasLoader::loadModel("Setting")->getValueByName('adminEmail', "journal");
+    $this->view->baseHandle = MidasLoader::loadModel("Setting")->getValueByName('baseHandle', "journal");
     $this->view->json['isConfigSaved'] = 0;
 
     if($this->_request->isPost() && is_numeric($_POST['defaultJournal']))
@@ -33,10 +34,12 @@ class Journal_ConfigController extends Journal_AppController
       $this->view->json['isConfigSaved'] = 1;
       $this->view->defaultJournal = $_POST['defaultJournal'];
       $this->view->defaultLayout = $_POST['defaultLayout'];
+      $this->view->baseHandle = $_POST['baseHandle'];
       $this->view->adminEmail = $_POST['adminEmail'];
       MidasLoader::loadModel("Setting")->setConfig('adminEmail', $this->view->adminEmail, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultJournal', $this->view->defaultJournal, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultLayout', $this->view->defaultLayout, "journal");
+      MidasLoader::loadModel("Setting")->setConfig('baseHandle', $this->view->baseHandle, "journal");
       }
     } // end indexAction
     

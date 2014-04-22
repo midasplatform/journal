@@ -149,6 +149,49 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("insitution", $institution);
     }
     
+  /** Get Institution
+   * 
+   * @return 
+   */
+  function getHandle()
+    {
+    $metadata = $this->getMetaDataByQualifier("handle");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Institution
+   * @param 
+   */
+  function setHandle($handle)
+    {
+    $this->setMetaDataByQualifier("handle", $handle);
+    }
+    
+  /** Generate new handle */
+  function initHandle()
+    {
+    if($this->getHandle() != "")
+      {
+      return;
+      }
+    $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "handle");
+    if(!$metadataDao)  $metadataDao = MidasLoader::loadModel('Metadata')->addMetadata(MIDAS_METADATA_TEXT, "journal", "handle", "");
+    $db = Zend_Registry::get('dbAdapter');
+    $sql = $db->select()
+            ->from('metadatavalue')
+            ->where('metadata_id  = '.$metadataDao->getKey())
+            ->order('value DESC')->limit(1);
+
+    $row = $db->fetchRow($sql);
+    $value = "1000";
+    if(isset($row['value']))
+      {
+      $value = $row['value'] + 1;
+      }
+    $this->setHandle($value);
+    }
+    
   /** Get Dislcaimer Id
    * 
    * @return 
