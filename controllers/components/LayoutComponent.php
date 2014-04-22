@@ -43,7 +43,8 @@ class Journal_LayoutComponent extends AppComponent
    */
   public function getLogoUrl()
     {    
-    $layout = getLayoutName();
+    if($this == null) return "";
+    $layout = $this->getLayoutName();
     $fc = Zend_Controller_Front::getInstance();
 
     if($layout == "ij")

@@ -40,6 +40,22 @@ class Journal_ConfigController extends Journal_AppController
       MidasLoader::loadModel("Setting")->setConfig('defaultJournal', $this->view->defaultJournal, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultLayout', $this->view->defaultLayout, "journal");
       MidasLoader::loadModel("Setting")->setConfig('baseHandle', $this->view->baseHandle, "journal");
+      if(is_numeric($this->view->baseHandle))
+        {
+        // This is a hack allowing us to use the Zend dispatch mechanisum to resolve the handles
+        $handleControllerFolder = __DIR__."/../../handle/controllers";
+        $handleController = $this->view->baseHandle."Controller.php";
+        if(!is_writeable($handleControllerFolder))
+          {
+          throw new Zend_Exception($handleControllerFolder." have to be writable.");
+          }
+        if(!file_exists($handleControllerFolder."/".$handleController))
+          {
+          $content = file_get_contents($handleControllerFolder."/TemplateController.php");
+          $content = str_replace("Handle_TemplateController", "Handle_".$this->view->baseHandle."Controller", $content);
+          file_put_contents($handleControllerFolder."/".$handleController, $content);
+          }
+        }
       }
     } // end indexAction
     
