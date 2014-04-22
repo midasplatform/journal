@@ -17,9 +17,9 @@
  *
  *=========================================================================*/
 
-class Journal_AppDao extends MIDAS_GlobalDao
+class Handle_AppDao extends MIDAS_GlobalDao
   {
-    public $_module='journal';
+    public $_module='handle';
     
   } //end class
 

@@ -16,29 +16,18 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-
 require_once BASE_PATH . '/modules/api/library/APIEnabledNotification.php';
-class Journal_Notification extends ApiEnabled_Notification
+
+class Handle_Notification extends ApiEnabled_Notification
   {
-  public $moduleName = 'journal';
-  public $_moduleComponents=array('Api');
+  public $moduleName = 'handle';
+  public $_moduleComponents = array();
 
   /** init notification process*/
   public function init()
     {
-    $this->enableWebAPI($this->moduleName);
-    $this->addCallBack('CALLBACK_CORE_GET_CONFIG_TABS', 'getConfigTabs');
+  
     }//end init
-    
-    
-   /** get Config Tabs */
-  public function getConfigTabs($params)
-    {
-    $user = $params['user'];
-    $fc = Zend_Controller_Front::getInstance();
-    $webroot = $fc->getBaseUrl();
-    return array('Notification' => $webroot.'/journal/user/notification?userId='.$user->getKey());
-    }
  
   } //end class
 ?>

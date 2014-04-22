@@ -16,9 +16,9 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-class Journal_AppModel extends MIDASModel
+class Handle_AppModel extends MIDASModel
 {
-  public $moduleName='journal';
+  public $moduleName='handle';
 
 }
 ?>
