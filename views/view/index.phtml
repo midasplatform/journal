@@ -87,6 +87,14 @@ foreach ($cssArray as $module => $list)
          RESOURCE_TYPE_PUBLICATION => "Publication",
          RESOURCE_TYPE_TUTORIAL => "Tutorial",
          RESOURCE_TYPE_DATASET => "Dataset");?>
+      
+      <?php
+      $level = $this->resource->getCertificationLevel();
+      if(is_numeric($level))
+        {
+        echo "<li><b>Certified</b> (level ".$level.")</li>";
+        }
+      ?>
        
       <li>Type: <?php echo $articleType[$this->resource->getType()] ?></li>
       <li>Categories: <?php 

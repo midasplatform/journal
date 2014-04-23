@@ -74,11 +74,17 @@ class Journal_ApiComponent extends AppComponent
         $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
         $rating = MidasLoader::loadModel("Itemrating", 'ratings')->getAggregateInfo($item);
         $authors = join(", ", $resourceDao->getAuthorsFullNames());
+        $level = $resourceDao->getCertificationLevel();
+        $isCertified = 0;
+        if(!empty($level) && is_numeric($level))
+          {
+          $isCertified = 1;
+          }
         $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
         $items[] = array('total' => $totalResults, 'title' => $item->getName(), 'rating' => (float)$rating['average'],
             'type' => $item->getType(), 'logo' => $resourceDao->getLogo(), 'id' => $item->getKey(), 'description' => $item->getDescription(), 'authors' => $authors,
             'view' => $item->getView() ,'downloads' => $item->getDownload(), 'statistics' => $statistics,
-            'revisionId' =>  $resourceDao->getRevision()->getKey());
+            'revisionId' =>  $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified);
         $count++;
         if($count >= $limit)
           {

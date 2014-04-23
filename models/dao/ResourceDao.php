@@ -149,7 +149,7 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("insitution", $institution);
     }
     
-  /** Get Institution
+  /** Get Handle
    * 
    * @return 
    */
@@ -160,12 +160,31 @@ class Journal_ResourceDao extends ItemDao
     return $metadata->getValue();
     }
 
-   /* Set Institution
+   /* Set Handle
    * @param 
    */
   function setHandle($handle)
     {
     $this->setMetaDataByQualifier("handle", $handle);
+    }
+    
+  /** Get Certification level
+   * 
+   * @return 
+   */
+  function getCertificationLevel()
+    {
+    $metadata = $this->getMetaDataByQualifier("certification_level");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Institution
+   * @param 
+   */
+  function setCertificationLevel($handle)
+    {
+    $this->setMetaDataByQualifier("certification_level", $handle);
     }
     
   /** Generate new handle */

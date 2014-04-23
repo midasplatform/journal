@@ -21,7 +21,11 @@ $(document).ready(function(){
   
   resizeEvent = function(){
     $.each($('.SearchResultEntry'),function(){
-      var descriptionWidth = $(this).width() - $(this).find('.ResultLogo').width();
+
+      var descriptionWidth = $(this).width() - 70;
+      var titleWidth = $(this).width() - 200;
+      $(this).find('.ResultTitle').css('width', titleWidth+"px");
+      $(this).find('.ResultTitle').dotdotdot( {'height': 20});
       $(this).find('.ResultDescription').css('width', descriptionWidth+"px");
       $(this).find('.ResultDescription').trigger("update");
     })
@@ -171,7 +175,7 @@ function searchDatabase()
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors})
+            'authors': value.authors, 'isCertified' : value.isCertified})
 
           })
                
@@ -184,6 +188,7 @@ function searchDatabase()
             $('.SearchCount').html(total+ " resource available.") 
             }
             
+          resizeEvent();
           setTimeout(resizeEvent, 200);
         },
         error: function (retVal) {
@@ -214,6 +219,10 @@ function addAndFormatResult(container, values) {
     newElement.find('.ResultLogo').remove();
     }
     
+  if(values.isCertified == 0)
+    {
+    newElement.find('.CertifiedWrapper').remove();
+    }
     
   newElement.find('.ResultDescription').dotdotdot();
   return str; 
