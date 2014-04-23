@@ -174,6 +174,7 @@ class Journal_MigrationComponent extends AppComponent
       
       $resourceDao->setView($views);
       $resourceDao->setDownload($downloads);
+      $this->getLogger()->warn("---- Creating " .$title);
       $resourceDao->setName($title);
       $resourceDao->setDescription($abstract);
       $resourceDao->setType(RESOURCE_TYPE_PUBLICATION);   
@@ -234,7 +235,12 @@ class Journal_MigrationComponent extends AppComponent
           }
         
         $revision = $this->getBitStreamRevision($bitquery_array['description']);
-        if(empty($revision) || !file_exists($filepath))continue;
+        $this->getLogger()->warn("---- Copying  " .$filepath);
+        if(empty($revision) || !file_exists($filepath))
+          {
+          $this->getLogger()->warn("---- Copy failed. Revision empty of path doesn't exist.");
+          continue;
+          }
         
         foreach($revision as $r)
           {
@@ -246,22 +252,16 @@ class Journal_MigrationComponent extends AppComponent
         }
 
       // Get Logo
+        ;
       $logoPath = UtilityComponent::getTempDirectory()."/logo.jpg";
       unlink($logoPath);
       $logoFound = false;
-      $res = pg_query("SELECT biglogo as logo from isj_publication WHERE id=".$publicationId);  
-      $raw = pg_fetch_result($res, 'logo');
-      if($raw != null)
+      copy("http://code.osehra.org/journal/download/logopublication/".$item_id."/big", $logoPath);
+      $c = file_get_contents($logoPath);   
+      if(!empty($c))
         {
-        $file = fopen($logoPath,"w");
-        fwrite($file, $raw);
-        fclose($file);
         $logoFound = true;
         }
-
-      // Convertit en binaire et envoie au navigateur
-      header('Content-type: image/jpeg');
-      echo pg_unescape_bytea($raw);
         
       $sqlRevision = pg_query("SELECT * FROM isj_revision WHERE publication ='".$publicationId."' ORDER BY revision ASC ");
       while($ij_revisionArray = pg_fetch_array($sqlRevision))
@@ -304,14 +304,17 @@ class Journal_MigrationComponent extends AppComponent
           {
           foreach($bitstreams[$revisionNumber] as $bitstream)
             {
+            $this->getLogger()->warn("---- Adding  Path:" .$bitstream['path']);
+            $this->getLogger()->warn("---- Adding  MD5 " .UtilityComponent::md5file($bitstream['path']));
             // Add bitstreams to the revision
             $bitstreamDao = new BitstreamDao;
             $bitstreamDao->setName($bitstream['filename']);
             // Upload the bitstream
             $assetstoreDao = $Assetstore->load($this->assetstoreId);
             $bitstreamDao->setPath($bitstream['path']);
-            $bitstreamDao->fillPropertiesFromPath();
+            $bitstreamDao->fillPropertiesFromPath();            
             $bitstreamDao->setAssetstoreId($this->assetstoreId);
+            $this->getLogger()->warn("---- Adding  Checksum " .$bitstreamDao->getChecksum());
 
             $UploadComponent = new UploadComponent();
             $UploadComponent->uploadBitstream($bitstreamDao, $assetstoreDao, true);
@@ -330,6 +333,7 @@ class Journal_MigrationComponent extends AppComponent
   /** function to create the collections */
   private function _createFolderForCollection($communityId, $parentFolderid)
     {
+    $this->getLogger()->warn("- Creating issues");
     $Folder = MidasLoader::loadModel("Folder");
     $User = MidasLoader::loadModel("User");
     $Folderpolicygroup = MidasLoader::loadModel("Folderpolicygroup");
@@ -361,6 +365,7 @@ class Journal_MigrationComponent extends AppComponent
         
         $issueDao->setParentId($parentFolderid);
         $issueDao->setName($name);
+        $this->getLogger()->warn("-- Creating ".$name);
         MidasLoader::loadModel("Folder")->save($issueDao);
         $issueDao->InitValues();
         
@@ -435,6 +440,7 @@ class Journal_MigrationComponent extends AppComponent
 
       if($issueDao)
         {
+        $this->getLogger()->warn("--- Creating Items ");
         // We should create the item
         $this->_createFolderForItem($collection_id, $issueDao->getFolderId());
         }
@@ -451,17 +457,13 @@ class Journal_MigrationComponent extends AppComponent
     {
     $this->userId = $userid;
 
-    // Check that we are in development mode
-    if(Zend_Registry::get('configGlobal')->environment != 'development')
-      {
-      throw new Zend_Exception("Please set your environment config variable to be 'development'.");
-      }
-
+    $this->getLogger()->warn("Starting migration");
     // Connect to the local PGSQL database
     ob_start();  // disable warnings
     $pgdb = pg_connect("host='".$this->midas2Host."' port='".$this->midas2Port."' dbname='".$this->midas2Database.
                        "' user='".$this->midas2User."' password='".$this->midas2Password."'");
     ob_end_clean();
+    $this->getLogger()->warn("Connected to the PG Database");
     if($pgdb === false)
       {
       throw new Zend_Exception("Cannot connect to the MIDAS2 database.");
@@ -474,6 +476,7 @@ class Journal_MigrationComponent extends AppComponent
       }
      
     // STEP 1: Import the users
+    $this->getLogger()->warn("Importing users");
     $User = MidasLoader::loadModel("User");
     $Group = MidasLoader::loadModel("Group");
     $query = pg_query("SELECT eperson_id, email, password, firstname, lastname FROM eperson");
@@ -489,6 +492,7 @@ class Journal_MigrationComponent extends AppComponent
         $userDao = $User->createUser($email, $password, $firstname, $lastname);
         $User->save($userDao);
         $this->epersonToUser[$eperson_id] = $userDao->getKey();
+        $this->getLogger()->warn("- ".$email." created");
         }
       catch(Zend_Exception $e)
         {
@@ -497,6 +501,8 @@ class Journal_MigrationComponent extends AppComponent
         //we continue
         }
       }
+    
+    $this->getLogger()->warn("Adding institutions");
     $query = pg_query("SELECT erperson_id, id, institution FROM isj_user");
     while($query_array = pg_fetch_array($query))
       {
@@ -508,6 +514,7 @@ class Journal_MigrationComponent extends AppComponent
         if(!isset($this->epersonToUser[$eperson_id]))continue;
         $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$eperson_id]);
         $userDao->setCompany($institution);
+        $this->getLogger()->warn("- Adding ".$institution." to ".$userDao->getEmail());
         MidasLoader::loadModel("User")->save($userDao);
         $this->ijuserToUser[$id] = $userDao->getKey();
         }
@@ -520,6 +527,7 @@ class Journal_MigrationComponent extends AppComponent
       }
       
     // STEP 2: Import Categories & tookits
+    $this->getLogger()->warn("Adding categories");
     $categoryDao = MidasLoader::newDao('CategoryDao', 'journal');
     $categoryDao->setName("Category");
     $categoryDao->setParentId(-1);
@@ -558,6 +566,7 @@ class Journal_MigrationComponent extends AppComponent
       }
       
     // STEP 3: Import the communities. The MIDAS2 TopLevel communities are communities in MIDAS3
+    $this->getLogger()->warn("Adding communities");
     $Community = MidasLoader::loadModel("Community");
     $query = pg_query("SELECT community_id, name, short_description, introductory_text FROM community");
     while($query_array = pg_fetch_array($query))
@@ -578,7 +587,15 @@ class Journal_MigrationComponent extends AppComponent
           {
           $privacy = MIDAS_COMMUNITY_PUBLIC;
           }
+        $this->getLogger()->warn("- Adding ".$name);
         $communityDao = $Community->createCommunity($name, $short_description, $privacy, NULL); // no user
+
+        
+        if(!$communityDao)
+          {
+          $this->getLogger()->warn("Unable to create community. It will fail.");
+          }
+        $this->getLogger()->warn("- Added ".$communityDao->getName());
 
         // Add the users to the community
         // MIDAS2 was not using the group heavily so we ignore them. This would have to be a manual step
@@ -632,6 +649,7 @@ class Journal_MigrationComponent extends AppComponent
       } // end while loop
 
     // STEP 4:Comments
+    $this->getLogger()->warn("Adding comment");
     $query = pg_query("SELECT * FROM isj_revision_comment");
     while($query_array = pg_fetch_array($query))
       {

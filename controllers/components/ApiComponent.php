@@ -42,13 +42,13 @@ class Journal_ApiComponent extends AppComponent
                                        Zend_Registry::get('userSession')->Dao);
 
     $limit = array_key_exists('limit', $args) ? (int)$args['limit'] : 25;
+    $offset = array_key_exists('offset', $args) ? (int)$args['offset'] : 0;
     $itemIds = array();
     try
       {
       $index = $solrComponent->getSolrIndex();
-
       UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
-      $response = $index->search($args['query'], 0, $limit * 5, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+      $response = $index->search($args['query'], 0, $limit * 4 + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
       UtilityComponent::endIgnoreWarnings();
 
       $totalResults = $response->response->numFound;
@@ -61,6 +61,8 @@ class Journal_ApiComponent extends AppComponent
       {
       throw new Exception('Syntax error in query ', -1);
       }
+      
+    sort($itemIds);
 
     $modelLoader = new MIDAS_ModelLoader();
     $itemModel = $modelLoader->loadModel('Item');
@@ -68,6 +70,11 @@ class Journal_ApiComponent extends AppComponent
     $count = 0;
     foreach($itemIds as $itemId)
       {
+      if($offset != 0)
+        {
+        $offset--;
+        continue;
+        }
       $item = $itemModel->load($itemId);
       if($item && $itemModel->policyCheck($item, $userDao))
         {

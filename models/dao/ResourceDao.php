@@ -402,6 +402,18 @@ class Journal_ResourceDao extends ItemDao
     return $community->getAdminGroup();
     }
     
+  /** 
+   * Get Resource Member group
+   * @return group
+   */
+  public function getMemberGroup()
+    {
+    $issue =  end($this->getFolders());
+    $community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
+    return $community->getMemberGroup();
+    }
+
+    
   /**
    * Get Metadata object
    * @param type $type

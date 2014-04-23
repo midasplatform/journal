@@ -47,7 +47,7 @@ $(document).ready(function(){
       selectMode: 3,
       children: tree.children,
       onSelect: function(select, node) {
-        searchDatabase();
+        searchDatabase(false);
       },
       onDblClick: function(node, event) {
         node.toggleExpand();
@@ -79,7 +79,7 @@ $(document).ready(function(){
       container.find('.issueDetails').show();
       selectIssue = key;
       }
-    searchDatabase();
+    searchDatabase(false);
   });
   if(json.selectedIssue != "")
     {
@@ -90,7 +90,7 @@ $(document).ready(function(){
    
   // Init instant search
   $('#live_search').keyup(function(){
-      searchDatabase();
+      searchDatabase(false);
     });
       
   // Init tree toogle
@@ -107,7 +107,7 @@ $(document).ready(function(){
     tree.toggle();
   });
   
-  searchDatabase()
+  searchDatabase(false)
 })
 
 function getSelectedCategories()
@@ -123,7 +123,7 @@ function getSelectedCategories()
   }
 
 //** Query the api */
-function searchDatabase()
+function searchDatabase(append)
   {
   var fullQuery = "text-journal.enable:true ";
   var query = $('#live_search').val();
@@ -161,14 +161,15 @@ function searchDatabase()
     }
     
   $('img#searchLoadingImg').show();
+  var shown = $('.resourceLink').length;
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
-        args: "query="+fullQuery,
+        args: "offset="+shown+"&query="+fullQuery,
         log: true,
         success: function (retVal) {
           $('img#searchLoadingImg').hide();
           var total = 0;
-          $('.SearchResults').html("");
+          if(!append) $('.SearchResults').html("");
           $.each(retVal.data, function(index, value)
           {
           total = value.total;
@@ -176,8 +177,21 @@ function searchDatabase()
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
             'authors': value.authors, 'isCertified' : value.isCertified})
-
           })
+          
+          var shown = $('.resourceLink').length;
+          
+          if(total != shown)
+            {
+            $('#showMoreResults').show();
+            $('#showMoreResults a').unbind('click').click(function(){
+              searchDatabase(true);
+            })
+            }
+          else
+            {
+            $('#showMoreResults').hide();
+            }
                
           if(total > 1)
             {
