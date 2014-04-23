@@ -20,6 +20,16 @@ class Reviewosehra_AdminController extends Reviewosehra_AppController
       throw new Zend_Exception('Read permission required', 403);
       }
       
+    if($this->_request->isPost())      
+      {
+      $value = $_POST['certificationLevel'];
+      if(!isset($_POST['certificationLevel']) || $_POST['certificationLevel'] == -1 || empty($_POST['certificationLevel']))
+        {
+        $value = "";
+        }
+      $resourceDao->setCertificationLevel($value);
+      }
+      
     $reviewsByRevisions = array();
     $revisions = $itemDao->getRevisions();
     foreach($revisions as $revision)

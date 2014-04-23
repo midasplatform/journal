@@ -10,8 +10,30 @@ $phaseConvert = array(OSERHAREVIEW_LIST_PEERREVIEW => "Peer",
 
 <h3>Manage Reviews</h3>
 
+
 <a href="<?php echo $this->webroot?>/journal/view/?revisionId=<?php echo $this->resource->getRevision()->getKey()?>">Back to article</a>
 
+<br/>
+<form method="post" action="">
+  <b>Article certification Level:</b>
+  <select name="certificationLevel" id="certificationLevel">
+    <option value="-1"></option>
+    <?php
+    for($i = 1; $i < 4; $i++)
+      {
+      echo "<option value = '".$i."' ";
+      if($i == $this->resource->getCertificationLevel())
+        {
+        echo "selected ";
+        }
+      echo ">".$i."</option>";
+      }
+    ?>
+  </select>
+  <input type="submit" value="Save"/>
+</form>
+<br/>
+<br/>
 <div id="tabs">
   <ul>
     <?php

@@ -72,5 +72,12 @@ function showReviews($review, $webroot)
   echo "<p style='margin:0;'><a href='".$webroot."/reviewosehra/submit?review_id=".$review->getKey()."'>".(($review->getType() == OSERHAREVIEW_LIST_PEERREVIEW)? "Peer":"Final")." review by ".$review->getUser()->getFullName()."</a>:</p>";
   echo "<table class='reviewTable'>";
   echo $review->getCacheSummary();
-  echo "</table><br/>";
+    $contentArray = JsonComponent::decode($review->getContent());
+  if(isset($contentArray['list']['certificationLevel']) && is_numeric($contentArray['list']['certificationLevel']))
+    {
+    echo "<tr><td>Recommended Certification Level</td><td>".$contentArray['list']['certificationLevel']."</td></tr>";
+    }
+  echo "</table>";
+
+  echo "<br/>";
   }
