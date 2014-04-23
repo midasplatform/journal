@@ -13,6 +13,10 @@ $(document).ready(function(){
     }]);
   }
   
+  $("#revisionSelector").change(function(){
+    window.location.href = json.global.webroot+"/journal/view/"+$(this).val();
+  })
+  
   var numberOfComments = json.modules.comments.comments.length;
   if(numberOfComments >1) $('#numberComment a').html(numberOfComments+" comments");
   else $('#numberComment a').html(numberOfComments+" comment");

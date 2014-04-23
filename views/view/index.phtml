@@ -102,7 +102,25 @@ foreach ($cssArray as $module => $list)
       foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=text-journal.tags:'.$tag.'">'.$tag.'</a>';
       echo join(', ', $tags)
       ?></li>
-      <li>Current revision: <?php echo $this->resource->getRevision()->getRevision()?></li>
+      <?php
+      $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+      if($lastRevision->getRevision() != 1)
+        {
+        echo "<li>Current revision: <select id='revisionSelector'>";
+        $currentRevision = $this->resource->getRevision()->getRevision();
+        for($i = $lastRevision->getRevision(); $i > 0; $i--)
+          {
+          $revision = MidasLoader::loadModel("Item")->getRevision($this->resource, $i);
+          if($revision)
+            {
+            echo "<option value='".$revision->getKey()."'";
+            if($currentRevision == $i) echo "selected ";
+            echo ">".$i."</option>";
+            }
+          }
+        echo "</select></li>";
+        }
+        ?>
       <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>
     <h4>Share</h4> 
