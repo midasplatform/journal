@@ -59,7 +59,7 @@ class Journal_ApiComponent extends AppComponent
       }
     catch(Exception $e)
       {
-      throw new Exception('Syntax error in query', -1);
+      throw new Exception('Syntax error in query ', -1);
       }
 
     $modelLoader = new MIDAS_ModelLoader();
@@ -69,9 +69,9 @@ class Journal_ApiComponent extends AppComponent
     foreach($itemIds as $itemId)
       {
       $item = $itemModel->load($itemId);
-      $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
       if($item && $itemModel->policyCheck($item, $userDao))
         {
+        $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
         $rating = MidasLoader::loadModel("Itemrating", 'ratings')->getAggregateInfo($item);
         $authors = join(", ", $resourceDao->getAuthorsFullNames());
         $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");

@@ -278,13 +278,5 @@ class Journal_AdminController extends Journal_AppController
     // send the tree to the JS files
     $this->view->json['trees'] = $this->view->tree;
     }
-    
-  /** Migrate */
-  function migratemidas2Action()
-    {
-    $this->requireAdminPrivileges();
-    $this->disableLayout();
-    $this->disableView();
-    MidasLoader::loadComponent("Migrate", "journal")->migrate($_GET);
-    }
+  
 }//end class

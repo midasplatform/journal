@@ -20,7 +20,6 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
 ?>
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/user/user.settings.css" rel="stylesheet" />
 
-<h3>Profile</h3>
 
 <?php
 if(isset($this->userId))echo $this->action("settings", "user-core", "journal", array("userId" => $this->userId));
