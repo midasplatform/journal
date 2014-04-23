@@ -179,7 +179,7 @@ foreach ($cssArray as $module => $list)
           {
           echo '<br/><img class="ResultLogo" src="'.$this->webroot.'/journal/view/logo/?revisionId='.$this->resource->getRevision()->getKey().'&size=300" /><br/><br/>';
           }
-        $handleUrl = "http://hdl.handle.net/".$this->baseHandle."/".$this->resource->getHandle();
+        $handleUrl = "http://hdl.handle.net/".$this->resource->getHandle();
         ?>
         
         <span style="background-color: #F2F3F3;">Please use this identifier to cite or link to this publication: <a href="<?php echo $handleUrl?>"><?php echo $handleUrl?></a></span><br/>

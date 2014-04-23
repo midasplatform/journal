@@ -194,6 +194,7 @@ class Journal_ResourceDao extends ItemDao
       {
       return;
       }
+    $baseHandle = MidasLoader::loadModel("Setting")->getValueByName('baseHandle', "journal");
     $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "handle");
     if(!$metadataDao)  $metadataDao = MidasLoader::loadModel('Metadata')->addMetadata(MIDAS_METADATA_TEXT, "journal", "handle", "");
     $db = Zend_Registry::get('dbAdapter');
@@ -208,7 +209,7 @@ class Journal_ResourceDao extends ItemDao
       {
       $value = $row['value'] + 1;
       }
-    $this->setHandle($value);
+    $this->setHandle($baseHandle."/".$value);
     }
     
   /** Get Dislcaimer Id
