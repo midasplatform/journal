@@ -316,6 +316,13 @@ class Journal_SubmitController extends Journal_AppController
             }
           MidasLoader::loadModel("Itempolicygroup")->createPolicy($memberGroup, $resourceDao, MIDAS_POLICY_READ);
           MidasLoader::loadComponent("Notification", "journal")->newArticle($resourceDao);
+          
+          // Delete cache file
+          $cacheFile = UtilityComponent::getTempDirectory()."/homeSearch.json";
+          if(file_exists($cacheFile))
+            {
+            unlink($cacheFile);
+            }
           }
         elseif($private) // Send for approval
           {

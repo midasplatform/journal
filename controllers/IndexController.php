@@ -72,6 +72,7 @@ class Journal_IndexController extends Journal_AppController
         $this->view->issues[] = $issueDao;
         }
 
+      $this->view->issues = array_reverse($this->view->issues);
       }
     // send the tree to the JS files
     $this->view->json['trees'] = $this->view->tree;

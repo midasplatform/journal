@@ -31,6 +31,8 @@ class Journal_ApiComponent extends AppComponent
    */
   public function search($args)
     {
+    $defaultCommunity = MidasLoader::loadModel("Setting")->getValueByName('defaultJournal', "journal");
+    
     $componentLoader = new MIDAS_ComponentLoader();
     $solrComponent = $componentLoader->loadComponent('Solr', 'solr');
     if(file_exists(BASE_PATH."/modules/api/controllers/components/AuthenticationComponent.php"))
@@ -40,29 +42,41 @@ class Journal_ApiComponent extends AppComponent
     else  $authComponent = $componentLoader->loadComponent('Authentication');
     $userDao = $authComponent->getUser($args,
                                        Zend_Registry::get('userSession')->Dao);
-
+    
+    $useCache  = !$userDao && "text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query'];  
+    $cacheFile = UtilityComponent::getTempDirectory()."/homeSearch.json";
     $limit = array_key_exists('limit', $args) ? (int)$args['limit'] : 25;
     $offset = array_key_exists('offset', $args) ? (int)$args['offset'] : 0;
     $itemIds = array();
-    try
+    
+    if($useCache && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
       {
-      $index = $solrComponent->getSolrIndex();
-      UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
-      $response = $index->search($args['query'], 0, $limit * 4 + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
-      UtilityComponent::endIgnoreWarnings();
-
-      $totalResults = $response->response->numFound;
-      foreach($response->response->docs as $doc)
+      $itemIds = JsonComponent::decode(file_get_contents($cacheFile));
+      }
+    else
+      {
+      try
         {
-        $itemIds[] = $doc->key;
+        $index = $solrComponent->getSolrIndex();
+        UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
+        $response = $index->search($args['query'], 0, $limit * 4 + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+        UtilityComponent::endIgnoreWarnings();
+
+        $totalResults = $response->response->numFound;
+        foreach($response->response->docs as $doc)
+          {
+          $itemIds[] = $doc->key;
+          }
         }
+      catch(Exception $e)
+        {
+        throw new Exception('Syntax error in query ', -1);
+        }
+      if($useCache) file_put_contents($cacheFile, JsonComponent::encode($itemIds));
       }
-    catch(Exception $e)
-      {
-      throw new Exception('Syntax error in query ', -1);
-      }
-      
+
     sort($itemIds);
+    $itemIds = array_reverse($itemIds);
 
     $modelLoader = new MIDAS_ModelLoader();
     $itemModel = $modelLoader->loadModel('Item');
