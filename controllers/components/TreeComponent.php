@@ -51,7 +51,7 @@ class Journal_TreeComponent extends AppComponent
               'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
           }
         }
-      if(empty($select)) file_put_contents($cacheFile, JsonComponent::encode($trees));
+      if(empty($selected)) file_put_contents($cacheFile, JsonComponent::encode($trees));
       }
  
     if($showCertification)
