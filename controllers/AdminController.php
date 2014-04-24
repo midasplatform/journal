@@ -242,6 +242,13 @@ class Journal_AdminController extends Journal_AppController
   function categoriesAction()
     {
     $this->requireAdminPrivileges();
+    
+    $cacheFile = UtilityComponent::getTempDirectory()."/treeCache.json";
+    if(file_exists($cacheFile))
+      {
+      unlink($cacheFile);
+      }
+      
     // if add a new tree
     if($this->_request->isPost() && !empty($_POST['newtree']))
       {

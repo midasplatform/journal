@@ -41,7 +41,7 @@ class Journal_Notification extends ApiEnabled_Notification
     $password = $params['password'];
     
     $userDao = MidasLoader::loadModel("User")->getByEmail($email);
-    if($userDao->getSalt() == md5($password))
+    if($userDao && $userDao->getSalt() == md5($password))
       {
       MidasLoader::loadModel("User")->convertLegacyPasswordHash($userDao, $password);
       }

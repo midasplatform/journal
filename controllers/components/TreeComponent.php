@@ -30,18 +30,30 @@ class Journal_TreeComponent extends AppComponent
     {    
     $trees = array();
     $allEntries = MidasLoader::loadModel('Category', 'journal')->getAll();
-    foreach($allEntries as $entry)
-      {      
-      if($entry->getParentId() == -1)
-        {
-        $select = 0;
-        if(in_array($entry->getKey(), $selected)) $select = 1;
-        if($includeDao) $trees[] = array('dao' => $entry, 'select' => $select, 'title' => $entry->getName(), 'key' => $entry->getKey(), 
-            'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
-        else $trees[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(), 
-            'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
-        }
+    
+    $cacheFile = UtilityComponent::getTempDirectory()."/treeCache.json";
+    
+    if(empty($selected) && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
+      {
+      $trees = JsonComponent::decode(file_get_contents($cacheFile));
       }
+    else
+      {
+      foreach($allEntries as $entry)
+        {      
+        if($entry->getParentId() == -1)
+          {
+          $select = 0;
+          if(in_array($entry->getKey(), $selected)) $select = 1;
+          if($includeDao) $trees[] = array('dao' => $entry, 'select' => $select, 'title' => $entry->getName(), 'key' => $entry->getKey(), 
+              'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
+          else $trees[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(), 
+              'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
+          }
+        }
+      if(empty($select)) file_put_contents($cacheFile, JsonComponent::encode($trees));
+      }
+ 
     if($showCertification)
       {
       $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified", 'key' => -1, 
@@ -51,8 +63,7 @@ class Journal_TreeComponent extends AppComponent
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 2", 'key' => "certified-2", 
                 'children' => array()),
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 3", 'key' => "certified-3", 
-                'children' => array())
-                
+                'children' => array())                
             ));
       }
     return $trees;

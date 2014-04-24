@@ -111,6 +111,13 @@ foreach ($cssArray as $module => $list)
       echo join(', ', $tags)
       ?></li>
       <?php
+      $grant = $this->resource->getGrant();
+      if(!empty($grant))
+        {
+        ?>
+        <li>Grand: <?php echo $grant ?></li>
+      <?php
+        }
       $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
       if($lastRevision->getRevision() != 1)
         {
