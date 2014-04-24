@@ -376,10 +376,31 @@ class Journal_MigrationComponent extends AppComponent
         MidasLoader::loadModel("Folderpolicygroup")->createPolicy($editorGroup, $issueDao, MIDAS_POLICY_ADMIN);
         
 
-        if(isset($ij_journalArray['paperdue_date'])) $issueDao->paperdue_date = $ij_journalArray['paperdue_date'];
-        if(isset($ij_journalArray['decision_date'])) $issueDao->paperdue_date = $ij_journalArray['decision_date'];
-        if(isset($ij_journalArray['publication_date'])) $issueDao->paperdue_date = $ij_journalArray['publication_date'];
-        
+        if(isset($ij_journalArray['paperdue_date'])) 
+          {
+          $date = $ij_journalArray['paperdue_date'];
+          $datearray = array('year' => substr($date, 6, 4), 'month' => substr($date, 0, 2), 'day' => substr($date, 3, 2));
+          $date = new Zend_Date($datearray);
+          $date = $date->toString("c");
+          $issueDao->paperdue_date = $date;
+          }
+        if(isset($ij_journalArray['decision_date'])) 
+          {
+          $date = $ij_journalArray['decision_date'];
+          $datearray = array('year' => substr($date, 6, 4), 'month' => substr($date, 0, 2), 'day' => substr($date, 3, 2));
+          $date = new Zend_Date($datearray);
+          $date = $date->toString("c");
+          $issueDao->decision_date = $date;
+          }
+        if(isset($ij_journalArray['publication_date']))
+          {
+          $date = $ij_journalArray['publication_date'];
+          $datearray = array('year' => substr($date, 6, 4), 'month' => substr($date, 0, 2), 'day' => substr($date, 3, 2));
+          $date = new Zend_Date($datearray);
+          $date = $date->toString("c");
+          $issueDao->publication_date = $date;
+          }
+          
         $issueDao->short_description = $short_description;
         $issueDao->introductory_text = $introductory_text;
         $issueDao->readerLicense = $license;
