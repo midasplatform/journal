@@ -70,6 +70,7 @@ class Journal_MigrationComponent extends AppComponent
     $Itempolicygroup = MidasLoader::loadModel("Itempolicygroup");
     $Itempolicyuser = MidasLoader::loadModel("Itempolicyuser");
     $User = MidasLoader::loadModel("User");
+    $db = Zend_Registry::get('dbAdapter');
 
     $colquery = pg_query("SELECT i.item_id, mtitle.text_value AS title, mabstract.text_value AS abstract ".
                          "FROM item AS i ".
@@ -178,7 +179,10 @@ class Journal_MigrationComponent extends AppComponent
       $resourceDao->setName($title);
       $resourceDao->setDescription($abstract);
       $resourceDao->setType(RESOURCE_TYPE_PUBLICATION);   
-      MidasLoader::loadModel("Item")->save($resourceDao);
+      MidasLoader::loadModel("Item")->save($resourceDao);      
+      $db->query("UPDATE item SET item_id ='".$publicationId."' WHERE item_id='".$resourceDao->getKey()."' ");
+
+      $resourceDao->setItemId($publicationId);      
       
       MidasLoader::loadModel("Folder")->addItem($parentFolder, $resourceDao);
       
@@ -480,7 +484,8 @@ class Journal_MigrationComponent extends AppComponent
   function migrate($userid)
     {
     $this->userId = $userid;
-
+    $db = Zend_Registry::get('dbAdapter');
+    $db->query("ALTER TABLE item AUTO_INCREMENT = 500");
     $this->getLogger()->warn("Starting migration");
     // Connect to the local PGSQL database
     ob_start();  // disable warnings
