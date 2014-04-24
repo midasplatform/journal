@@ -138,7 +138,7 @@ class Journal_MigrationComponent extends AppComponent
       $tags = array();
       while($tagstArray = pg_fetch_array($sqlTags))
         {
-        $tags[] = $ij_toolkitArray["text_value"];       
+        $tags[] = $tagstArray["text_value"];       
         }      
       
       $institution = $ij_publicationArray['institution'];
@@ -328,7 +328,7 @@ class Journal_MigrationComponent extends AppComponent
             MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, $bitstream['type']);   
             if($bitstream['type'] == BITSTREAM_TYPE_THUMBNAIL)
               {
-              $resourceDao->setLogo($bitstream);
+              $resourceDao->setLogo($bitstreamDao);
               }
             unset($UploadComponent);
             }
