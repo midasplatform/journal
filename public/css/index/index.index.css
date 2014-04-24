@@ -153,10 +153,10 @@ div.SearchResultEntry .CertifiedWrapper img{
   top: -1px;
 }
 div.SearchResultEntry span.ResultTitle{
-  font-size: 16px;
+  font-size: 13px;
   position: absolute;
   top:0px;
-  left:5px;
+  left:1px;
   width:800px;
   color: #374E9E;
   font-weight: bold;
@@ -164,10 +164,10 @@ div.SearchResultEntry span.ResultTitle{
 div.SearchResultEntry div.ResultAuthors{
   position: absolute;
   top:16px;
-  left:5px;
+  left:1px;
   width:800px;
   color: #374E9E;
-  font-size: 12px;
+  font-size: 10px;
 }
 div.SearchResultEntry div.ResultDescription{
   position:absolute;
@@ -175,6 +175,7 @@ div.SearchResultEntry div.ResultDescription{
   width: 880px;
   top:33px;
   left:1px;
+  font-size: 10px;
 }
 div.SearchResultEntry div.ResultSubDescription{
   position:absolute;

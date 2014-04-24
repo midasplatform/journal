@@ -79,23 +79,32 @@ class Journal_ViewController extends Journal_AppController
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $resourceDao->setRevision($revisionDao);
     $logo = $resourceDao->getLogo();
-    $img_src_resource = null;
-    $extension = strtolower(end(explode(".", $logo->getName())));
-    switch ( $extension ) {
-      case "jpg":
-      case "peg": 
-        $img_src_resource = imagecreatefromjpeg($logo->getFullPath());
-        break;
-      case "gif":
-        $img_src_resource = imagecreatefromgif($logo->getFullPath());
-        break;
-      case "png":
-        $img_src_resource = imagecreatefrompng($logo->getFullPath());
-        break;
-      default:
-        return;
+    if(empty($logo))
+      {
+      $img_src_resource = imagecreatefromgif(__DIR__."/../public/images/journal.gif");
+      list ($x, $y) = getimagesize(__DIR__."/../public/images/journal.gif");  //--- get size of img ---
       }
-    list ($x, $y) = getimagesize($logo->getFullPath());  //--- get size of img ---
+    else
+      {
+      $img_src_resource = null;
+      $extension = strtolower(end(explode(".", $logo->getName())));
+      switch ( $extension ) {
+        case "jpg":
+        case "peg": 
+          $img_src_resource = imagecreatefromjpeg($logo->getFullPath());
+          break;
+        case "gif":
+          $img_src_resource = imagecreatefromgif($logo->getFullPath());
+          break;
+        case "png":
+          $img_src_resource = imagecreatefrompng($logo->getFullPath());
+          break;
+        default:
+          return;
+        }
+      list ($x, $y) = getimagesize($logo->getFullPath());  //--- get size of img ---
+      }
+    
     if(isset($_GET['size']) && is_numeric($_GET['size'])) $thumb = $_GET['size'];
     else $thumb = 50;  //--- max. size of thumb ---
     if($x > $y)
