@@ -68,8 +68,7 @@ class Journal_IndexController extends Journal_AppController
         if($issue->getName() == "Public" || $issue->getName() == "Private") continue;
         $issueDao = MidasLoader::loadModel("Folder")->initDao("Issue", $issue->toArray(), "journal");
         if(in_array($issue->getKey(), $activeIssuesArray)) $issueDao->active = true;
-        else $issueDao->active = false;
-        
+        else $issueDao->active = false;        
         $this->view->issues[] = $issueDao;
         }
 

@@ -46,7 +46,7 @@ foreach ($cssArray as $module => $list)
 
     <h4>Resources</h4>
     <ul>
-      <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>">Download</a> 
+      <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download</a> 
         (<?php echo MidasLoader::loadComponent("Utility")->formatSize($this->resource->getSizebytes()); ?>)</li>
     </ul>
 

@@ -27,6 +27,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
 <link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
 <div class="ContentWithLeftPanel">
   <div class="Panel box">
+     <img id="searchLoadingImg" src="<?php echo $this->webroot?>/core/public/images/icons/loading-small.gif"/>
     <h3 class="FilterH3">Filters:</h3>
     <div class="FiltersPanel">
       <div id="treeWrapper"></div>
@@ -59,8 +60,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         }
       }
       ?>
-    <div style="margin:5px;" class="SearchCount"></div>
-    <img id="searchLoadingImg" src="<?php echo $this->webroot?>/core/public/images/icons/loading-small.gif"/>
+    <div style="margin:5px;" class="SearchCount"></div>   
   </div>
   
   <div class="MainContent">

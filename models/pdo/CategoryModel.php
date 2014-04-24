@@ -27,7 +27,7 @@ class Journal_CategoryModel extends Journal_CategoryModelBase
    */
   function getAll()
     {
-    $rowset = $this->database->fetchAll($this->database->select());
+    $rowset = $this->database->fetchAll($this->database->select()->order('name'));
     $results = array();
     foreach($rowset as $row)
       {
