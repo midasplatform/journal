@@ -28,9 +28,25 @@ class Journal_Notification extends ApiEnabled_Notification
     {
     $this->enableWebAPI($this->moduleName);
     $this->addCallBack('CALLBACK_CORE_GET_CONFIG_TABS', 'getConfigTabs');
+    $this->addCallBack('CALLBACK_CORE_AUTHENTICATION', 'authIntercept');
     }//end init
     
     
+  /**
+   * The goal is to convert old account to new ones
+   */
+  public function authIntercept($params)
+    {
+    $email = $params['email'];
+    $password = $params['password'];
+    
+    $userDao = MidasLoader::loadModel("User")->getByEmail($email);
+    if($userDao->getSalt() == md5($password))
+      {
+      MidasLoader::loadModel("User")->convertLegacyPasswordHash($userDao, $password);
+      }
+    }
+
    /** get Config Tabs */
   public function getConfigTabs($params)
     {

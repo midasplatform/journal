@@ -489,7 +489,7 @@ class Journal_MigrationComponent extends AppComponent
       $eperson_id = $query_array['eperson_id'];
       try
         {
-        $userDao = $User->createUser($email, $password, $firstname, $lastname);
+        $userDao = $User->createUser($email, false, $firstname, $lastname, 0, $password);           
         $User->save($userDao);
         $this->epersonToUser[$eperson_id] = $userDao->getKey();
         $this->getLogger()->warn("- ".$email." created");

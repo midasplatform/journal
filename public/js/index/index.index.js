@@ -36,9 +36,10 @@ $(document).ready(function(){
 
   $('.issuePage').fancybox({type: 'ajax'});
   
+  
   // Create the root html element of each tree
   $.each(json.trees, function(key, tree)
-    {
+    {    
     $('#treeWrapper').append('<div class="TreeEntry"><img class="tooggleButton" src="'+json.global.webroot+'/privateModules/journal/public/images/arrow-bottom.png"/><h4>'+tree.title+' </h4><div id="categoryTree-'+tree.key+'" class="categoryTree"></div>');
     /* Init trees */
     $("div.categoryTree:last").dynatree({
@@ -142,7 +143,14 @@ function searchDatabase(append)
     fullQuery+= " AND (";
     $.each(categories, function(index, value){
       if(index != 0) fullQuery += " OR ";
-      fullQuery+= " text-journal.categories:"+value+" ";
+      if(value.indexOf("certified") != -1)
+        {          
+        fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";          
+        }
+      else
+        {
+        fullQuery+= " text-journal.categories:"+value+" ";
+        }
     });
     fullQuery+= ")";
     }

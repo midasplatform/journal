@@ -34,7 +34,7 @@ class Journal_IndexController extends Journal_AppController
     // fetch all the keywords and send them to the view
     $selectedCat = array();
     if(isset($_GET['category'])) $selectedCat = array($_GET['category']);
-    $this->view->tree = MidasLoader::loadComponent("Tree", "journal")->getAllTrees(false, $selectedCat);
+    $this->view->tree = MidasLoader::loadComponent("Tree", "journal")->getAllTrees(false, $selectedCat, true);
     if(isset($_GET['q'])) $this->view->query = $_GET['q'];
     if(isset($_GET['community']))$community = MidasLoader::loadModel ('Community')->load($_GET['community']);
     else if(isset($_GET['issue']))

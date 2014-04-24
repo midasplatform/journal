@@ -26,7 +26,7 @@ class Journal_TreeComponent extends AppComponent
    * (we don't want to do it if we plan to sent the array to the json format)
    * @return array
    */
-  public function getAllTrees($includeDao = false, $selected = array())
+  public function getAllTrees($includeDao = false, $selected = array(), $showCertification = false)
     {    
     $trees = array();
     $allEntries = MidasLoader::loadModel('Category', 'journal')->getAll();
@@ -41,6 +41,19 @@ class Journal_TreeComponent extends AppComponent
         else $trees[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(), 
             'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
         }
+      }
+    if($showCertification)
+      {
+      $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified", 'key' => -1, 
+            'children' => array(
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 1", 'key' => "certified-1", 
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 2", 'key' => "certified-2", 
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 3", 'key' => "certified-3", 
+                'children' => array())
+                
+            ));
       }
     return $trees;
     }
