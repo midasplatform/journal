@@ -236,9 +236,13 @@ function addAndFormatResult(container, values) {
   var newElement = $('div.SearchResultEntry:last');
   newElement.find('.ResultTitle').dotdotdot( {'height': 20});
             
-  if(values.logo == "")
+  if(true||  values.logo == "")
     {
-    newElement.find('.ResultLogo').remove();
+    newElement.find('.ResultLogo:first').remove();
+    }
+  else
+    {
+    newElement.find('.ResultLogo:last').remove();
     }
     
   if(values.isCertified == 0)

@@ -252,7 +252,6 @@ class Journal_MigrationComponent extends AppComponent
         }
 
       // Get Logo
-        ;
       $logoPath = UtilityComponent::getTempDirectory()."/logo.jpg";
       unlink($logoPath);
       $logoFound = false;
@@ -322,7 +321,11 @@ class Journal_MigrationComponent extends AppComponent
             // Upload the bitstream ifnecessary (based on the assetstore type)
             $ItemRevision->addBitstream($itemRevisionDao, $bitstreamDao);
             
-            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, $bitstream['type']);            
+            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, $bitstream['type']);   
+            if($bitstream['type'] == BITSTREAM_TYPE_THUMBNAIL)
+              {
+              $resourceDao->setLogo($bitstream);
+              }
             unset($UploadComponent);
             }
           }
@@ -556,7 +559,7 @@ class Journal_MigrationComponent extends AppComponent
 
     
     $toolkitDao = MidasLoader::newDao('CategoryDao', 'journal');
-    $toolkitDao->setName("Tollkit");
+    $toolkitDao->setName("Packages");
     $toolkitDao->setParentId(-1);
     MidasLoader::loadModel("Category", "journal")->save($toolkitDao);
       
