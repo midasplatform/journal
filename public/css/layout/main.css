@@ -2,8 +2,8 @@
 body {
   background-color: white;
   border: 0px;
-  font-family: Verdana, 'Lucida Grande', 'Lucida Sans Unicode', helvetica, arial, verdana, sans-serif;
-  font-size: 12px;
+
+  font: 83%/1.4 arial,helvetica,sans-serif;
   margin: 0px;
   padding: 0px;
   text-align: left;

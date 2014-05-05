@@ -1,5 +1,5 @@
 <?php
-/*=========================================================================
+/* =========================================================================
  *
  *  Copyright OSHERA Consortium
  *
@@ -14,89 +14,152 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *do
- *=========================================================================*/
+ * do
+ * ========================================================================= */
 
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/index/index.index.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dynatree/jquery.dynatree.min.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.pack.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dodotdot.1.5.9.js');
 ?>
-<link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/css/index/index.index.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/index/index.index.css" rel="stylesheet" />
 <LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
-<link type="text/css" href="<?php echo $this->webroot?>/privateModules/journal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/dynatree/skin/ui.dynatree.css" rel="stylesheet" />
 <div class="ContentWithLeftPanel">
   <div class="Panel box">
-     <img id="searchLoadingImg" src="<?php echo $this->webroot?>/core/public/images/icons/loading-small.gif"/>
+    <img id="searchLoadingImg" src="<?php echo $this->webroot ?>/core/public/images/icons/loading-small.gif"/>
     <h3 class="FilterH3">Filters:</h3>
     <div class="FiltersPanel">
       <div id="treeWrapper"></div>
     </div>
     <?php
-    if(isset($this->issues))
+    if (isset($this->issues))
       {
       echo '<h3 style="margin-top:10px;" class="FilterH3">Issues:</h3>';
-      foreach($this->issues as $issue)
+      foreach ($this->issues as $issue)
         {
-        echo "<div class='issueButton' key='".$issue->getKey()."'>";
-        if($issue->active)
+        echo "<div class='issueButton' key='" . $issue->getKey() . "'>";
+        if ($issue->active)
           {
-          echo "<div qtipconditionnal=\"".$issue->getName()."\" class='issueTitle issueActive'>".$issue->getName()."</div>";
-          echo "<div class='issueSubTitle'><b>Active: ".date("m.d.y", strtotime($issue->getPaperdueDate()))." (Paperdue)</b></div>";
+          echo "<div qtipconditionnal=\"" . $issue->getName() . "\" class='issueTitle issueActive'>" . $issue->getName() . "</div>";
+          echo "<div class='issueSubTitle'><b>Active: " . date("m.d.y", strtotime($issue->getPaperdueDate())) . " (Paperdue)</b></div>";
           }
         else
           {
-          echo "<div qtipconditionnal=\"".$issue->getName()."\" class='issueTitle'>".$issue->getName()."</div>";
+          echo "<div qtipconditionnal=\"" . $issue->getName() . "\" class='issueTitle'>" . $issue->getName() . "</div>";
           echo "<div class='issueSubTitle'>Completed</div>";
           }
         echo "<div class='issueDetails'>";
-        echo "<a class='issuePage' href='".$this->webroot."/journal/view/issue?folderId=".$issue->getKey()."'>Show details</a><br/>";
-        if($issue->active)
+        echo "<a class='issuePage' href='" . $this->webroot . "/journal/view/issue?folderId=" . $issue->getKey() . "'>Show details</a><br/>";
+        if ($issue->active)
           {
-          echo "<a href='".$this->webroot . "/journal/submit/?issue=" . $issue->getKey()."'>Submit a new article</a>";
+          echo "<a href='" . $this->webroot . "/journal/submit/?issue=" . $issue->getKey() . "'>Submit a new article</a>";
           }
         echo "</div>";
         echo "</div>";
         }
       }
-      ?>
+    ?>
     <div style="margin:5px;" class="SearchCount"></div>   
   </div>
-  
+
   <div class="MainContent">
+    <div id="noResultElement" style="display:none">
+      <b>Your search did not match any items.</b>
+    </div>
+    <div id="infoElement" >
+      <br/>
+      <span style="font-weight: bold;">The OSEHRA Technical Journal</span> is an Open Access, on-line publication
+      covering technical topics related to open source software for management
+      of electronic health records. The goal of the Journal is to foster innovation
+      and to channel this innovation in the form of concrete working pieces of
+      software that can later be integrated into the OSEHRA open source platform.
+      <br>
+      <div class="hidable">
+        <br>
+        The unique characteristics of the "OSEHRA Technical Journal" include:
+        <br>
+        <ul>
+          <li><b>Open Access:</b> all material is freely distributed under open licenses
+            <ul>
+              <li>Source code: Apache 2.0 License</li>
+              <li>Documents: Creative Commons by Attribution 3.0 License</li>
+              <li>Data: Open Data License (by science commons)</li>
+            </ul>
+          </li>
+          <li>
+            <b>Open peer-review:</b> inviting discussions and exchange of ideas.
+            reviewers are also publicly rated, creating a public system of
+            checks and balances.
+          </li>
+          <li>
+            <b>Reproducibility:</b> all contributions are required to include the source
+            code of working implementations. These are tested in an automated
+            build system.
+          </li>
+          <li>
+            <b>All materials are made available to readers</b>, enabling them also to
+            experiment with the contributions and to improve upon them.
+          </li>
+          <li>
+            <b>Contributed source code is directly put in a sandbox repository</b>
+            where it can evolve and mature, with the final goal of being
+            incorporated into the OSEHRA platform, if vetted by the community.
+          </li>
+          <li>
+            <b>Support for continuous revisions:</b> the technical reports, and associated
+            source code contributions can be revised by the authors at any time.
+            In this way the reports are corrected, improved and extended as
+            needed, in response to the online discussions with the community.
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <div class="SearchResultsHeader">     
     </div>
-    
+
     <div class="SearchResults">
-      
+
     </div>    
     <div id="showMoreResults" style="display:none">
       <a>Show more results</a>
     </div>
     <script type="text/template" id="SearchResultTemplate">
       <div class="SearchResultEntry box" id="{id}">
-        <div class="ResultTop">
-          <a class="resourceLink" href="<?php echo $this->webroot?>/journal/view/{id}"></a>
-          
-          <span class="ResultTitle">{title}</span>          
-        </div>
-        <div class="ResultAuthors">
-          {authors}
-        </div>
-        
-        <div class="ResultDescription">
-          {description}
-        </div>
-        <div class="ResultSubDescription">
-          {statistics}
-        </div>
-        <img class="ResultLogo" src="<?php echo $this->webroot?>/journal/view/logo/?revisionId={id}&size=64" />
-        <img class="ResultLogo" style="height:50px;" src="<?php echo $this->webroot?>/privateModules/journal/public/images/journal.gif" />
-        <div class="CertifiedWrapper">          
-          <img  style='border:none;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/check.gif" /> Certified
-        </div>
+        <table style="width: 99%">
+          <tr>
+            <td style="width:100px;height:98px;vertical-align: middle;text-align: center;">
+              <img class="ResultLogo" src="<?php echo $this->webroot ?>/journal/view/logo/?revisionId={id}&size=64" />
+              <img class="ResultLogo" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/journal.gif" />
+              <div class="CertifiedWrapper">          
+                <img  style='border:none;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/check.gif" /> Certified
+              </div>
+            </td>
+            <td style="vertical-align: top;">
+              <div class="ResultSubDescription">
+                {statistics}
+              </div>
+              <div class="ResultTop">
+                <a class="resourceLink" href="<?php echo $this->webroot ?>/journal/view/{id}"></a>
+
+                <span class="ResultTitle">{title}</span>          
+              </div>
+              <div class="ResultAuthors">
+                {authors}
+              </div>
+
+              <div class="ResultDescription">
+                {description}
+              </div>
+
+            </td>
+          </tr>
+        </table>
+
+
       </div>
-    </script>
-  </div>  
-</div>
+      </script>
+    </div>  
+  </div>
 

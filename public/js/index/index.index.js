@@ -21,12 +21,7 @@ $(document).ready(function(){
   
   resizeEvent = function(){
     $.each($('.SearchResultEntry'),function(){
-
-      var descriptionWidth = $(this).width() - 70;
-      var titleWidth = $(this).width() - 200;
-      $(this).find('.ResultTitle').css('width', titleWidth+"px");
       $(this).find('.ResultTitle').dotdotdot( {'height': 20});
-      $(this).find('.ResultDescription').css('width', descriptionWidth+"px");
       $(this).find('.ResultDescription').trigger("update");
     })
 
@@ -48,6 +43,7 @@ $(document).ready(function(){
       selectMode: 3,
       children: tree.children,
       onSelect: function(select, node) {
+        $('#infoElement').hide();
         searchDatabase(false);
       },
       onDblClick: function(node, event) {
@@ -80,6 +76,7 @@ $(document).ready(function(){
       container.find('.issueDetails').show();
       selectIssue = key;
       }
+    $('#infoElement').hide();
     searchDatabase(false);
   });
   if(json.selectedIssue != "")
@@ -91,6 +88,7 @@ $(document).ready(function(){
    
   // Init instant search
   $('#live_search').keyup(function(){
+      $('#infoElement').hide();
       searchDatabase(false);
     });
       
@@ -170,6 +168,7 @@ function searchDatabase(append)
     
   $('img#searchLoadingImg').show();
   var shown = $('.resourceLink').length;
+  if(!append) shown = 0;
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
         args: "offset="+shown+"&query="+fullQuery,
@@ -178,9 +177,11 @@ function searchDatabase(append)
           $('img#searchLoadingImg').hide();
           var total = 0;
           if(!append) $('.SearchResults').html("");
+          if(!append) $('#noResultElement').show();
           $.each(retVal.data, function(index, value)
           {
           total = value.total;
+          $('#noResultElement').hide();
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
@@ -201,12 +202,18 @@ function searchDatabase(append)
             $('#showMoreResults').hide();
             }
                
-          if(total > 1)
+          if(total == "")
             {
+            $('.SearchCount').hide();
+            }
+          else if(total > 1)
+            {
+            $('.SearchCount').show();
             $('.SearchCount').html(total+ " resources available.")  
             }
           else
             {
+            $('.SearchCount').show();
             $('.SearchCount').html(total+ " resource available.") 
             }
             
