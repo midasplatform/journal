@@ -140,7 +140,7 @@ function searchDatabase(append)
     {
     fullQuery+= " AND (";
     $.each(categories, function(index, value){
-      if(index != 0) fullQuery += " OR ";
+      if(index != 0) fullQuery += " AND ";
       if(value.indexOf("certified") != -1)
         {          
         fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";          
@@ -185,7 +185,7 @@ function searchDatabase(append)
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors, 'isCertified' : value.isCertified})
+            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel})
           })
           
           var shown = $('.resourceLink').length;
@@ -255,6 +255,11 @@ function addAndFormatResult(container, values) {
   if(values.isCertified == 0)
     {
     newElement.find('.CertifiedWrapper').remove();
+    newElement.find('.CertifiedLevel').remove();
+    }
+  else
+    {
+    newElement.find('.CertifiedLevel').html("(Level "+values.certifiedLevel+")");  
     }
     
   newElement.find('.ResultDescription').dotdotdot();

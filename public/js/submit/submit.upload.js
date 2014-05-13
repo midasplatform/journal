@@ -4,12 +4,25 @@ $(document).ready(function(){
       $('input[type=submit]').attr('disabled', !$(this).is(':checked'));
     })
     
-    $('#typeFile').change(function(){$('#uploadContentBlock').show()});
+    $('#typeFile').change(function(){      
+      if($(this).val() == 6)
+        {
+        $('#githubContentBlock').show();
+        $('#progress').hide();
+        $('#uploadContentBlock').hide();
+        }
+      else
+        {
+        $('#githubContentBlock').hide();
+        $('#uploadContentBlock').show();
+        }
+      });
     $('#fileupload').fileupload({
         url: json.global.webroot+"/journal/submit/uploadhandler",
         dataType: 'json',
         start: function(e, data){
           $('#typeFile').attr('disabled', true);
+          $('#progress').show();
         },
         done: function (e, data) {
             $.each(data.result.files, function (index, file) {
@@ -33,9 +46,16 @@ $(document).ready(function(){
         {
         $.post(json.global.webroot+"/journal/submit/upload?revisionId="+json.revision, {deletebitstream: $(this).parents('tr').attr('key')},function(){
           window.location.reload();
-        });
-        
+        });        
         }
+    })
+    
+    // Add github repository
+    $('#addGithub').click(function(){
+      $.post(json.global.webroot+"/journal/submit/addgithubhandler?revisionId="+json.revision, {github: $("#github").val()},function(retVal){
+          if(retVal[0] == 1) window.location.reload();
+          else alert(retVal[1]);
+        }, 'json');        
     })
     
 });

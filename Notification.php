@@ -27,10 +27,39 @@ class Journal_Notification extends ApiEnabled_Notification
   public function init()
     {
     $this->enableWebAPI($this->moduleName);
+    $this->addTask('TASK_JOURNAL_UPLOAD_GITHUB', 'processGithub', "");
+    $this->addEvent('EVENT_JOURNAL_UPLOAD_GITHUB', 'TASK_JOURNAL_UPLOAD_GITHUB');
     $this->addCallBack('CALLBACK_CORE_GET_CONFIG_TABS', 'getConfigTabs');
     $this->addCallBack('CALLBACK_CORE_AUTHENTICATION', 'authIntercept');
     }//end init
     
+  /** Backup github*/
+  public function processGithub($param)
+    {
+   
+    if(isset($param[0]['bitstream_id']))
+      {
+      $bitstream = MidasLoader::loadModel("Bitstream")->load($param[0]['bitstream_id']);
+      if($bitstream)
+        {
+        $zipPath = "/tmp/github_zip.zip";
+        if(file_exists($zipPath)) unlink($zipPath);
+              
+        copy("https://github.com/".$bitstream->getName()."/archive/master.zip", $zipPath);
+ 
+        if(file_exists($zipPath))
+          {
+          $bitstream->setName($bitstream->getName().".zip");
+          $bitstream->setPath($zipPath);
+          $bitstream->setChecksum(md5($zipPath));
+          $bitstream->fillPropertiesFromPath();        
+          $assetstoreDao = MidasLoader::loadModel('Assetstore')->getDefault();
+          MidasLoader::loadComponent("Upload")->uploadBitstream($bitstream, $assetstoreDao, false);
+          MidasLoader::loadModel('Bitstream')->save($bitstream);
+          }
+        }      
+      }
+    }
     
   /**
    * The goal is to convert old account to new ones

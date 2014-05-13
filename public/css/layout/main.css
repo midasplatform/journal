@@ -605,7 +605,6 @@ div.Header div.HeaderSearch input#live_search{
 
 #searchloading{
   position:absolute;
-  background:  url("../../images/icons/loading-small.gif") bottom center no-repeat;
   color:#FFFFFF;
   text-decoration:none;
   width: 12px;

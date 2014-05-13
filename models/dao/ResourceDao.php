@@ -149,6 +149,25 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("insitution", $institution);
     }
     
+  /** Get Github
+   * 
+   * @return 
+   */
+  function getGithub()
+    {
+    $metadata = $this->getMetaDataByQualifier("github");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Institution
+   * @param 
+   */
+  function setGithub($github)
+    {
+    $this->setMetaDataByQualifier("github", $github);
+    }
+    
   /** Get Handle
    * 
    * @return 

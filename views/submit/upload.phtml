@@ -40,6 +40,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     <option value="<?php echo BITSTREAM_TYPE_THUMBNAIL ?>">Thumbnail (Logo)</option>    
     <option value="<?php echo BITSTREAM_TYPE_PAPER ?>">Paper</option>    
     <option value="<?php echo BITSTREAM_TYPE_SOURCECODE ?>">Source Code</option>    
+    <option value="<?php echo BITSTREAM_TYPE_SOURCECODE_GITHUB ?>">Github repository</option>    
     <option value="<?php echo BITSTREAM_TYPE_DATA ?>">Data</option>    
     <option value="<?php echo BITSTREAM_TYPE_MIST ?>">Other</option>    
   </select><br/><br/>
@@ -52,11 +53,19 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
       <input id="fileupload" type="file" name="files[]" multiple> 
     </span>
 
-
     <!-- The global progress bar -->
-    <div id="progress" style="width: 200px;" class="progress progress-success progress-striped">
+    <div id="progress" style="display:none;width: 200px;" class="progress progress-success progress-striped">
       <div class="bar"></div>
     </div>
+    <br/>
+    <br/>
+  </div>
+  <div id='githubContentBlock' style="display:none;width:700px;">
+    <label>Set github URL (for example: https://github.com/midasplatform/Midas):</label>
+    <input type="text" style="width: 400px;" id="github" name="github"/>
+    <input type="button" id="addGithub" value="Add"/>
+    <br/>
+    <br/>
   </div>
 
   <?php
@@ -79,6 +88,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         BITSTREAM_TYPE_THUMBNAIL => "Thumbnail (Logo)",
         BITSTREAM_TYPE_PAPER => "Paper",
         BITSTREAM_TYPE_SOURCECODE => "Source Code",
+        BITSTREAM_TYPE_SOURCECODE_GITHUB => "Github repository",
         BITSTREAM_TYPE_DATA => "Data",
         BITSTREAM_TYPE_MISC => "Other",
     );

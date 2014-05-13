@@ -187,6 +187,64 @@ class Journal_SubmitController extends Journal_AppController
     $this->view->json['trees'] = MidasLoader::loadComponent("Tree", "journal")->getAllTrees(false, $resourceDao->getCategories());
     }    
     
+  /** Check if github repository exists. If yes, add it*/
+  function addgithubhandlerAction()
+    {
+    $this->disableLayout();
+    $this->disableView();
+    
+    $revision_id = $this->_getParam('revisionId');  
+    $github = $this->_getParam('github');  
+    $githubArray = explode("/", $github);
+      
+    // Check if github exists
+    $client = new Zend_Http_Client("https://api.github.com/repos/".$githubArray[3]."/".$githubArray[4]);
+    $returnJson = $client->request()->getBody();    
+    $return = JsonComponent::decode($returnJson);    
+    if($return['message'] == "Not Found")
+      {
+      echo JsonComponent::encode(array(0, "The repository doesn't exist or the URL is invalid."));
+      return;
+      }
+    
+    // load resource if it exists
+    $revision = MidasLoader::loadModel("ItemRevision")->load($revision_id);    
+    if(!$revision)
+      {
+      throw new Zend_Exception("Unable to find revision.");
+      }        
+    $item = $revision->getItem(); 
+    if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
+      {
+      throw new Zend_Exception("Permissions error.");
+      }       
+    if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
+      {
+      throw new Zend_Exception("Permissions error.");
+      }  
+      
+    $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $revision->getItem()->toArray(), "journal");
+    $resourceDao->setGithub($github);
+    
+    // Add bitstream to the revision
+    Zend_Loader::loadClass('BitstreamDao', BASE_PATH . '/core/models/dao');
+    $bitstreamDao = new BitstreamDao;
+    $bitstreamDao->setName($githubArray[3]."/".$githubArray[4]);
+    $bitstreamDao->setPath("https://api.github.com/repos/".$githubArray[3]."/".$githubArray[4]);
+    $bitstreamDao->setMimetype('url');
+    $bitstreamDao->setSizebytes(0);
+    $bitstreamDao->setChecksum(' ');
+
+    $assetstoreDao = MidasLoader::loadModel('Assetstore')->getDefault();
+    $bitstreamDao->setAssetstoreId($assetstoreDao->getKey());
+
+    MidasLoader::loadModel('ItemRevision')->addBitstream($revision, $bitstreamDao);
+    MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, BITSTREAM_TYPE_SOURCECODE_GITHUB);      
+    
+    Zend_Registry::get('notifier')->notifyEvent('EVENT_JOURNAL_UPLOAD_GITHUB', array($bitstreamDao->toArray()));
+    echo JsonComponent::encode(array(1, ""));
+    }
+    
   /** Upload management. See jquery uploader library */
   function uploadhandlerAction()
     {

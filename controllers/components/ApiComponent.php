@@ -105,7 +105,7 @@ class Journal_ApiComponent extends AppComponent
         $items[] = array('total' => $totalResults, 'title' => $item->getName(), 'rating' => (float)$rating['average'],
             'type' => $item->getType(), 'logo' => $resourceDao->getLogo(), 'id' => $item->getKey(), 'description' => $item->getDescription(), 'authors' => $authors,
             'view' => $item->getView() ,'downloads' => $item->getDownload(), 'statistics' => $statistics,
-            'revisionId' =>  $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified);
+            'revisionId' =>  $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, "certifiedLevel" => $level);
         $count++;
         if($count >= $limit)
           {

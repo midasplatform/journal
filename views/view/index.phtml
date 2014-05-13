@@ -48,6 +48,17 @@ foreach ($cssArray as $module => $list)
     <ul>
       <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download</a> 
         (<?php echo MidasLoader::loadComponent("Utility")->formatSize($this->resource->getSizebytes()); ?>)</li>
+      <?php
+      $github = $this->resource->getGithub();
+      if(!empty($github))
+        {
+        ?>
+        <li><a href="<?php echo $github ?>" target="_blank">
+             Github <img  style='border:none;position:relative;top:-2px;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/github-small.png" /></a> 
+        </li>
+      <?php
+        }
+      ?>
     </ul>
 
 
