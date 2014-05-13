@@ -72,7 +72,11 @@ class Journal_IndexController extends Journal_AppController
         $this->view->issues[] = $issueDao;
         }
 
-      $this->view->issues = array_reverse($this->view->issues);
+      function sortIssues($a, $b)
+        {
+        return strtotime($a->getPaperdueDate()) < strtotime($b->getPaperdueDate());
+        }
+      usort($this->view->issues, "sortIssues");
       }
     // send the tree to the JS files
     $this->view->json['trees'] = $this->view->tree;
