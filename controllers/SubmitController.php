@@ -143,9 +143,9 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao->enable();
       
       // Make sure the journal and issue editor and the author can manage the resource
+      $resourceDao->setSubmitter($this->userSession->Dao);
       if($isNew)
         {
-        $resourceDao->setSubmitter($this->userSession->Dao);
         $resourceDao->initHandle();
         $adminGroup = $resourceDao->getAdminGroup();
         MidasLoader::loadModel("Itempolicygroup")->createPolicy($adminGroup, $resourceDao, MIDAS_POLICY_ADMIN);
@@ -384,7 +384,7 @@ class Journal_SubmitController extends Journal_AppController
           }
         elseif($private) // Send for approval
           {
-          MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
+          $this->view = MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
           }
         $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
         return;
