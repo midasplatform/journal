@@ -8,6 +8,16 @@ class Reviewosehra_AdminController extends Reviewosehra_AppController
     parent::init();    
     }
     
+    
+  /** Hidden migrate page*/
+  function migrateAction()
+    {
+    $this->requireAdminPrivileges();
+    $this->disableLayout();
+    $this->disableView();
+    MidasLoader::loadComponent("Migrate", "reviewosehra")->migrateQuestionlist();      
+    }
+    
   /** Manage an article reviews */
   function manageAction()
     {
@@ -28,6 +38,7 @@ class Reviewosehra_AdminController extends Reviewosehra_AppController
         $value = "";
         }
       $resourceDao->setCertificationLevel($value);
+      MidasLoader::loadModel("Item")->save($resourceDao);
       }
       
     $reviewsByRevisions = array();

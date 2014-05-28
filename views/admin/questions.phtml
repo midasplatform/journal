@@ -109,6 +109,7 @@ if($this->questionlist)
     <label for="newcategory">Category:</label>
     <select name="newcategory">
       <?php
+      echo "<option value='-1'>Default</option>";
       foreach ($this->categoryTree as $tree)
         {
         echo "<optgroup label=\"" . $tree['title'] . "\">";

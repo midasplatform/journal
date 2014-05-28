@@ -100,6 +100,14 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       {
       $categories = $resourceDao->getCategories();
       $mainListTmp = false;
+      foreach($questionslists as $list)
+        {
+        if($list->getCategoryId() == -1)
+          {
+          $mainListTmp = $list;
+          break;
+          }
+        }
       foreach($categories as $cat)
         {
         foreach($questionslists as $list)
