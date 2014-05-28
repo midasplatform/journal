@@ -42,12 +42,16 @@ class Journal_Notification extends ApiEnabled_Notification
       $bitstream = MidasLoader::loadModel("Bitstream")->load($param[0]['bitstream_id']);
       if($bitstream)
         {
-        $zipPath = "/tmp/github_zip.zip";
+        $zipPath = "/tmp/journal/github_zip.zip";
+        if(!file_exists("/tmp/journal"))
+          {
+          mkdir("/tmp/journal");
+          }
         if(file_exists($zipPath)) unlink($zipPath);
               
-        copy("https://github.com/".$bitstream->getName()."/archive/master.zip", $zipPath);
- 
-        if(file_exists($zipPath))
+        $name = str_replace(".zip", "", $bitstream->getName());
+        $return = copy("https://github.com/".$name."/archive/master.zip", $zipPath);
+        if($return && file_exists($zipPath))
           {
           $bitstream->setName($bitstream->getName().".zip");
           $bitstream->setPath($zipPath);

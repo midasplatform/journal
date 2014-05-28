@@ -43,7 +43,30 @@ $(document).ready(function(){
   $.each(json.trees, function(key, tree)
   {
     tree = FixTreeObjects(tree);
-    $('#treeWrapper').append('<div class="TreeEntry"><b>'+tree.title+' </b><br/><div id="categoryTree-'+tree.key+'" class="categoryTree"></div>');    
+    if(tree.title == "Packages")
+      {
+      $('#treeWrapper').append('<div class="TreeEntry"><b>'+tree.title+' </b> <span tree="categoryTree-'+tree.key+'" id="showPackagesLink">(<a>Show Packages</a>)</span><br/><div style="display:none;" id="categoryTree-'+tree.key+'" class="categoryTree"></div>');    
+      $('#showPackagesLink').click(function(){
+         var treeid = $(this).attr('tree');
+         $('#'+treeid).show();
+         $(this).html("(<a>Select all</a>, <a>Un-Select all</a>");
+         $(this).unbind('click')
+         $(this).find('a:first').click(function(){
+           $('#'+treeid).dynatree("getRoot").visit(function(node){
+            node.select(true);
+          });
+         })
+         $(this).find('a:last').click(function(){
+           $('#'+treeid).dynatree("getRoot").visit(function(node){
+            node.select(false);
+          });
+         })
+      })
+      }
+    else
+      {
+      $('#treeWrapper').append('<div class="TreeEntry"><b>'+tree.title+' </b><br/><div id="categoryTree-'+tree.key+'" class="categoryTree"></div>');    
+      }
     /* Init trees */
     $("div.categoryTree:last").dynatree({
       checkbox: true,
