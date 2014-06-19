@@ -7,26 +7,33 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
 <h3>Title: <?php echo $this->resource->getName() ?> </h3>
 <div class="abstract" style="text-align: justify;"><?php echo str_replace("<br>", "<br/>", nl2br($this->resource->getDescription())) ?></div>
 
+<h3><?php echo ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW) ? "Peer Review": "Final Review"?></h3>
+<div id="certificationWrapper">
+  <h4>OSEHRA Certification Standard Matrix:</h4>
+  <table id="certificationTable">
+    <thead>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
 <br/>
-
 <div id="reviewWrapper">
   <table>
     <tr>
       <td id="tdLeftPanel">
         <div id="divLeftPanel">
-          <h4><?php echo ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW) ? "Peer Review": "Final Review"?></h4>
-          <p id="descriptionQuestionList">
-
-          </p>
-          <p >
-            Text about the certifications levels.
-          </p>
+          <h4 id="descriptionQuestionList"> </h4>
           <h4>Summary</h4>
           <table id="summaryTable">
             <thead>
               <tr>
                 <th>Topic</th>
-                <th>Completed</th>
+                <?php if ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_FINALREVIEW):?>
+                  <th>Level</th>
+                <?php else:?>
+                  <th>Completed</th>
+                <?php endif;?>
               </tr>
             </thead>
             <tbody>
@@ -55,6 +62,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
+            <option value="4">4</option>
           </select>
           </h4>
           
@@ -70,15 +78,26 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
           </select></h4>
           <div id="templateQuestion" style="display:none;">
             <div class="selectMultipleWrapper">
-              <select <?php   if(!$this->isEditable)echo 'disabled="disabled"';  ?> multiple size=4>
-                <option value="<?php echo OSERHAREVIEW_REVIEW_LOW ?>">Low</option>
-                <option value="<?php echo OSERHAREVIEW_REVIEW_MEDIUM ?>">Medium</option>
-                <option value="<?php echo OSERHAREVIEW_REVIEW_HIGH ?>">High</option>
-                <option value="<?php echo OSERHAREVIEW_REVIEW_NA ?>">N/A</option>
-              </select>
+              <?php if ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW): ?>
+                <select <?php   if(!$this->isEditable)echo 'disabled="disabled"';  ?> multiple size=4>
+                  <option value="<?php echo OSERHAREVIEW_REVIEW_LOW ?>">Low</option>
+                  <option value="<?php echo OSERHAREVIEW_REVIEW_MEDIUM ?>">Medium</option>
+                  <option value="<?php echo OSERHAREVIEW_REVIEW_HIGH ?>">High</option>
+                  <option value="<?php echo OSERHAREVIEW_REVIEW_NA ?>">N/A</option>
+                </select>
+              <?php else: ?>
+                <select <?php   if(!$this->isEditable)echo 'disabled="disabled"';  ?> multiple size=5>
+                  <option value="<?php echo OSEHRAREVIEW_LEVEL_ZERO ?>">Level 0</option>
+                  <option value="<?php echo OSEHRAREVIEW_LEVEL_ONE ?>">Level 1</option>
+                  <option value="<?php echo OSEHRAREVIEW_LEVEL_TWO ?>">Level 2</option>
+                  <option value="<?php echo OSEHRAREVIEW_LEVEL_THREE ?>">Level 3</option>
+                  <option value="<?php echo OSEHRAREVIEW_LEVEL_FOUR ?>">Level 4</option>
+                </select>
+              <?php endif; ?>
             </div>
             <span class="questionDescription">{description}</span><br/>
-            Comment: <textarea <?php   if(!$this->isEditable)echo 'readonly';  ?> ></textarea><br/>
+            <div>Comment: </div>
+            <div><textarea <?php   if(!$this->isEditable)echo 'readonly';  ?> ></textarea><br/></div>
           </div>
         </div>        
       </td>
