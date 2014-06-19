@@ -60,6 +60,11 @@ class Journal_Notification extends ApiEnabled_Notification
           $assetstoreDao = MidasLoader::loadModel('Assetstore')->getDefault();
           MidasLoader::loadComponent("Upload")->uploadBitstream($bitstream, $assetstoreDao, false);
           MidasLoader::loadModel('Bitstream')->save($bitstream);
+          
+          $revision = $bitstream->getItemrevision();
+          $item = $revision->getItem();
+          $item->setSizebytes(MidasLoader::loadModel('ItemRevision')->getSize($revision));
+          MidasLoader::loadModel('Item')->save($item);
           }
         }      
       }
