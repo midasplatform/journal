@@ -130,7 +130,7 @@ $(document).ready(function(){
       }
     else
       {
-      $("#newQuestion input[name=oldquestion]").val(json.question.topic_id);
+      $("#newQuestion input[name=oldquestion]").val(json.question.question_id);
       $("#newQuestion textarea[name=questiondescription]").val(json.question.description);
       $("#newQuestion input[name=questioncomment]").attr('checked',json.question.comment == "1");
       $("#newQuestion input[name=questionattachfile]").attr('checked',json.question.attachfile == "1");

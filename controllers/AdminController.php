@@ -193,6 +193,7 @@ class Reviewosehra_AdminController extends Reviewosehra_AppController
     // Edit/Create Question
     if($this->getRequest()->isPost() && isset($_POST['questiondescription']))
       {
+
       if(is_numeric($_POST['oldquestion']))
         {
         $dao = MidasLoader::loadModel("Question", 'reviewosehra')->load($_POST['oldquestion']);
