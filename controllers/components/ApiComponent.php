@@ -59,7 +59,10 @@ class Journal_ApiComponent extends AppComponent
         {
         $index = $solrComponent->getSolrIndex();
         UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
-        $response = $index->search($args['query'], 0, $limit * 4 + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+        
+        $factor = 10;        
+        if($useCache) $factor = 100000; // Get all the ids when creating the cache
+        $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
         UtilityComponent::endIgnoreWarnings();
 
         $totalResults = $response->response->numFound;
