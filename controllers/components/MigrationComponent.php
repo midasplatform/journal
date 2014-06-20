@@ -532,12 +532,14 @@ class Journal_MigrationComponent extends AppComponent
       }
     
     $this->getLogger()->warn("Adding institutions");
-    $query = pg_query("SELECT erperson_id, id, institution FROM isj_user");
+    $query = pg_query("SELECT erperson_id, id, institution, emailpref, newreviewemail, newsubmissionemail FROM isj_user");
     while($query_array = pg_fetch_array($query))
       {
       $id = $query_array['id'];
       $institution = $query_array['institution'];
       $eperson_id = $query_array['erperson_id'];
+      $newreviewemail = (int) $query_array['emailpref'] == 1 && $query_array["newreviewemail"] == 1;
+      $newsubmissionemail = (int) $query_array['emailpref'] == 1 && $query_array["newsubmissionemail"] == 1;
       try
         {
         if(!isset($this->epersonToUser[$eperson_id]))continue;
@@ -545,6 +547,9 @@ class Journal_MigrationComponent extends AppComponent
         $userDao->setCompany($institution);
         $this->getLogger()->warn("- Adding ".$institution." to ".$userDao->getEmail());
         MidasLoader::loadModel("User")->save($userDao);
+        
+        MidasLoader::loadComponent("Notification", "journal")->setUserNotificationStatus($userDao, 
+              $newsubmissionemail, $newreviewemail);
         $this->ijuserToUser[$id] = $userDao->getKey();
         }
       catch(Zend_Exception $e)

@@ -244,6 +244,75 @@ class Journal_NotificationComponent extends AppComponent
     }
 
   /**
+   * Get user status
+   * @param UserDao $user
+   * @return array
+   */
+  public function getUserNotificationStatus($user)
+    {
+    if(!$user instanceof UserDao) return array();
+    $db = Zend_Registry::get('dbAdapter');
+    $results = $db->query("SELECT journalmodule_notification_submission as submission, 
+      journalmodule_notification_review as review FROM user
+      WHERE user_id='".$user->getKey()."'")
+               ->fetchAll();
+    
+    if(empty($results))return array();
+    return array($results[0]['submission'], $results[0]['review']);    
+    }
+    
+
+  public function setUserNotificationStatus($user, $submission, $review)
+    {
+    if(!$user instanceof UserDao || !is_numeric($submission) || !is_numeric($review)) return;
+    $db = Zend_Registry::get('dbAdapter');
+    $sql = "UPDATE `user` set journalmodule_notification_submission = ".$db->quote($submission).",
+      journalmodule_notification_review = ".$db->quote($review)."where user_id=".$user->getKey();
+    $db->query($sql);   
+    }
+    
+  /**
+   * Get all the user who wants to receive notifications
+   * @return array
+   */
+  public function findWithSubmissionNotification()
+    {
+    $db = Zend_Registry::get('dbAdapter');
+    $results = $db->query("SELECT user_id FROM user
+      WHERE journalmodule_notification_submission='1'")
+               ->fetchAll();
+    
+    $return = array();
+    
+    foreach($results as $result)
+      {
+      $return[] = MidasLoader::loadModel("ItemRevision")->load($result['user_id']);
+      }
+     
+    return $return;
+    }
+  /**
+   * Get all the user who wants to receive notifications
+   * @return array
+   */
+  public function findWithReviewNotification()
+    {
+    $db = Zend_Registry::get('dbAdapter');
+    $results = $db->query("SELECT user_id FROM user
+      WHERE journalmodule_notification_review='1'")
+               ->fetchAll();
+    
+    $return = array();
+    
+    foreach($results as $result)
+      {
+      $return[] = MidasLoader::loadModel("ItemRevision")->load($result['user_id']);
+      }
+     
+    return $return;
+    }
+    
+  /**
    * private functions
    */
   private function _createEmailView($scriptpath, $baseUrl)

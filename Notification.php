@@ -93,7 +93,7 @@ class Journal_Notification extends ApiEnabled_Notification
     $user = $params['user'];
     $fc = Zend_Controller_Front::getInstance();
     $webroot = $fc->getBaseUrl();
-    return array('Notification' => $webroot.'/journal/user/notification?userId='.$user->getKey());
+    return array('Notifications' => $webroot.'/journal/user/notification?userId='.$user->getKey());
     }
 
   /**

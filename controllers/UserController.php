@@ -28,12 +28,30 @@ class Journal_UserController extends Journal_AppController
   // Show setting
   function settingsAction()
     {
+    if(!$this->logged)
+      {
+      throw new Zend_Exception("You have to be logged in.");
+      }
     $this->view->userId = $this->_getParam('userId');
     }
     
   // Show notification setting
   function notificationAction()
-    {
+    {    
+    if(!$this->logged)
+      {
+      throw new Zend_Exception("You have to be logged in.");
+      }
+      
+    if(isset($_POST) && !empty($_POST))
+      {
+      MidasLoader::loadComponent("Notification", "journal")->setUserNotificationStatus($this->userSession->Dao, 
+              $_POST['NewSubmissionEmail'], $_POST['NewReviewsEmail']);
+      $this->disableView();
+      echo JsonComponent::encode(array(1, "Changes saved."));
+      }
+      
+    $this->view->status = MidasLoader::loadComponent("Notification", "journal")->getUserNotificationStatus($this->userSession->Dao);
     $this->disableLayout();
     }
   
