@@ -1,7 +1,10 @@
 <?php
+$this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/public/js/lib/File-Upload/jquery.iframe-transport.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/public/js/lib/File-Upload/jquery.fileupload.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/public/js/submit/submit.index.js');
 ?>
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/css/submit/submit.index.css" rel="stylesheet" />
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/reviewosehra/public/js/lib/File-Upload/jquery.fileupload-ui.css" rel="stylesheet" />
 
 <h2>Review an article</h2>
 <h3>Title: <?php echo $this->resource->getName() ?> </h3>
@@ -96,8 +99,40 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
               <?php endif; ?>
             </div>
             <span class="questionDescription">{description}</span><br/>
-            <div>Comment: </div>
-            <div><textarea <?php   if(!$this->isEditable)echo 'readonly';  ?> ></textarea><br/></div>
+            <div class="commentWrapper">
+              <table>
+                <tr>
+                  <td style="width:100px;">Comment: </td>
+                  <td><textarea <?php   if(!$this->isEditable)echo 'readonly';  ?> ></textarea> </td>
+                </tr>     
+              </table>
+            </div>
+            <div class="uploadWrapper">
+              <table>
+                <tr>
+                  <td style="vertical-align: top;width:100px;">Attachement: </td>
+                  <td>
+                     <label class="downloadButton" class="fileinput-button">
+                          <a class="fileNameUploaded"></a>
+                      </label>
+                    <?php
+                      if($this->isEditable)
+                        {?>
+                        <label class="uploadButton"  class="fileinput-button">
+                            <span class="inputUpload" style="color:#56758B;cursor:pointer;">Attach a file...</span>
+                            <input class="fileupload"  style='display:none;' type="file" name="files[]">
+                        </label>
+                        <label class="uploadProgress" style="display:none;">
+                            Upload in progress... <span class="progressValue"></span>
+                        </label>
+                    <?php
+                        }?>
+                       
+                        <input type="hidden" class="fileItemId" value=""/>
+                  </td>
+                </tr>     
+              </table>
+            </div>
           </div>
         </div>        
       </td>

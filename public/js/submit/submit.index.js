@@ -105,6 +105,14 @@ function populateCertificationMatrixTable(){
 function questionTemplate(id, html, values) {
   html = "<div class='questionElement' key='"+id+"' id='questionElement_"+id+"'>"+html+"</div>";
   html = html.replace("{description}", values.description);
+  if(values.comment == 0)
+    {
+    html = html.replace('class="commentWrapper"', 'class="commentWrapper" style="display:none"');
+    }
+  if(values.attachfile == 0)
+    {
+    html = html.replace('class="uploadWrapper"', 'class="uploadWrapper" style="display:none"');
+    }
   return html; 
 };
 
@@ -135,7 +143,7 @@ function processQuestionUpdate(init){
       $("select#listTopics").append("<option value='"+i+"'>"+v.name+"</options>");
       $("div#divRightPanel h4").after("<div class='questionWrapper' id='questionWrapper_"+i+"'>");
       $.each(v.questions, function(j, q){
-      $("div#questionWrapper_"+i).append(questionTemplate(j, template, q));
+        $("div#questionWrapper_"+i).append(questionTemplate(j, template, q));
       });
     });
     }
@@ -154,6 +162,54 @@ function processQuestionUpdate(init){
         if(q.value != 0) totalQuestionAnswered++;
         $('#questionElement_'+j+" select").val(parseInt(q.value));
         $('#questionElement_'+j+" textarea").val(q.commentValue);
+        $('#questionElement_'+j+" .downloadButton .fileNameUploaded").click(function(){
+          var item_id = $('#questionElement_'+j+" .fileItemId").val();
+          window.location.href = json.global.webroot+"/download/?items="+item_id;
+        })
+        if(q.attachfileValue == "")
+          {
+          $('#questionElement_'+j+" .downloadButton").hide();
+          $('#questionElement_'+j+" .fileItemId").val(q.attachfileValue);
+          }
+        else
+          {
+          $('#questionElement_'+j+" .uploadButton .inputUpload").html("Attach a different file...");
+          $('#questionElement_'+j+" .downloadButton .fileNameUploaded").html(q.attachfileValue[0]);
+          $('#questionElement_'+j+" .fileItemId").val(q.attachfileValue[1]);
+          }
+        var revision_id = json.listArray.revision_id;
+        var uploadElement = $('#questionElement_'+j+" .uploadButton .fileupload");
+        uploadElement.fileupload({
+              dataType: 'json',
+              url:  json.global.webroot+'/reviewosehra/submit/upload?revision_id='+revision_id,
+              start:function(){
+                $('#questionElement_'+j+" .uploadButton").hide();
+                $('#questionElement_'+j+" .uploadProgress").show();
+                $('#questionElement_'+j+" .uploadProgress .progressValue").html("");
+              },
+              done: function (e, data) {
+                $('#questionElement_'+j+" .uploadButton").show();
+                $('#questionElement_'+j+" .uploadButton .inputUpload").html("Attach a different file...");
+                $('#questionElement_'+j+" .uploadProgress").hide();
+                if(data.result[0]['size'] > 0);
+                  {
+                  var item_id = data.result[0]['item_id'];
+                  $('#questionElement_'+j+" .downloadButton").show();
+                  $('#questionElement_'+j+" .downloadButton .fileNameUploaded").html(data.result[0]['name']);
+                  $('#questionElement_'+j+" .fileItemId").val(item_id);
+                  var question = $('#questionElement_'+j).attr('key');
+                  var topic = $("select#listTopics").val();
+                  json.listArray.topics[topic].questions[question].attachfileValue = [data.result[0]['name'], item_id];
+                  processQuestionUpdate();
+                  }
+              }
+          });
+          
+        uploadElement.bind('fileuploadprogress', function (e, data)
+          {
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          $('#questionElement_'+j+" .uploadProgress .progressValue").html("("+progress+"%)");
+          });
       });
     if (isFinalReview){
       $('#questionLevel_'+i).attr('value', levelValue);

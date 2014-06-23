@@ -133,4 +133,71 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
     $this->view->json['listArray']['review_id'] = $review_id;
     $this->view->lists = $questionslists;
     }
+
+  /** upload a file (see jquery upload file)*/
+  function uploadAction()
+    {
+    if(!$this->logged)
+      {
+      return;
+      }
+    
+    $userDao = $this->userSession->Dao;    
+    $revision = MidasLoader::loadModel("ItemRevision")->load($_GET['revision_id']);
+    
+    if(!$revision)
+      {
+      return;
+      }
+    
+    // Get PrivateFolder
+    $item = $revision->getItem();
+    $itemFolder = end($item->getFolders());
+    $rootFolder = MidasLoader::loadModel("Folder")->getRoot($itemFolder);
+    $communityFolders = $rootFolder->getFolders();
+    $privateFolder = false;
+    foreach($communityFolders as $f)
+      {
+      if($f->getName() == "Private")$privateFolder = $f;
+      }
+      
+    if(!$privateFolder)
+      {
+      return;
+      }
+      
+    $uploadRootFolder = $this->getTempDirectory()."/reviewosehrafiles";
+    if(!file_exists($uploadRootFolder))
+      {
+      mkdir($uploadRootFolder);
+      }
+    $uploadFolder = $uploadRootFolder."/".time()."/";
+    mkdir($uploadFolder);
+      
+    require_once __DIR__.'/components/UploadHandler.php';
+    $upload_handler = new UploadHandler(array('upload_dir' => $uploadFolder,
+                                              'max_number_of_files' => 1,
+                                              'upload_url' => $this->view->webroot.'/journal/submit/upload'));
+
+
+    header('Pragma: no-cache');
+    header('Cache-Control: private, no-cache');
+    header('Content-Disposition: inline; filename="files.json"');
+    header('X-Content-Type-Options: nosniff');
+
+    $returninfo = $upload_handler->post();
+
+    if(isset($returninfo[0]) && $returninfo[0]->size > 0 && isset($upload_handler->filepath) && file_exists($upload_handler->filepath))
+      {              
+      $item = MidasLoader::loadComponent("Upload")->createUploadedItem($this->userSession->Dao, $upload_handler->filename,
+                                $upload_handler->filepath, $privateFolder); 
+      $anonymousGroup = MidasLoader::loadModel('Group')->load(MIDAS_GROUP_ANONYMOUS_KEY);
+      MidasLoader::loadModel('Itempolicygroup')->createPolicy($anonymousGroup, $item, MIDAS_POLICY_READ);  
+      $returninfo[0]->item_id = $item->getKey();
+      unlink($uploadFolder);
+      }
+
+    echo json_encode($returninfo);
+    exit;
+    }
 }//end class

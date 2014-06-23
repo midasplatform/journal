@@ -45,8 +45,16 @@ div.questionElement{
 }
 
 .questionElement textarea{
-  width:72%;
-  height:30px;
+  width:100%;
+  height:15px;
+}
+
+div.commentWrapper, div.uploadWrapper {
+  width:85%;
+}
+
+div.commentWrapper table, div.uploadWrapper table{
+  width:100%
 }
 
 .questionDescription{
