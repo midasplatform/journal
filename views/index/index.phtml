@@ -36,6 +36,9 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     if (isset($this->issues))
       {
       echo '<h3 style="margin-top:10px;" class="FilterH3">Issues:</h3>';
+      echo "<div class='issueButton' key='-999'>";
+      echo "<div qtipconditionnal=\"all\" class='issueTitle issueActive'>All Issues</div>";
+      echo "</div>";
       foreach ($this->issues as $issue)
         {
         echo "<div class='issueButton' key='" . $issue->getKey() . "'>";

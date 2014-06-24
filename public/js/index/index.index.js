@@ -69,7 +69,7 @@ $(document).ready(function(){
       $(this).removeClass('issueSelected');
       $(this).find('.issueDetails').hide();
     })
-    if(selectIssue == key) selectIssue = false;
+    if(selectIssue == key || key === -999) selectIssue = false;
     else
       {
       container.addClass('issueSelected');
