@@ -5,7 +5,12 @@ $(document).ready(function(){
     })
     
     $('#acceptLicense').change(function(){
-      $('#hiddenSourceLicense').attr('value', $(this).is(':checked') ? 1: 0);
+      var license = $("#licenseChoice").val();
+      $('#hiddenSourceLicense').attr('value', $(this).is(':checked') ? license: 0);
+    })
+    $('#licenseChoice').change(function(){
+      var license = $(this).val();
+      $('#hiddenSourceLicense').attr('value', $('#acceptLicense').is(':checked') ? license: 0);
     })
     $('#typeFile').change(function(){      
       if($(this).val() == 6)
