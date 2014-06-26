@@ -62,13 +62,7 @@ class Journal_NotificationComponent extends AppComponent
       $authList .= join(" ", $author) . ",";
       }
     if (!empty($authList)) $authList = substr($authList, 0, -1);
-    $this->getLogger()->debug("Name is " . $name);
-    $this->getLogger()->debug("Description is " . $description);
-    $this->getLogger()->debug("handle is " . $handle);
-    $this->getLogger()->debug("Authors are " . $authList);
     $approveLink = "/journal/submit?revisionId=" . $revisionId;
-    $this->getLogger()->debug("link is " . $approveLink);
-    $this->getLogger()->debug("ItemId is " . $itemId);
     $this->_view->assign("name", $name);
     $this->_view->assign("author", $authList);
     $this->_view->assign("description", $description);
@@ -79,10 +73,11 @@ class Journal_NotificationComponent extends AppComponent
     $this->getLogger()->debug("Body Text is " . $bodyText);
     $subject = 'New Submission - Pending Approval: ' . $name;
     $to = '';
-    // form the email headers part
-    $headers = $this->_formMailHeader($contactEmail, $editList, $adminList);
+    $emailLstArray = array($editList, $adminList);
+    $bccList = $this->_formBccList($emailLstArray);
+    $headers = $this->_formMailHeader($contactEmail, "", $bccList);
     $this->getLogger()->debug("Email Header is " . $headers);
-    // send mail to the editors
+    // send mail to the editors/admins for approval
     $result = mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     $this->getLogger()->debug("mail result is " . $result);
     // send mail to the submitter
@@ -90,7 +85,6 @@ class Journal_NotificationComponent extends AppComponent
     $readlink = "/journal/view/" . $revisionId;
     $submitter = $resourceDao->getSubmitter();
     $name = $submitter->getFullName();
-    $this->getLogger()->debug("name is " . $name);
     $this->_view->assign("name", $name);
     $this->_view->assign("link", $readlink);
     $this->_layout->assign("content", $this->_view->render('waitforapproval.phtml'));
@@ -129,13 +123,7 @@ class Journal_NotificationComponent extends AppComponent
       $authList .= join(" ", $author) . ",";
       }
     if (!empty($authList)) $authList = substr($authList, 0, -1);
-    $this->getLogger()->debug("Name is " . $name);
-    $this->getLogger()->debug("Description is " . $description);
-    $this->getLogger()->debug("handle is " . $handle);
-    $this->getLogger()->debug("Authors are " . $authList);
     $handleLink = "http://hdl.handle.net/" . $handle;
-    $this->getLogger()->debug("link is " . $approveLink);
-    $this->getLogger()->debug("ItemId is " . $itemId);
     $this->_view->assign("name", $name);
     $this->_view->assign("author", $authList);
     $this->_view->assign("description", $description);
@@ -145,10 +133,12 @@ class Journal_NotificationComponent extends AppComponent
     $this->getLogger()->debug("Body Text is " . $bodyText);
     $subject = 'New Submission: ' . $name;
     $to = '';
-    // form the email headers part
-    $editList = $this->_getSubmissionAdminEmails($resourceDao);
-    $adminList = $this->_getSubmissionEditorEmails($resourceDao);
-    $headers = $this->_formMailHeader($contactEmail, $editList, $adminList);
+    $subList = $this->_getNewSubmissionSubscribeList();
+    $editList = $this->_getSubmissionEditorEmails($resourceDao);
+    $adminList = $this->_getSubmissionAdminEmails($resourceDao);
+    $emailLstArray = array($subList, $editList, $adminList);
+    $bccList = $this->_formBccList($emailLstArray);
+    $headers = $this->_formMailHeader($contactEmail, null, $bccList);
     $this->getLogger()->debug("Email Header is " . $headers);
     // send mail to the editors
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
@@ -178,9 +168,6 @@ class Journal_NotificationComponent extends AppComponent
     $contactEmail = $submitter->getEmail();
     $title = $resourceDao->getName();
     $handle = $resourceDao->getHandle();
-    $this->getLogger()->debug("contact email is " . $contactEmail);
-    $this->getLogger()->debug("comment email is " . $comment);
-    $this->getLogger()->debug("comment user is " . $userDao->getFullName());
     $this->_view->assign("name", $userDao->getFullName());
     $this->_view->assign("title", $title);
     $this->_view->assign("comments", $comment);
@@ -194,7 +181,9 @@ class Journal_NotificationComponent extends AppComponent
     // form the email headers part
     $editList = $this->_getSubmissionEditorEmails($resourceDao);
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
-    $headers = $this->_formMailHeader($contactEmail, $editList, $adminList);
+    $emailLstArray = array($subList, $editList, $adminList);
+    $bccList = $this->_formBccList($emailLstArray);
+    $headers = $this->_formMailHeader($contactEmail, null, $bccList);
     $this->getLogger()->debug("Email Header is " . $headers);
     // send mail to the editors
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
@@ -215,16 +204,13 @@ class Journal_NotificationComponent extends AppComponent
     $userId = $reviewDao->getUserId();
     $revision_id = $reviewDao->getRevisionId();
     $reviewId = $reviewDao->getKey();
-    $this->getLogger()->debug("Review Id is " . $reviewId);
     $userDao = MidasLoader::loadModel("User")->load($userId);
     $name = $userDao->getFullName();
-    $this->getLogger()->debug("User name is " . $name);
     $revision = MidasLoader::loadModel("ItemRevision")->load($revision_id);
     $itemDao = $revision->getItem();
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $contactEmail = $resourceDao->getSubmitter()->getEmail();
     $title = $resourceDao->getName();
-    $this->getLogger()->debug("Name is " . $name);
     $viewLink =  $baseUrl . "/reviewosehra/submit?review_id=" . $reviewId;
     $this->_view->assign("name", $name);
     $this->_view->assign("title", $title);
@@ -235,9 +221,13 @@ class Journal_NotificationComponent extends AppComponent
     $subject = 'New Review: ' . $title;
     $to = '';
     // form the email headers part
-    $editList = $this->_getSubmissionAdminEmails($resourceDao);
-    $adminList = $this->_getSubmissionEditorEmails($resourceDao);
-    $headers = $this->_formMailHeader($contactEmail, $editList, $adminList);
+    $subList = $this->_getNewReviewSubscribeList();
+    // form the email headers part
+    $editList = $this->_getSubmissionEditorEmails($resourceDao);
+    $adminList = $this->_getSubmissionAdminEmails($resourceDao);
+    $emailLstArray = array($subList, $editList, $adminList);
+    $bccList = $this->_formBccList($emailLstArray);
+    $headers = $this->_formMailHeader($contactEmail, null, $bccList);
     $this->getLogger()->debug("Email Header is " . $headers);
     // send mail to the submitter, editor as well as admins
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
@@ -286,7 +276,7 @@ class Journal_NotificationComponent extends AppComponent
     
     foreach($results as $result)
       {
-      $return[] = MidasLoader::loadModel("ItemRevision")->load($result['user_id']);
+      $return[] = MidasLoader::loadModel("User")->load($result['user_id']);
       }
      
     return $return;
@@ -306,7 +296,7 @@ class Journal_NotificationComponent extends AppComponent
     
     foreach($results as $result)
       {
-      $return[] = MidasLoader::loadModel("ItemRevision")->load($result['user_id']);
+      $return[] = MidasLoader::loadModel("User")->load($result['user_id']);
       }
      
     return $return;
@@ -322,7 +312,7 @@ class Journal_NotificationComponent extends AppComponent
     $this->_layout->setScriptPath($scriptpath);
     $this->_view->setScriptPath($scriptpath);
     $this->_view->assign("webroot", $baseUrl);
-    $this->_layout->assign("webroot", $baseUrl);
+    $this->_layout->assign("webroot", $baseUrm);
     }
   private function _formMailHeader($contactEmail, $ccList, $bccList)
     {
@@ -374,14 +364,61 @@ class Journal_NotificationComponent extends AppComponent
       }
     if (!empty($editGroup))
       {
-        $editUsers = $editGroup->getUsers();
-        foreach ($editUsers as $editUser)
-          {
-          $editList .= $editUser->getEmail() . ',';
-          }
-        if (!empty($editList)) $editList = substr($editList, 0, -1);
+      $editUsers = $editGroup->getUsers();
+      foreach ($editUsers as $editUser)
+        {
+        $editList .= $editUser->getEmail() . ',';
+        }
+      if (!empty($editList)) $editList = substr($editList, 0, -1);
       }
     return $editList;
+    }
+  private function _getNewSubmissionSubscribeList()
+    {
+    $allSubscriberLst = '';
+    $subscribers = $this->findWithSubmissionNotification();
+    if (!empty($subscribers))
+      {
+        foreach ($subscribers as $subscriber)
+          {
+          $allSubscriberLst .= $subscriber->getEmail() . ',';
+          }
+
+        if (!empty($allSubscriberLst)) $allSubscriberLst = substr($allSubscriberLst, 0, -1);
+      }
+    return $allSubscriberLst;
+    }
+
+  private function _getNewReviewSubscribeList()
+    {
+    $allSubscriberLst = '';
+    $subscribers = $this->findWithReviewNotification();
+    if (!empty($subscribers))
+      {
+        foreach ($subscribers as $subscriber)
+          {
+          $allSubscriberLst .= $subscriber->getEmail() . ',';
+          }
+
+        if (!empty($allSubscriberLst)) $allSubscriberLst = substr($allSubscriberLst, 0, -1);
+      }
+    return $allSubscriberLst;
+    }
+  private function _formBccList($emailLstArray)
+    {
+    $bccList = '';
+    foreach ($emailLstArray as $emailList)
+      {
+      if (!empty($bccList) && !empty($emailList))
+        {
+        $bccList .= "," . $emailList;
+        }
+      else
+        {
+        $bccList .= $emailList;
+        }
+      }
+    return $bccList;
     }
   private function _testMail()
     {
