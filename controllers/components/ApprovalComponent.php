@@ -50,6 +50,7 @@ class Journal_ApprovalComponent extends AppComponent
     
     $db = Zend_Registry::get('dbAdapter');
     $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "approval_status");
+    if(!$metadataDao) return array();
     $results = $db->query("SELECT itemrevision_id FROM metadatavalue WHERE metadata_id='".$metadataDao->getKey()."' AND value='1' ")
                ->fetchAll();
     
