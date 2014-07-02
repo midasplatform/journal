@@ -148,7 +148,7 @@ echo $this->doctype()
         </div>
           <div id="topbar"><ul id="Nav" class="nav"><li id='browseLink'><a href="<?php echo $this->webroot ?>/journal">Home</a></li>
 
-        <li>
+           <li>
              <a  href="<?php echo $this->webroot."/journal/view/journals"?>">Journal</a>
                
            </li>
@@ -169,6 +169,7 @@ echo $this->doctype()
               </ul>
             </li>
             <?php }?>
+              
             <?php if($this->logged && $this->userDao->isAdmin())
             {?>
             <li>
@@ -217,6 +218,14 @@ echo $this->doctype()
               </li>
               </ul>
             </li>
+            <?php
+            if(!empty($this->waitingApproval))
+              {?>
+              <li>
+               <a style="color:orange;"  href="<?php echo $this->webroot."/journal/admin/approval"?>">Waiting approval: <?php echo count($this->waitingApproval)?></a>               
+              </li>
+            <?php
+              }?>
 
             <?php
             $hideBlog = true;

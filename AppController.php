@@ -40,6 +40,13 @@ class Journal_AppController extends MIDAS_GlobalModule
       }
     $this->view->json['dynamicHelp'] = array();
     
+    // Check if approval required
+    $this->view->waitingApproval = array();
+    if($this->logged)
+      {
+      $this->view->waitingApproval = MidasLoader::loadComponent("Approval", "journal")->getArticlesWaitingForApproval($this->userSession->Dao);
+      }
+    
     // Create footer stats
     $cacheFile = UtilityComponent::getTempDirectory()."/mainStats.json";
     if(file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache

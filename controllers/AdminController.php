@@ -25,6 +25,31 @@ class Journal_AdminController extends Journal_AppController
     parent::init();    
     }
     
+  // List publications waiting for approval
+  function approvalAction()
+    {
+    if(!$this->logged)
+      {
+      throw new Zend_Exception("Please log in.", 404);
+      }
+    if(empty($this->view->waitingApproval))
+      {
+      throw new Zend_Exception("No approval required", 404);
+      }
+     
+    $articles = array();
+    foreach($this->view->waitingApproval as $item)
+      {
+      $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
+      $articles[] = array('total' => count($this->view->waitingApproval), 'title' => $item->getName(), 
+            'type' => $item->getType(), 'logo' => $resourceDao->getLogo(), 'id' => $item->getKey(), 'description' => $item->getDescription(), 'authors' => $authors,
+            'view' => $item->getView() ,'downloads' => $item->getDownload(),
+            'revisionId' =>  $resourceDao->getRevision()->getKey());
+      }
+     
+    $this->view->json["articles"] = $articles;
+    }
+    
   /** Manage journals and issues*/
   function issuesAction()
     {   

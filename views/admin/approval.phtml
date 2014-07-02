@@ -1,0 +1,72 @@
+<?php
+/*=========================================================================
+ *
+ *  Copyright OSHERA Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/admin/admin.approval.js');
+$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/dodotdot.1.5.9.js');
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/index/index.index.css" rel="stylesheet" />
+<div align="center"><font size="+1"><strong>Aritcles waiting for approval</strong></font></div>
+
+<br/>
+<br/>
+
+<div class="ContentWithLeftPanel">
+  
+  <div class="MainContent" style="margin-left:0px;">
+   
+    <div class="SearchResultsHeader">     
+    </div>
+
+    <div class="SearchResults">
+
+    </div>    
+    <div id="showMoreResults" style="display:none">
+      <a>Show more results</a>
+    </div>
+    <script type="text/template" id="SearchResultTemplate">
+      <div class="SearchResultEntry box" id="{id}">
+        <table style="width: 99%">
+          <tr>
+            <td style="width:100px;height:98px;vertical-align: middle;text-align: center;">
+              <img class="ResultLogo" src="<?php echo $this->webroot ?>/journal/view/logo/?revisionId={id}&size=64" />
+              <img class="ResultLogo" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/journal.gif" />
+             
+            </td>
+            <td style="vertical-align: top;">
+             
+              <div class="ResultTop">
+                <a class="resourceLink" href="<?php echo $this->webroot ?>/journal/submit?revisionId={id}"></a>
+                <span class="ResultTitle">{title}</span>          
+              </div>
+              <div class="ResultAuthors">
+                {authors}
+              </div>
+
+              <div class="ResultDescription">
+                {description}
+              </div>
+
+            </td>
+          </tr>
+        </table>
+      </div>
+      </script>
+    </div>  
+  </div>
+

@@ -367,6 +367,7 @@ class Journal_SubmitController extends Journal_AppController
         {
         if($private && $resourceDao->isAdmin($this->userSession->Dao)) // Approve
           {
+          $resourceDao->setApprovalStatus(0);
           $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
           if($community->getPrivacy() != MIDAS_COMMUNITY_PRIVATE) 
             {
@@ -384,6 +385,7 @@ class Journal_SubmitController extends Journal_AppController
           }
         elseif($private) // Send for approval
           {
+          $resourceDao->setApprovalStatus(1);
           $this->view = MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
           }
         if (isset($_POST['source-license']))
@@ -395,9 +397,12 @@ class Journal_SubmitController extends Journal_AppController
         }
       }
       
+    $submitter = $resourceDao->getSubmitter();
+    
     // sent to theview
     $this->view->isPrivate = $private;
     $this->view->isAdmin = $resourceDao->isAdmin($this->userSession->Dao);
+    $this->view->isSubmitter = $submitter && $submitter->getKey() == $this->userSession->Dao->getKey();
     $this->view->resource = $resourceDao;
     $this->view->bitstreams = $bitstreams;
     $this->view->json['resource'] = $resourceDao->toArray();

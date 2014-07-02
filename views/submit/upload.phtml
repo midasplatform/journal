@@ -39,6 +39,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     <option></option>
     <option value="<?php echo BITSTREAM_TYPE_THUMBNAIL ?>">Thumbnail (Logo)</option>    
     <option value="<?php echo BITSTREAM_TYPE_PAPER ?>">Paper</option>    
+    <option value="<?php echo BITSTREAM_TYPE_PAPER_TECHNICAL ?>">Major technique paper for reference</option>    
     <option value="<?php echo BITSTREAM_TYPE_SOURCECODE ?>">Source Code</option>    
     <option value="<?php echo BITSTREAM_TYPE_SOURCECODE_GITHUB ?>">Github repository</option>    
     <option value="<?php echo BITSTREAM_TYPE_DATA ?>">Data</option>    
@@ -87,6 +88,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     $typeToString = array(
         BITSTREAM_TYPE_THUMBNAIL => "Thumbnail (Logo)",
         BITSTREAM_TYPE_PAPER => "Paper",
+        BITSTREAM_TYPE_PAPER_TECHNICAL => "Major technique paper for reference",
         BITSTREAM_TYPE_SOURCECODE => "Source Code",
         BITSTREAM_TYPE_SOURCECODE_GITHUB => "Github repository",
         BITSTREAM_TYPE_DATA => "Data",
@@ -131,13 +133,13 @@ I have the right to distribute these files
 
     <form action="" method="POST">
       <?php
-      if ($this->isPrivate && !$this->isAdmin)
+      if($this->isPrivate && !$this->isAdmin)
         {
         echo '<input type="submit" disabled="disabled" name="finish"  value="Submit for Approval >"/>';
         }
-      elseif ($this->isPrivate && !$this->isAdmin)
+      elseif ($this->isPrivate && $this->isAdmin && !$this->isSubmitter)
         {
-        echo '<input type="submit" disabled="disabled" name="finish"  value="Approve >"/>';
+        echo '<input type="submit" disabled="disabled" name="finish"  value="Approve and Publish >"/>';
         }
       else
         {

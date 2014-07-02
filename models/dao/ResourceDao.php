@@ -206,6 +206,26 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("certification_level", $handle);
     }
     
+  /** Get Approval Status 
+   *  1 = waiting for approval
+   *  0 = already approved or not complete
+   * @return 
+   */
+  function getApprovalStatus()
+    {
+    $metadata = $this->getMetaDataByQualifier("approval_status");
+    if(!$metadata) return 0;
+    return $metadata->getValue();
+    }
+
+   /* Set Approval Status 
+   * @param 
+   */
+  function setApprovalStatus($status)
+    {
+    $this->setMetaDataByQualifier("approval_status", $status);
+    }
+    
 
   /** Get source code license
    * 
