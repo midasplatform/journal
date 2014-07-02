@@ -175,12 +175,26 @@ class Journal_ViewController extends Journal_AppController
       MidasLoader::loadComponent("Export", "journal")->citation($resourceDao, $_POST['exportType']);
       return;
       }
+      
+    // Try to find paper bitstream
+    $bitstreams = $resourceDao->getRevision()->getBitstreams();
+    $paper = false;
+    foreach($bitstreams as $b)
+      {
+      $type = MidasLoader::loadComponent("Bitstream", "journal")->getType($b);
+      if($type == BITSTREAM_TYPE_PAPER)
+        {
+        $paper = $b;
+        break;
+        }
+      }
 
     // Send resource to the view
     $this->view->isPrivate = $private;
     $this->view->isApproved = $isApproved;
     $this->view->resource = $resourceDao;
     $this->view->issue =  $issue;
+    $this->view->paper = $paper;
     $this->view->revisions =  $itemDao->getRevisions();;
     $this->view->community =  $community;
     $this->view->creationDate = MidasLoader::loadComponent("Date")->formatDate(strtotime($resourceDao->getDateCreation()));
