@@ -312,7 +312,7 @@ class Journal_NotificationComponent extends AppComponent
     $this->_layout->setScriptPath($scriptpath);
     $this->_view->setScriptPath($scriptpath);
     $this->_view->assign("webroot", $baseUrl);
-    $this->_layout->assign("webroot", $baseUrm);
+    $this->_layout->assign("webroot", $baseUrl);
     }
   private function _formMailHeader($contactEmail, $ccList, $bccList)
     {
