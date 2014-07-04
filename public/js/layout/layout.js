@@ -13,6 +13,14 @@ if (typeof console != "object") {
 
 // Main calls
 $(function() {
+  
+    // Add header
+  jQuery('BODY').prepend('<iframe id="osehranav-iframe" scrolling="no" src="" width="100%" height="35px" border="0" style="border: 0;"></iframe>');
+  var ifrm = document.getElementById('osehranav-iframe');
+  ifrm = (ifrm.contentWindow) ? ifrm.contentWindow : (ifrm.contentDocument.document) ? ifrm.contentDocument.document : ifrm.contentDocument;
+  ifrm.document.open();
+  ifrm.document.write(jQuery('#osehranav-iframe-data').text());
+  ifrm.document.close();
 
   // Parse json content
   json = jQuery.parseJSON(rawJson);

@@ -71,6 +71,56 @@ echo $this->doctype()
 
 <body>
     
+  <div id="announcement-banner" class="alertHeader">
+    <script type="text/template" id="osehranav-iframe-data">
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+        <head>
+          <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+          <title>
+            OSEHRA header bar
+          </title>
+      <style type="text/css">
+      body {background-color: #E6E6E6;}
+      * {padding: 0px;margin: 0px;}
+      .logo {float: left;padding:2px 9px;}
+      li {
+        font-size: 16px;
+        font-family: lato,oswald,"Francois One",Arial,Helvetica,sans-serif;
+        text-decoration: none;
+        letter-spacing: 0px;
+        font-weight: normal;
+        list-style: none;
+        float: left;
+        font-weight:bold;
+        height: 17px;
+        border-left: 1px solid #BBB;
+        padding:9px;
+      }
+      li a{margin-top:3px;}
+      a {text-decoration: none;color: #666;}
+      </style>     
+          <base target="_parent">
+        </head>
+        <body>
+          <div id="wrapper"> 
+            <div id="header">
+              <!--<h2>Resources</h2> -->
+              <a class="logo" href="http://osehra.org"><img src="http://www.osehra.org/profiles/drupal_commons/themes/commons_osehra_earth/images/logo.png" border="0" height="35" width="150"/></a>
+              <ul id="nav_primary">
+                <li><a href="http://www.osehra.org/groups" title="Open Source Workgroup">Open Source Workgroup</a></li>
+                <li><a href="http://issues.osehra.org" title="Fill bug reports, improvements and feature requests here">Issue Tracker</a></li>
+                <li><a href="http://wiki.osehra.org" title="The place to collaboratively author project documents, and to find documentation on the Open Source Project">Open Source Project Wiki</a></li>
+                <li><a href="http://code.osehra.org/journal/" title="OSEHRA Technical Journal">OSEHRA Technical Journal</a></li>
+                <li><a href="http://www.osehra.org/content/joining-osehra" title="OSEHRA is community driven - please join in!">Join OSEHRA</a></li>
+              </ul>
+            </div>
+          </div>   
+        </body>
+      </html>      
+      </script>
+      </div>
+
   <div class="TopDynamicBar" style="display:none;">
       <div class="dumbBoxOverlay">
         &nbsp;
@@ -324,7 +374,15 @@ echo $this->doctype()
       var rawJson="<?php echo addslashes(trim($this->json))?>";
     </script>
 
-  
+    
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    var pageTracker = _gat._getTracker("UA-26757196-6");
+    pageTracker._trackPageview();
+    </script>
   </body>
   
   <?php
