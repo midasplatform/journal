@@ -17,16 +17,15 @@
  *
  *=========================================================================*/
 
-class Handle_TemplateController extends Handle_AppController
+class Handle_12Controller extends Handle_AppController
 {
 // Initialization method. Called before every Action
   function init()
     {
     $handle = Zend_Controller_Front::getInstance()->getRequest()->getActionName();
-    $controller = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
     if(empty($handle) || !is_numeric($handle))
       {
-      echo "Unable to find handle.";exit;
+      parent::init();
       }
     $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "handle");
     if(!$metadataDao)  $metadataDao = MidasLoader::loadModel('Metadata')->addMetadata(MIDAS_METADATA_TEXT, "journal", "handle", "");
@@ -34,7 +33,7 @@ class Handle_TemplateController extends Handle_AppController
     $sql = $db->select()
             ->from('metadatavalue')
             ->where('metadata_id  = '.$metadataDao->getKey())
-            ->where('value  = '.$handle.' OR value=\''.$controller."/".$handle.'\'')
+            ->where('value  = '.$handle)
             ->order('value DESC')->limit(1);
 
     $row = $db->fetchRow($sql);
@@ -47,6 +46,6 @@ class Handle_TemplateController extends Handle_AppController
         $this->_redirect("/journal/view/".$revision->getKey());
         }
       }
-    echo "Unable to find handle.";exit;
+    parent::init();    
     }
 }//end class
