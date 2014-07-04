@@ -301,7 +301,13 @@ class Journal_MigrationComponent extends AppComponent
           {
           $resourceDao->setMetaDataByQualifier("has_old_review", "1");
           }
-        
+          
+        $sql = pg_query("SELECT disclaimer FROM isj_osehr_publication where pubid=".$publicationId." ");
+        $returnArray = pg_fetch_assoc($sql);
+        if(isset($returnArray['disclaimer']) && $returnArray['disclaimer'] == 1)
+          {
+          $resourceDao->setDisclaimer("This software is providing on an AS IS BASIS, with no express or implied warranties of any kind, for the following reasons:<br/><br/>This is untested software and is a work in progress.  The source code and  associated software documentation is incomplete, and may also require corrections;   the extent or timeliness of any testing or other quality assurance efforts on this Untested Software are unknown; it is unknown whether the source code from this Untested Software reflects any of the designs or business requirements that may be associated with it; use of the source code from this untested software may alter or damage existing patient or other data; the installation or use of this untested software may cause defects, malfunctions or loss of use in VistA or any other computer systems; and it is unknown whether  installation or use of this untested software may cause accounting, bookkeeping or financial errors in the financial, management, integrity, internal control audit and review processes.<br/><br/><strong>The User understands and agrees that the User has sole and exclusive responsibility for any MEDICAL DECISIONS OR ACTIONS WITH RESPECT TO A PATIENT’S MEDICAL CARE AND FOR DETERMINING THE ACCURACY, COMPLETENESS, OR APPROPRIATENESS OF ANY INFORMATION PROVIDED BY OR THROUGH this OPEN SOURCE Software.  The User understands and agrees THAT this OPEN SOURCE Software CONTENT IS NOT INTENTED TO ELIMINATE, REPLACE OR SUBSTITUTE FOR, IN WHOLE OR IN PART, THE HEALTH CARE PROVIDER’S ANALYSIS OR JUDGMENT, AND THAT THE RESPONSIBILITY FOR MEDICAL TREATMENT RESTS WITHIN THE HEALTH CARE PROVIDER’S ANALYSIS OF THE PATIENT’S CONDITION AND JUDGMENT AS TO THE NATURE AND AMOUNT OF CARE.</strong><br/><br/>"); 
+          }
 
         $revisionNumber = $itemRevisionDao->getRevision();
         
@@ -542,21 +548,23 @@ class Journal_MigrationComponent extends AppComponent
       }
     
     $this->getLogger()->warn("Adding institutions");
-    $query = pg_query("SELECT erperson_id, id, institution, emailpref, newreviewemail, newsubmissionemail FROM isj_user");
+    $query = pg_query("SELECT erperson_id, id, institution,  newreviewemail, newsubmissionemail FROM isj_user");
     while($query_array = pg_fetch_array($query))
       {
       $id = $query_array['id'];
       $institution = $query_array['institution'];
       $eperson_id = $query_array['erperson_id'];
-      $newreviewemail = (int) $query_array['emailpref'] == 1 && $query_array["newreviewemail"] == 1;
-      $newsubmissionemail = (int) $query_array['emailpref'] == 1 && $query_array["newsubmissionemail"] == 1;
+      $newreviewemail = $query_array["newreviewemail"];
+      $newsubmissionemail = $query_array["newsubmissionemail"];
       try
-        {
+        {      
         if(!isset($this->epersonToUser[$eperson_id]))continue;
         $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$eperson_id]);
         $userDao->setCompany($institution);
         $this->getLogger()->warn("- Adding ".$institution." to ".$userDao->getEmail());
         MidasLoader::loadModel("User")->save($userDao);
+        
+        $this->getLogger()->warn("- Adding Email preferences".$newreviewemail." ".$newsubmissionemail);
         
         MidasLoader::loadComponent("Notification", "journal")->setUserNotificationStatus($userDao, 
               $newsubmissionemail, $newreviewemail);
