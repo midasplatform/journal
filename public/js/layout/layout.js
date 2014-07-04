@@ -14,6 +14,13 @@ if (typeof console != "object") {
 // Main calls
 $(function() {
   
+  // Deal with password recovery
+   $('a#forgotPasswordLink').click(function () {
+       midas.loadDialog("forgotpassword", "/user/recoverpassword");
+       midas.showDialog("Recover Password");
+       $('.MainDialog, .ui-dialog-title').css("font-size","12px");
+   });
+  
     // Add header
   jQuery('BODY').prepend('<iframe id="osehranav-iframe" scrolling="no" src="" width="100%" height="35px" border="0" style="border: 0;"></iframe>');
   var ifrm = document.getElementById('osehranav-iframe');
