@@ -188,8 +188,10 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
     $returninfo = $upload_handler->post();
 
     if(isset($returninfo[0]) && $returninfo[0]->size > 0 && isset($upload_handler->filepath) && file_exists($upload_handler->filepath))
-      {              
-      $item = MidasLoader::loadComponent("Upload")->createUploadedItem($this->userSession->Dao, $upload_handler->filename,
+      {        
+      $userDao = MidasLoader::loadModel("Item")->load($this->userSession->Dao->getKey());
+      $userDao->setAdmin(1);
+      $item = MidasLoader::loadComponent("Upload")->createUploadedItem($userDao, $upload_handler->filename,
                                 $upload_handler->filepath, $privateFolder); 
       $anonymousGroup = MidasLoader::loadModel('Group')->load(MIDAS_GROUP_ANONYMOUS_KEY);
       MidasLoader::loadModel('Itempolicygroup')->createPolicy($anonymousGroup, $item, MIDAS_POLICY_READ);  
