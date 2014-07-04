@@ -199,7 +199,7 @@ class Journal_ViewController extends Journal_AppController
         {
         $hasOldReview = $resourceDao->getMetaDataByQualifier("has_old_review");
         $revisionNumber = $resourceDao->getMetaDataByQualifier("old_revision");
-        $this->view->oldWebsiteUrl = $oldWebsiteUrl."/browse/publication/".$oldWebsiteId."/".$revisionNumber;
+        $this->view->oldWebsiteUrl = $oldWebsiteUrl."/browse/publication/".$oldWebsiteId->getValue()."/".$revisionNumber->getValue();
         $this->view->hasOldReview = $hasOldReview != false;
         }
       }
