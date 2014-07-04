@@ -188,7 +188,22 @@ class Journal_ViewController extends Journal_AppController
         break;
         }
       }
-
+      
+    $oldWebsiteId = $resourceDao->getMetaDataByQualifier("old_id");
+    $this->view->hasOldReview = false;
+    $this->view->oldWebsiteUrl = false;    
+    if($oldWebsiteId)
+      {
+      $oldWebsiteUrl = MidasLoader::loadModel("Setting")->getValueByName('oldWebsiteUrl', "journal");
+      if(!empty($oldWebsiteUrl))
+        {
+        $hasOldReview = $resourceDao->getMetaDataByQualifier("has_old_review");
+        $revisionNumber = $resourceDao->getMetaDataByQualifier("old_revision");
+        $this->view->oldWebsiteUrl = $oldWebsiteUrl."/browse/publication/".$oldWebsiteId."/".$revisionNumber;
+        $this->view->hasOldReview = $hasOldReview != false;
+        }
+      }
+      
     // Send resource to the view
     $this->view->isPrivate = $private;
     $this->view->isApproved = $isApproved;

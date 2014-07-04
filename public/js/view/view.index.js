@@ -1,6 +1,10 @@
 // When page ready
 $(document).ready(function(){
   
+  $('.linkToArchive').click(function(){   
+    return confirm("You are about to be redirected to an archive version. The content may not be accurate.");
+  })
+  
   if($('#disclaimerWrapper').length != 0)
   {
     $.fancybox.open([

@@ -43,6 +43,7 @@ foreach ($cssArray as $module => $list)
 <LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
 <div class="ContentWithRightPanel">
   <div class="Panel">
+    
 
     <h4>Resources</h4>
     <ul>
@@ -197,6 +198,17 @@ foreach ($cssArray as $module => $list)
       echo "</ul>";
       }
       ?>
+    
+    <?php
+    if($this->oldWebsiteUrl)
+      {
+      ?>
+      <div class="linkToArchiveWrapper">
+      This article was migrated. An archived version is available <a href="<?php echo $this->oldWebsiteUrl?>" class="linkToArchive" target="_blank">here</a>.
+      </div>
+    <?php
+      }
+      ?>
   </div>
   
   
@@ -249,6 +261,19 @@ foreach ($cssArray as $module => $list)
       {
       echo $this->action($element['action'], $element['controller'], $element['module'], $element['params']);
       }?>
+    
+    <?php
+    if($this->hasOldReview)
+      {
+      ?>
+      <br/>
+      <br/>
+      <div class="linkToArchiveWrapper">
+      This article contains additionnal reviews available <a href="<?php echo $this->oldWebsiteUrl?>" class="linkToArchive" target="_blank">here</a>.
+      </div>
+    <?php
+      }
+      ?>
     <h4>Comments</h4>
     <?php
     echo '<div id="commentsContainer" >';

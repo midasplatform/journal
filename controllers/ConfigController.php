@@ -27,6 +27,7 @@ class Journal_ConfigController extends Journal_AppController
     $this->view->defaultLayout = MidasLoader::loadModel("Setting")->getValueByName('defaultLayout', "journal");
     $this->view->adminEmail = MidasLoader::loadModel("Setting")->getValueByName('adminEmail', "journal");
     $this->view->baseHandle = MidasLoader::loadModel("Setting")->getValueByName('baseHandle', "journal");
+    $this->view->oldWebsiteUrl = MidasLoader::loadModel("Setting")->getValueByName('oldWebsiteUrl', "journal");
     $this->view->json['isConfigSaved'] = 0;
 
     if($this->_request->isPost() && is_numeric($_POST['defaultJournal']))
@@ -36,10 +37,12 @@ class Journal_ConfigController extends Journal_AppController
       $this->view->defaultLayout = $_POST['defaultLayout'];
       $this->view->baseHandle = $_POST['baseHandle'];
       $this->view->adminEmail = $_POST['adminEmail'];
+      $this->view->oldWebsiteUrl = $_POST['oldWebsiteUrl'];
       MidasLoader::loadModel("Setting")->setConfig('adminEmail', $this->view->adminEmail, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultJournal', $this->view->defaultJournal, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultLayout', $this->view->defaultLayout, "journal");
       MidasLoader::loadModel("Setting")->setConfig('baseHandle', $this->view->baseHandle, "journal");
+      MidasLoader::loadModel("Setting")->setConfig('oldWebsiteUrl', $this->view->oldWebsiteUrl, "journal");
       if(is_numeric($this->view->baseHandle))
         {
         // This is a hack allowing us to use the Zend dispatch mechanisum to resolve the handles

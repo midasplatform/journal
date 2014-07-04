@@ -269,6 +269,7 @@ class Journal_MigrationComponent extends AppComponent
       $sqlRevision = pg_query("SELECT * FROM isj_revision WHERE publication ='".$publicationId."' ORDER BY revision ASC ");
       while($ij_revisionArray = pg_fetch_array($sqlRevision))
         {
+        $revisionNumber = $ij_revisionArray['revision'];
         $itemRevisionDao = new ItemRevisionDao();
         $itemRevisionDao->setChanges($ij_revisionArray['comments']);
         $itemRevisionDao->setUser_id($authorid);
@@ -292,7 +293,16 @@ class Journal_MigrationComponent extends AppComponent
         $resourceDao->enable();
         
         $resourceDao->setMetaDataByQualifier("old_id", $publicationId);
+        $resourceDao->setMetaDataByQualifier("old_revision", $revisionNumber);        
         
+        $sql = pg_query("SELECT id FROM isj_osehr_review where publication=".$publicationId." AND revision=".$revisionNumber." AND completed=1");
+        $returnArray = pg_fetch_assoc($sql);
+        if(isset($returnArray['id']))
+          {
+          $resourceDao->setMetaDataByQualifier("has_old_review", "1");
+          }
+        
+
         $revisionNumber = $itemRevisionDao->getRevision();
         
         if($logoFound)

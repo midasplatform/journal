@@ -4,6 +4,10 @@
 
 }
 
+.linkToArchiveWrapper{
+  color:#666666;
+}
+
 #publication .thumbnail {
   padding-top: 10px;
   /*width:300px;*/
