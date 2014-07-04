@@ -10,7 +10,16 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
 <h3>Title: <?php echo $this->resource->getName() ?> </h3>
 <div class="abstract" style="text-align: justify;"><?php echo str_replace("<br>", "<br/>", nl2br($this->resource->getDescription())) ?></div>
 
+
 <h3><?php echo ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW) ? "Peer Review": "Final Review"?></h3>
+<div class="abstract" style="text-align: justify;">
+A peer review is an attestation by a fellow developer or community member that contributed software is useful and of high quality.
+The goal is to ensure that it has a demonstrable and useful function, that it is licensed correctly, that it installs correctly and easily,
+that it is documented, that it is tested and that the tests cover a reasonable portion of the code.
+Please use the topics and questions below as guides as you go through your review.
+In the end, use the OSEHRA Certification Standard Matrix to help you select a "Recommended Certification Level."
+All comments and attachments will be reviewed as part of the certification process and will help guide the final certification level determination.
+</div>
 <div id="certificationWrapper">
   <h4>OSEHRA Certification Standard Matrix:</h4>
   <table id="certificationTable">
@@ -110,7 +119,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
             <div class="uploadWrapper">
               <table>
                 <tr>
-                  <td style="vertical-align: top;width:100px;">Attachement: </td>
+                  <td style="vertical-align: top;width:100px;">Attachment: </td>
                   <td>
                      <label class="downloadButton" class="fileinput-button">
                           <a class="fileNameUploaded"></a>
