@@ -261,7 +261,7 @@ class Journal_ResourceDao extends ItemDao
     $sql = $db->select()
             ->from('metadatavalue')
             ->where('metadata_id  = '.$metadataDao->getKey())
-            ->order('value DESC')->limit(1);
+            ->order('metadatavalue_id  DESC')->limit(1);
 
     $row = $db->fetchRow($sql);
     $value = "1000";
