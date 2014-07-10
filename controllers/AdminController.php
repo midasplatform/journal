@@ -73,8 +73,8 @@ class Journal_AdminController extends Journal_AppController
       }      
 
     $community = $group->getCommunity();
-    if(!$this->logged || !$this->userSession->Dao->isAdmin()
-            || !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup()))
+    if(!$this->logged ||  (!$this->userSession->Dao->isAdmin() 
+            && !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup())))
       {
       throw new Zend_Exception("Permission error.", 404);
       }
