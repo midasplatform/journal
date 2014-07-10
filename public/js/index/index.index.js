@@ -130,7 +130,7 @@ function searchDatabase(append)
   var query = $('#live_search').val();
   if(query.indexOf(":") != -1)
     {
-    fullQuery += "AND "+query+" ";
+    fullQuery += "AND ( "+query+" ) ";
     }
   else if(query != "" && query!="Search...")
     {
