@@ -75,8 +75,8 @@ class Journal_NotificationComponent extends AppComponent
     $to = '';
     $emailLstArray = array($editList, $adminList);
     $bccList = $this->_formBccList($emailLstArray);
-    $headers = $this->_formMailHeader($contactEmail, "", $bccList);
-    $this->getLogger()->debug("Email Header is " . $headers);
+    $headers = $this->_formMailHeader("", "", $bccList);
+    $this->getLogger()->info("Email Header is " . $headers);
     // send mail to the editors/admins for approval
     $result = mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     $this->getLogger()->debug("mail result is " . $result);
@@ -91,7 +91,7 @@ class Journal_NotificationComponent extends AppComponent
     $headers = $this->_formMailHeader($contactEmail, null, null);
     $bodyText = $this->_layout->render('layout.phtml');
     $this->getLogger()->debug("Body Text is " . $bodyText);
-    $this->getLogger()->debug("Email Header is " . $headers);
+    $this->getLogger()->info("Email Header is " . $headers);
     $result = mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     $this->getLogger()->debug("mail result is " . $result);
     }
@@ -109,7 +109,12 @@ class Journal_NotificationComponent extends AppComponent
     $baseUrl = UtilityComponent::getServerURL().$fc->getBaseUrl();
     $scriptpath = BASE_PATH . '/privateModules/journal/views/email';
     $this->_createEmailView($scriptpath, $baseUrl);
-    $contactEmail = $resourceDao->getSubmitter()->getEmail();
+    $submitter = $resourceDao->getSubmitter();
+    $contactEmail = '';
+    if ($submitter)
+      {
+      $contactEmail = $submitter->getEmail();
+      }
     $this->getLogger()->debug("Contact Email is " . $contactEmail);
     $name = $resourceDao->getName();
     $description = $resourceDao->getDescription();
@@ -138,8 +143,12 @@ class Journal_NotificationComponent extends AppComponent
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
     $emailLstArray = array($subList, $editList, $adminList);
     $bccList = $this->_formBccList($emailLstArray);
-    $headers = $this->_formMailHeader($contactEmail, null, $bccList);
-    $this->getLogger()->debug("Email Header is " . $headers);
+    if (!empty($contactEmail))
+      {
+        $bccList .= ',' . $contactEmail; # append contact email to the last.
+      }
+    $headers = $this->_formMailHeader('', null, $bccList);
+    $this->getLogger()->info("Email Header is " . $headers);
     // send mail to the editors
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     }
@@ -165,7 +174,11 @@ class Journal_NotificationComponent extends AppComponent
     // to this journal item to make the comment
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
     $submitter = $resourceDao->getSubmitter();
-    $contactEmail = $submitter->getEmail();
+    $contactEmail = '';
+    if ($submitter)
+      {
+      $contactEmail = $submitter->getEmail();
+      }
     $title = $resourceDao->getName();
     $handle = $resourceDao->getHandle();
     $this->_view->assign("name", $userDao->getFullName());
@@ -183,8 +196,12 @@ class Journal_NotificationComponent extends AppComponent
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
     $emailLstArray = array($subList, $editList, $adminList);
     $bccList = $this->_formBccList($emailLstArray);
-    $headers = $this->_formMailHeader($contactEmail, null, $bccList);
-    $this->getLogger()->debug("Email Header is " . $headers);
+    if (!empty($contactEmail))
+      {
+        $bccList .= ',' . $contactEmail; # append contact email to the last.
+      }
+    $headers = $this->_formMailHeader('', null, $bccList);
+    $this->getLogger()->info("Email Header is " . $headers);
     // send mail to the editors
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     }
@@ -209,7 +226,12 @@ class Journal_NotificationComponent extends AppComponent
     $revision = MidasLoader::loadModel("ItemRevision")->load($revision_id);
     $itemDao = $revision->getItem();
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
-    $contactEmail = $resourceDao->getSubmitter()->getEmail();
+    $submitter = $resourceDao->getSubmitter();
+    $contactEmail = '';
+    if ($submitter)
+      {
+      $contactEmail = $submitter->getEmail();
+      }
     $title = $resourceDao->getName();
     $viewLink =  $baseUrl . "/reviewosehra/submit?review_id=" . $reviewId;
     $this->_view->assign("name", $name);
@@ -227,8 +249,12 @@ class Journal_NotificationComponent extends AppComponent
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
     $emailLstArray = array($subList, $editList, $adminList);
     $bccList = $this->_formBccList($emailLstArray);
-    $headers = $this->_formMailHeader($contactEmail, null, $bccList);
-    $this->getLogger()->debug("Email Header is " . $headers);
+    if (!empty($contactEmail))
+      {
+        $bccList .= ',' . $contactEmail; # append contact email to the last.
+      }
+    $headers = $this->_formMailHeader('', null, $bccList);
+    $this->getLogger()->info("Email Header is " . $headers);
     // send mail to the submitter, editor as well as admins
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     }
