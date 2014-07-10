@@ -137,12 +137,16 @@ class Journal_ViewController extends Journal_AppController
     $revisionDao = MidasLoader::loadModel("ItemRevision")->load($revisionId);
     if($revisionDao === false)
       {
-      throw new Zend_Exception("This item doesn't exist.", 404);
+      $this->disableView();      
+      echo "<br/><b>The requested article doesn't exist.</b>";
+      return;
       }
     $itemDao = $revisionDao->getItem();    
     if(!MidasLoader::loadModel("Item")->policyCheck($itemDao, $this->userSession->Dao, MIDAS_POLICY_READ))
       {
-      throw new Zend_Exception('Read permission required', 403);
+      echo "<br/><b>This is a restricted content. This page cannot be shared or accessed directly.</b>";
+      $this->disableView();
+      return;
       }     
       
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
