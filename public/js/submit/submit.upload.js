@@ -4,6 +4,8 @@ $(document).ready(function(){
       $('input[type=submit]').attr('disabled', !$(this).is(':checked'));
     })
     
+    $('#acceptRights').change();
+    
     $('#acceptLicense').change(function(){
       var license = $("#licenseChoice").val();
       $('#hiddenSourceLicense').attr('value', $(this).is(':checked') ? license: 0);

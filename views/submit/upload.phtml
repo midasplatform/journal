@@ -68,7 +68,6 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     <br/>
     <br/>
   </div>
-
   <?php
   if (count($this->bitstreams) != 0)
     {
@@ -109,7 +108,8 @@ I have the right to distribute these files
           </table>";
     ?>
     <br/>
-    <input type="checkbox" class="checkbox" id="acceptRights" value="1">
+    <input type="checkbox" <?php if ($this->isPrivate && $this->isAdmin && !$this->isSubmitter) echo "checked='true'";?>
+           class="checkbox" id="acceptRights" value="1">
     <label style="display:inline;" for="acceptRights"> I certify that I have the right to distribute these files.</label>
     <br/>
     <input type="checkbox" class="checkbox" id="acceptLicense" value="0" <?php if ($this->resource->getSourceLicense()) echo "checked='true'";?>>

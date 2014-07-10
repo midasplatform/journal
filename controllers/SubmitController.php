@@ -142,10 +142,10 @@ class Journal_SubmitController extends Journal_AppController
       MidasLoader::loadModel('Folder')->addItem($this->view->issueDao, $resourceDao, false);
       $resourceDao->enable();
       
-      // Make sure the journal and issue editor and the author can manage the resource
-      $resourceDao->setSubmitter($this->userSession->Dao);
+      // Make sure the journal and issue editor and the author can manage the resource      
       if($isNew)
         {
+        $resourceDao->setSubmitter($this->userSession->Dao);
         $resourceDao->initHandle();
         $adminGroup = $resourceDao->getAdminGroup();
         MidasLoader::loadModel("Itempolicygroup")->createPolicy($adminGroup, $resourceDao, MIDAS_POLICY_ADMIN);
