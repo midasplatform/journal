@@ -66,4 +66,12 @@ $(document).ready(function(){
         }, 'json');        
     })
     
+  KeepAlive();
 });
+
+
+function KeepAlive()
+  {
+  $.get(json.global.webroot+'/journal/help', function(data) { });
+  setTimeout("KeepAlive()", 1000 * 60 * 5);
+  } 
