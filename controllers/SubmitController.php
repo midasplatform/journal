@@ -386,7 +386,7 @@ class Journal_SubmitController extends Journal_AppController
         elseif($private) // Send for approval
           {
           $resourceDao->setApprovalStatus(1);
-          $this->view = MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao);
+          MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao, $this->userSession->Dao);
           }
         if (isset($_POST['source-license']))
           {

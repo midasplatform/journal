@@ -31,20 +31,18 @@ class Journal_NotificationComponent extends AppComponent
   private $_layout;
   private $_view;
 
-  public function sendForApproval($resourceDao)
+  public function sendForApproval($resourceDao, $userDao)
     {
     //TODO & make sure multiple notification
     // Need to send email notification to
     // *. Administrator of the community
     // *. Editors in this specific issue
     // *. Submitter
-    $this->getLogger()->info("Send for approval is called" . $resourceDao->getName());
+    $this->getLogger()->info("Send for approval is called: " . $resourceDao->getName());
     $fc = Zend_Controller_Front::getInstance();
     $baseUrl = UtilityComponent::getServerURL().$fc->getBaseUrl();
     $scriptpath = BASE_PATH . '/privateModules/journal/views/email';
     $this->_createEmailView($scriptpath, $baseUrl);
-    $contactEmail = $resourceDao->getSubmitter()->getEmail();
-    $this->getLogger()->debug("Contact Email is " . $contactEmail);
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
     $this->getLogger()->debug("AdminList is " . $adminList);
     // extract the editor group based resourceDao
@@ -83,11 +81,11 @@ class Journal_NotificationComponent extends AppComponent
     // send mail to the submitter
     $this->_createEmailView($scriptpath, $baseUrl);
     $readlink = "/journal/view/" . $revisionId;
-    $submitter = $resourceDao->getSubmitter();
-    $name = $submitter->getFullName();
+    $name = $userDao->getFullName();
     $this->_view->assign("name", $name);
     $this->_view->assign("link", $readlink);
     $this->_layout->assign("content", $this->_view->render('waitforapproval.phtml'));
+    $contactEmail = $userDao->getEmail();
     $headers = $this->_formMailHeader($contactEmail, null, null);
     $bodyText = $this->_layout->render('layout.phtml');
     $this->getLogger()->debug("Body Text is " . $bodyText);
