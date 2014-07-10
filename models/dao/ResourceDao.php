@@ -267,7 +267,8 @@ class Journal_ResourceDao extends ItemDao
     $value = "1000";
     if(isset($row['value']))
       {
-      $value = $row['value'] + 1;
+      $value = end(explode("/", $row['value']));
+      $value = $value + 1;
       }
     $this->setHandle($baseHandle."/".$value);
     }
