@@ -39,6 +39,7 @@ class Googleoauth_UserController extends Googleoauth_AppController {
                   trim($firstname), 
                   trim($lastname));
           }
+
           
         setcookie('midasUtil', null, time() + 60 * 60 * 24 * 30, '/'); //30 days
         Zend_Session::start();

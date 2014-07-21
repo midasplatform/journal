@@ -25,12 +25,11 @@ class Google implements \Zend_Auth_Adapter_Interface
       $result['code'] = Result::FAILURE;
       $result['identity'] = NULL;
       $result['messages'] = array();
- 
+      
       if(!array_key_exists('error',$this->_accessToken)) {
          $result['code'] = Result::SUCCESS;
          $result['identity'] = new Identity($this->_accessToken);
       }
- 
       return new Result($result['code'],
                                   $result['identity'],
                                   $result['messages']);

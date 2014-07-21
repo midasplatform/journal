@@ -47,14 +47,8 @@ class Consumer {
 		$client->setUri($urlparams['token_url']);
 		$client->setParameterPost($authparams);
 		$response = $client->request('POST');
-		if($response->getHeader("Content-type") == "application/json") {
-			return (array)json_decode($response->getBody());
-		}
-		else {
-			$token;
-			parse_str($response->getBody(),$token);
-			return $token;
-		}
+    return (array)json_decode($response->getBody());
+	
 	}
 
 	public static function getData($url, $accesstoken, $redirects = true)
