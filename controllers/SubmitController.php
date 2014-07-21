@@ -375,6 +375,7 @@ class Journal_SubmitController extends Journal_AppController
             }
           MidasLoader::loadModel("Itempolicygroup")->createPolicy($memberGroup, $resourceDao, MIDAS_POLICY_READ);
           MidasLoader::loadComponent("Notification", "journal")->newArticle($resourceDao);
+          Zend_Registry::get('notifier')->notifyEvent('EVENT_JOURNAL_UPDATESITEMAP', array());
           
           // Delete cache file
           $cacheFile = UtilityComponent::getTempDirectory()."/homeSearch.json";

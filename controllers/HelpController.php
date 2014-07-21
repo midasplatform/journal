@@ -28,6 +28,7 @@ class Journal_HelpController extends Journal_AppController
   /** Index. Main help page */
   function indexAction()
     {
+     $this->view->title .= ' - Help';
     $settingModel = MidasLoader::loadModel('Setting');
     try
       {
@@ -42,6 +43,7 @@ class Journal_HelpController extends Journal_AppController
   /** About the website*/
   function aboutAction()
     {
+     $this->view->title .= ' - About';
     $settingModel = MidasLoader::loadModel('Setting');
     try
       {
@@ -56,6 +58,7 @@ class Journal_HelpController extends Journal_AppController
   /** Frequent ask questions */
   function faqAction()
     {
+     $this->view->title .= ' - FAQ';
     $settingModel = MidasLoader::loadModel('Setting');
     try
       {

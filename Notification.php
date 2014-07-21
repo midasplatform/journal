@@ -29,16 +29,23 @@ class Journal_Notification extends ApiEnabled_Notification
     $this->enableWebAPI($this->moduleName);
     $this->addTask('TASK_JOURNAL_UPLOAD_GITHUB', 'processGithub', "");
     $this->addEvent('EVENT_JOURNAL_UPLOAD_GITHUB', 'TASK_JOURNAL_UPLOAD_GITHUB');
+    $this->addTask('TASK_JOURNAL_UPDATESITEMAP', 'updateSitemap', "");
+    $this->addEvent('EVENT_JOURNAL_UPDATESITEMAP', 'TASK_JOURNAL_UPDATESITEMAP');
     $this->addCallBack('CALLBACK_CORE_GET_CONFIG_TABS', 'getConfigTabs');
     $this->addCallBack('CALLBACK_CORE_AUTHENTICATION', 'authIntercept');
     $this->addCallBack('CALLBACK_COMMENTS_ADDED_COMMENT', 'commentAdded');
     $this->addCallBack('CALLBACK_REVIEW_ADDED', 'reviewAdded');
     }//end init
     
+  /** Update sitemap.xml */
+  public function updateSitemap($param)
+    {
+    MidasLoader::loadComponent("Sitemap", "journal")->generate();
+    }
+    
   /** Backup github*/
   public function processGithub($param)
-    {
-   
+    {   
     if(isset($param[0]['bitstream_id']))
       {
       $bitstream = MidasLoader::loadModel("Bitstream")->load($param[0]['bitstream_id']);

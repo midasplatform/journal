@@ -31,6 +31,8 @@ class Journal_IndexController extends Journal_AppController
    */
   function indexAction()
     {   
+    $this->view->title .= ' - Home';
+    
     // fetch all the keywords and send them to the view
     $selectedCat = array();
     if(isset($_GET['category'])) $selectedCat = array($_GET['category']);

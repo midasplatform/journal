@@ -53,9 +53,16 @@ class Journal_ViewController extends Journal_AppController
     $this->view->issue = MidasLoader::loadModel("Folder")->initDao("Issue", $folder->toArray(), "journal");
     }
     
+  function biglogoAction()
+    {
+    $this->_forward("logo", "view", "journal", array('revisionId' => $_GET['revisionId'], 'size' => 300));
+    }
+    
   function logoAction()
     {
     $revisionId = $this->_getParam("revisionId");
+    $size = $this->_getParam("size");
+
     if(!isset($revisionId) || !is_numeric($revisionId))
       {
       throw new Zend_Exception("revisionId should be a number");
@@ -105,7 +112,7 @@ class Journal_ViewController extends Journal_AppController
       list ($x, $y) = getimagesize($logo->getFullPath());  //--- get size of img ---
       }
     
-    if(isset($_GET['size']) && is_numeric($_GET['size'])) $thumb = $_GET['size'];
+    if(isset($size) && is_numeric($size)) $thumb = $size;
     else $thumb = 50;  //--- max. size of thumb ---
     if($x > $y)
       {
@@ -209,6 +216,10 @@ class Journal_ViewController extends Journal_AppController
       }
       
     // Send resource to the view
+    $this->view->title .= ' - '.$resourceDao->getName();
+    $this->view->metaDescription = substr($resourceDao->getDescription(), 0, 160);
+    $tags = $resourceDao->getTags();
+    $this->view->metaKeywords .= ", ".join(', ', $tags);
     $this->view->isPrivate = $private;
     $this->view->isApproved = $isApproved;
     $this->view->resource = $resourceDao;

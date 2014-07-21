@@ -25,6 +25,13 @@ class Journal_AdminController extends Journal_AppController
     parent::init();    
     }
     
+  /** Generate Sitemap (hidden action) */
+  function generatesitemapAction()
+    {
+    $this->requireAdminPrivileges();
+    MidasLoader::loadComponent("Sitemap", "journal")->generate();
+    }
+    
   // List publications waiting for approval
   function approvalAction()
     {
