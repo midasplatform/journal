@@ -118,7 +118,55 @@ class Journal_ApiComponent extends AppComponent
       }
     return $items;
     }
+    
+
+  public function usersearch($args)
+    {
+    // This is necessary in order to avoid session lock and being able to run two
+    // ajax requests simultaneously
+    session_write_close();
+    
+    // Search for the users
+    $UsersDao = MidasLoader::loadModel('User')->getUsersFromSearch($args['term'], $this->userSession->Dao, 14, false);
+   
+    // Compute how many of each we should display
+    $nusers = count($UsersDao);
+
+    // Return the JSON results
+    $results = array();
+    $id = 1;
+    $n = 0;
+    
+    // User
+    $n = 0;
+    foreach($UsersDao as $userDao)
+      {
+      if($n == 10)
+        {
+        break;
+        }
+      $label = $userDao->getFirstname().' '.$userDao->getLastname();
+      $value = $label;
+      $result = array('id' => $id,
+                      'label' => $label." (".$userDao->getEmail().")",
+                      'value' => $value,
+                      'category' => 'Users');
+
+      $result['userid'] = $userDao->getKey();
+      $id++;
+      $n++;
+      $results[] = $result;
+      }
+    // Other live search options
+    foreach($OtherOptions as $option)
+      {
+      $results[] = $option;
+      }
+
+    return $results;
+    }
 } // end class
+
 
 
 

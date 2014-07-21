@@ -23,7 +23,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
 <div class="viewMain">
   <h3>Manage Editors (<?php echo $this->name?>)</h3>
 
-  <table id='memberListTable' class="tablesorter">
+  <table id='memberListTable' style="width:500px;" class="tablesorter">
     <thead>
       <tr>
         <th width="80%">Member</th><th>Actions</th>
@@ -37,7 +37,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         $stripeIndex++;
         $class = $stripeIndex % 2 ? 'odd' : 'even';
         echo '<tr class=' . $class . '>';
-        echo '  <td width="80%">' . $this->linkuser($user) . '</td>';
+        echo '  <td width="80%">' . $this->linkuser($user) . ' ('.$user->getEmail().')</td>';
         echo '  <td><span class="actionsList">';
         echo '  <a qtip="Remove editor" ' .
         '     class="tableActions removeMember" key="editor" userId="' . $user->getKey() . '">';
@@ -63,8 +63,8 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     <hr/>
     <h3>Manage Members (<?php echo $this->name?>)</h3>
 
-    <table id='memberListTable' class="tablesorter">
-      <thead>
+    <table id='memberListTable' style="width:500px;" class="tablesorter">
+      <thead >
         <tr>
           <th width="80%">Member</th><th>Actions</th>
         </tr>
@@ -77,7 +77,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
           $stripeIndex++;
           $class = $stripeIndex % 2 ? 'odd' : 'even';
           echo '<tr class=' . $class . '>';
-          echo '  <td width="80%">' . $this->linkuser($user) . '</td>';
+          echo '  <td width="80%">' . $this->linkuser($user) . ' ('.$user->getEmail().')</td>';
           echo '  <td><span class="actionsList">';
           echo '  <a qtip="Remove member" ' .
           '     class="tableActions removeMember" key="member" userId="' . $user->getKey() . '">';

@@ -61,12 +61,13 @@ $(document).ready(function(){
           var loadingObj = $(this).parents('.invitationSearch').find(".searchInvitationLoading");
           loadingObj.show();
 
-          lastShareXhr = $.getJSON( $('.webroot').val()+"/search/live?userSearch=true&allowEmail",
+          lastShareXhr = $.getJSON( $('.webroot').val()+"/api/json?method=midas.journal.usersearch",
             request, function(data, status, xhr) {
+              
               loadingObj.hide();
-              invitationSearchcache[term] = data;
+              invitationSearchcache[term] = data.data;
               if(xhr === lastShareXhr) {
-                  response(data);
+                  response(data.data);
               }
           });
       }, // end source
