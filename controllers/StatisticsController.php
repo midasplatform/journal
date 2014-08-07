@@ -104,7 +104,7 @@ class Journal_StatisticsController extends Journal_AppController
     $start_date_formatted = $date."-01";
     $end_date_formatted = $date."-".date("t", strtotime($date));
     $db = Zend_Registry::get('dbAdapter');
-    $results = $db->query("SELECT DISTINCT item_id FROM statistics_download WHERE date BETWEEN '".$start_date_formatted."' AND '".$end_date_formatted."' ")->fetchAll();
+    $results = $db->query("SELECT DISTINCT item_id FROM itemrevision WHERE date BETWEEN '".$start_date_formatted."' AND '".$end_date_formatted."' ")->fetchAll();
 
     $submitters = array();
     $count_noncode = 0;
