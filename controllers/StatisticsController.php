@@ -137,7 +137,8 @@ class Journal_StatisticsController extends Journal_AppController
         {
         $count_noncode++;
         }
-      $submitters[] = $name;
+
+      foreach($authors as $name) $submitters[] = $name;
 
       $pub = array();
       $pub['id'] = $resourceDao->getKey();;
