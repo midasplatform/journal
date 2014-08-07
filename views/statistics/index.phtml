@@ -1,0 +1,76 @@
+<?php
+/*=========================================================================
+MIDAS Server
+Copyright (c) Kitware SAS. 20 rue de la Villette. All rights reserved.
+69328 Lyon, FRANCE.
+
+See Copyright.txt for details.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+=========================================================================*/
+
+?>
+<link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/statistics/statistics.index.css" rel="stylesheet" />
+
+<div class="viewMain">
+
+<h3>Statistics (<?php echo $this->date?>)</h3>
+
+<a href="<?php echo $this->webroot?>/journal/statistics?date=<?php echo $this->date_previous?>"/> Previous Year</a>,
+<a href="<?php echo $this->webroot?>/journal/statistics?date=<?php echo $this->date_next?>"/> Next Year</a>
+<br/>
+
+<h4>Overall Statistics</h4>
+<table style="width:98%;">
+  <thead>
+    <th>Month</th>
+    <th>Submissions - Code</th>
+    <th>Submissions - Non-Code</th>
+    <th>Submitters</th>
+    <th>Downloads</th>
+  </thead>
+  <tbody>
+    <?php
+    $months = array('', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+
+    foreach($this->byMonth as $month => $values)
+      {
+      echo "<tr>";
+      echo "<td>".$months[$month]."</td>";
+      echo "<td>".$values[0]."</td>";
+      echo "<td>".$values[1]."</td>";
+      echo "<td>".join("<br/>",$values[2])."</td>";
+      echo "<td>".$values[3]."</td>";
+      echo "<tr>";
+      }
+    ?>
+  </tbody>
+</table>
+<p>Note: The number of download between May 2013 and February 2014 is incorrect.</p>
+
+
+<h4>Submission Statistics</h4>
+<table style="width:98%;">
+  <thead>
+    <th>Title</th>
+    <th>Date</th>
+    <th>Views</th>
+    <th>Downloads</th>
+  </thead>
+  <tbody>
+    <?php
+    foreach($this->publications as $pub)
+      {
+      echo "<tr>";
+      echo "<td><a href=\"".$this->webroot."browse/publication/".$pub['id']."\" target='_blank'>".$pub['title']."</a></td>";
+      echo "<td>".substr($pub['date'], 0, 10)."</td>";
+      echo "<td>".$pub['views']."</td>";
+      echo "<td>".$pub['downloads']."</td>";
+      echo "<tr>";
+      }
+    ?>
+  </tbody>
+</table>
+
+</div>

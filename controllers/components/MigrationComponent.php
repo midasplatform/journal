@@ -81,7 +81,7 @@ class Journal_MigrationComponent extends AppComponent
       {
       $item_id = $colquery_array['item_id'];
       $title = $colquery_array['title'];
-      
+
       // Add IJ information
       $sql = pg_query("SELECT * FROM isj_publication WHERE itemid=".$item_id);
       $ij_publicationArray = pg_fetch_assoc($sql);
@@ -90,7 +90,7 @@ class Journal_MigrationComponent extends AppComponent
       if(!isset($this->ijuserToUser[$ij_publicationArray['authorid']]))continue;
       $authorid = $this->ijuserToUser[$ij_publicationArray['authorid']];
       $author = MidasLoader::loadModel('User')->load($authorid);
-      
+
       $publicationAuthorList = array();
       $sqlAuthors = pg_query("SELECT metadata_value_id,text_value FROM metadatavalue
                                   WHERE item_id='$item_id' AND metadata_field_id='3' ORDER BY place ASC");
@@ -107,11 +107,11 @@ class Journal_MigrationComponent extends AppComponent
           $firstname = "";
           $lastname = $value;
           }
-          
+
         $publicationAuthorList[0][] = $firstname;
         $publicationAuthorList[1][] = $lastname;
         }
-        
+
       $publicationCat = array();
       $sqlCat = pg_query("SELECT * FROM isj_publication2category where publicationid=".$publicationId);
       while($ij_cattArray = pg_fetch_array($sqlCat))
@@ -122,7 +122,7 @@ class Journal_MigrationComponent extends AppComponent
           $publicationCat[] = $this->categoriesReference[$value];
           }
         }
-      
+
       $sqlToolkit = pg_query("SELECT * FROM isj_publication2toolkit where publicationid=".$publicationId);
       while($ij_toolkitArray = pg_fetch_array($sqlToolkit))
         {
@@ -131,16 +131,16 @@ class Journal_MigrationComponent extends AppComponent
           {
           $publicationCat[] = $this->tookitReference[$value];
           }
-        }     
-        
+        }
+
       $sqlTags = pg_query("SELECT text_value FROM metadatavalue WHERE item_id='$item_id' AND metadata_field_id='57'
                                     ORDER BY place ASC");
       $tags = array();
       while($tagstArray = pg_fetch_array($sqlTags))
         {
-        $tags[] = $tagstArray["text_value"];       
-        }      
-      
+        $tags[] = $tagstArray["text_value"];
+        }
+
       $institution = $ij_publicationArray['institution'];
 
       // If title is empty we skip this item
@@ -148,12 +148,12 @@ class Journal_MigrationComponent extends AppComponent
         {
         continue;
         }
-        
+
       $views = 0;
       $downloads = 0;
       $handle = "";
       $grant = "";
-        
+
       $sql = pg_query("SELECT sum(downloads) FROM isj_publication_statistics where publication=".$publicationId);
       $returnArray = pg_fetch_assoc($sql);
       if(isset($returnArray['sum'])) $downloads = $returnArray['sum'];
@@ -168,30 +168,30 @@ class Journal_MigrationComponent extends AppComponent
       if(isset($returnArray['text_value'])) $grant = $returnArray['text_value'];
 
       $abstract = $colquery_array['abstract'];
-      $parentFolder = $Folder->load($parentFolderid);    
-      
+      $parentFolder = $Folder->load($parentFolderid);
+
       $resourceDao = MidasLoader::newDao('ResourceDao', 'journal');
       $resourceDao->setRevision("New");
-      
+
       $resourceDao->setView($views);
       $resourceDao->setDownload($downloads);
       $this->getLogger()->warn("---- Creating " .$title);
       $resourceDao->setName($title);
       $resourceDao->setDescription($abstract);
-      $resourceDao->setType(RESOURCE_TYPE_PUBLICATION);   
-      MidasLoader::loadModel("Item")->save($resourceDao);      
+      $resourceDao->setType(RESOURCE_TYPE_PUBLICATION);
+      MidasLoader::loadModel("Item")->save($resourceDao);
       $db->query("UPDATE item SET item_id ='".$publicationId."' WHERE item_id='".$resourceDao->getKey()."' ");
 
-      $resourceDao->setItemId($publicationId);      
-      
+      $resourceDao->setItemId($publicationId);
+
       MidasLoader::loadModel("Folder")->addItem($parentFolder, $resourceDao);
-      
+
       $adminGroup = $resourceDao->getAdminGroup();
       $memberGroup = $resourceDao->getMemberGroup();
       MidasLoader::loadModel("Itempolicygroup")->createPolicy($adminGroup, $resourceDao, MIDAS_POLICY_ADMIN);
       MidasLoader::loadModel("Itempolicygroup")->createPolicy($memberGroup, $resourceDao, MIDAS_POLICY_READ);
       MidasLoader::loadModel("Itempolicyuser")->createPolicy($author, $resourceDao, MIDAS_POLICY_WRITE);
-      
+
       $policies = $parentFolder->getFolderpolicygroup();
       foreach($policies as $policy)
         {
@@ -200,14 +200,14 @@ class Journal_MigrationComponent extends AppComponent
           MidasLoader::loadModel("Itempolicygroup")->createPolicy($policy->getGroup(), $resourceDao, MIDAS_POLICY_ADMIN);
           }
         }
-        
+
       // Create the item from the bitstreams
       $bitquery = pg_query("SELECT bundle2bitstream.bitstream_id, bitstream.name, bitstream.internal_id, bitstream.type, bitstream.description
         FROM bundle2bitstream,item2bundle,bitstream
                                 WHERE item2bundle.item_id='$item_id'
                                 AND item2bundle.bundle_id=bundle2bitstream.bundle_id AND
                                 bitstream.bitstream_id=bundle2bitstream.bitstream_id");
-      
+
       $bitstreams = array();
 
       while($bitquery_array = pg_fetch_array($bitquery))
@@ -220,8 +220,8 @@ class Journal_MigrationComponent extends AppComponent
         $filepath .= substr($internal_id, 2, 2).'/';
         $filepath .= substr($internal_id, 4, 2).'/';
         $filepath .= $internal_id;
-        
-        $newtype = BITSTREAM_TYPE_MISC;        
+
+        $newtype = BITSTREAM_TYPE_MISC;
         switch ($filepath)
           {
           case 1:
@@ -237,7 +237,7 @@ class Journal_MigrationComponent extends AppComponent
           default:
             break;
           }
-        
+
         $revision = $this->getBitStreamRevision($bitquery_array['description']);
         $this->getLogger()->warn("---- Copying  " .$filepath);
         if(empty($revision) || !file_exists($filepath))
@@ -245,7 +245,7 @@ class Journal_MigrationComponent extends AppComponent
           $this->getLogger()->warn("---- Copy failed. Revision empty of path doesn't exist.");
           continue;
           }
-        
+
         foreach($revision as $r)
           {
           if(!isset($bitstreams[$r])) $bitstreams[$r] = array();
@@ -260,12 +260,12 @@ class Journal_MigrationComponent extends AppComponent
       unlink($logoPath);
       $logoFound = false;
       copy("http://code.osehra.org/journal/download/logopublication/".$item_id."/big", $logoPath);
-      $c = file_get_contents($logoPath);   
+      $c = file_get_contents($logoPath);
       if(!empty($c))
         {
         $logoFound = true;
         }
-        
+
       $sqlRevision = pg_query("SELECT * FROM isj_revision WHERE publication ='".$publicationId."' ORDER BY revision ASC ");
       while($ij_revisionArray = pg_fetch_array($sqlRevision))
         {
@@ -276,42 +276,42 @@ class Journal_MigrationComponent extends AppComponent
         $itemRevisionDao->setDate(date('c', strtotime($ij_revisionArray['date'])));
         $itemRevisionDao->setLicenseId(null);
         MidasLoader::loadModel("Item")->addRevision($resourceDao, $itemRevisionDao);
-        
-        $resourceDao->setRevision($itemRevisionDao);        
-        
+
+        $resourceDao->setRevision($itemRevisionDao);
+
         $resourceDao->setSubmitter($author);
-        $resourceDao->setInstitution($institution);     
-        $resourceDao->setAuthors($publicationAuthorList);     
-        $resourceDao->setCategories($publicationCat);     
-        $resourceDao->setCopyright("");     
-        $resourceDao->setDisclaimer("");     
-        $resourceDao->setTags($tags);     
-        $resourceDao->setRelated("");     
-        $resourceDao->setGrant($grant);     
-        $resourceDao->setHandle($handle);     
-        
+        $resourceDao->setInstitution($institution);
+        $resourceDao->setAuthors($publicationAuthorList);
+        $resourceDao->setCategories($publicationCat);
+        $resourceDao->setCopyright("");
+        $resourceDao->setDisclaimer("");
+        $resourceDao->setTags($tags);
+        $resourceDao->setRelated("");
+        $resourceDao->setGrant($grant);
+        $resourceDao->setHandle($handle);
+
         $resourceDao->enable();
-        
+
         $resourceDao->setMetaDataByQualifier("old_id", $publicationId);
-        $resourceDao->setMetaDataByQualifier("old_revision", $revisionNumber);        
-        
+        $resourceDao->setMetaDataByQualifier("old_revision", $revisionNumber);
+
         $sql = pg_query("SELECT id FROM isj_osehr_review where publication=".$publicationId." AND revision=".$revisionNumber." AND completed=1");
         $returnArray = pg_fetch_assoc($sql);
         if(isset($returnArray['id']))
           {
           $resourceDao->setMetaDataByQualifier("has_old_review", "1");
           }
-          
+
         $sql = pg_query("SELECT disclaimer FROM isj_osehr_publication where pubid=".$publicationId." ");
         $returnArray = pg_fetch_assoc($sql);
         if(isset($returnArray['disclaimer']) && $returnArray['disclaimer'] == 1)
           {
           $this->getLogger()->warn("- Adding Disclaimer");
-          $resourceDao->setDisclaimer("This software is providing on an AS IS BASIS, with no express or implied warranties of any kind, for the following reasons:<br/><br/>This is untested software and is a work in progress.  The source code and  associated software documentation is incomplete, and may also require corrections;   the extent or timeliness of any testing or other quality assurance efforts on this Untested Software are unknown; it is unknown whether the source code from this Untested Software reflects any of the designs or business requirements that may be associated with it; use of the source code from this untested software may alter or damage existing patient or other data; the installation or use of this untested software may cause defects, malfunctions or loss of use in VistA or any other computer systems; and it is unknown whether  installation or use of this untested software may cause accounting, bookkeeping or financial errors in the financial, management, integrity, internal control audit and review processes.<br/><br/><strong>The User understands and agrees that the User has sole and exclusive responsibility for any MEDICAL DECISIONS OR ACTIONS WITH RESPECT TO A PATIENT’S MEDICAL CARE AND FOR DETERMINING THE ACCURACY, COMPLETENESS, OR APPROPRIATENESS OF ANY INFORMATION PROVIDED BY OR THROUGH this OPEN SOURCE Software.  The User understands and agrees THAT this OPEN SOURCE Software CONTENT IS NOT INTENTED TO ELIMINATE, REPLACE OR SUBSTITUTE FOR, IN WHOLE OR IN PART, THE HEALTH CARE PROVIDER’S ANALYSIS OR JUDGMENT, AND THAT THE RESPONSIBILITY FOR MEDICAL TREATMENT RESTS WITHIN THE HEALTH CARE PROVIDER’S ANALYSIS OF THE PATIENT’S CONDITION AND JUDGMENT AS TO THE NATURE AND AMOUNT OF CARE.</strong><br/><br/>"); 
+          $resourceDao->setDisclaimer("This software is providing on an AS IS BASIS, with no express or implied warranties of any kind, for the following reasons:<br/><br/>This is untested software and is a work in progress.  The source code and  associated software documentation is incomplete, and may also require corrections;   the extent or timeliness of any testing or other quality assurance efforts on this Untested Software are unknown; it is unknown whether the source code from this Untested Software reflects any of the designs or business requirements that may be associated with it; use of the source code from this untested software may alter or damage existing patient or other data; the installation or use of this untested software may cause defects, malfunctions or loss of use in VistA or any other computer systems; and it is unknown whether  installation or use of this untested software may cause accounting, bookkeeping or financial errors in the financial, management, integrity, internal control audit and review processes.<br/><br/><strong>The User understands and agrees that the User has sole and exclusive responsibility for any MEDICAL DECISIONS OR ACTIONS WITH RESPECT TO A PATIENT’S MEDICAL CARE AND FOR DETERMINING THE ACCURACY, COMPLETENESS, OR APPROPRIATENESS OF ANY INFORMATION PROVIDED BY OR THROUGH this OPEN SOURCE Software.  The User understands and agrees THAT this OPEN SOURCE Software CONTENT IS NOT INTENTED TO ELIMINATE, REPLACE OR SUBSTITUTE FOR, IN WHOLE OR IN PART, THE HEALTH CARE PROVIDER’S ANALYSIS OR JUDGMENT, AND THAT THE RESPONSIBILITY FOR MEDICAL TREATMENT RESTS WITHIN THE HEALTH CARE PROVIDER’S ANALYSIS OF THE PATIENT’S CONDITION AND JUDGMENT AS TO THE NATURE AND AMOUNT OF CARE.</strong><br/><br/>");
           }
 
         $revisionNumber = $itemRevisionDao->getRevision();
-        
+
         if($logoFound)
           {
           if(!isset($bitstreams[$revisionNumber])) $bitstreams[$revisionNumber] = array();
@@ -319,7 +319,7 @@ class Journal_MigrationComponent extends AppComponent
               'path' => $logoPath,
               'type' => BITSTREAM_TYPE_THUMBNAIL);
           }
-        
+
         if(!empty($bitstreams[$revisionNumber]))
           {
           foreach($bitstreams[$revisionNumber] as $bitstream)
@@ -332,7 +332,7 @@ class Journal_MigrationComponent extends AppComponent
             // Upload the bitstream
             $assetstoreDao = $Assetstore->load($this->assetstoreId);
             $bitstreamDao->setPath($bitstream['path']);
-            $bitstreamDao->fillPropertiesFromPath();            
+            $bitstreamDao->fillPropertiesFromPath();
             $bitstreamDao->setAssetstoreId($this->assetstoreId);
             $this->getLogger()->warn("---- Adding  Checksum " .$bitstreamDao->getChecksum());
 
@@ -341,8 +341,8 @@ class Journal_MigrationComponent extends AppComponent
 
             // Upload the bitstream ifnecessary (based on the assetstore type)
             $ItemRevision->addBitstream($itemRevisionDao, $bitstreamDao);
-            
-            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, $bitstream['type']);   
+
+            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstreamDao, $bitstream['type']);
             if($bitstream['type'] == BITSTREAM_TYPE_THUMBNAIL)
               {
               $resourceDao->setLogo($bitstreamDao);
@@ -364,7 +364,7 @@ class Journal_MigrationComponent extends AppComponent
     $Folderpolicyuser = MidasLoader::loadModel("Folderpolicyuser");
     $parentFolder = MidasLoader::loadModel("Folder")->load($parentFolderid);
     $communityDao = MidasLoader::loadModel("Folder")->getCommunity($parentFolder);
-    
+
     $colquery = pg_query("SELECT collection_id FROM community2collection   WHERE community_id='$communityId' ORDER BY collection_id");
     while($collist_array = pg_fetch_array($colquery))
       {
@@ -382,25 +382,25 @@ class Journal_MigrationComponent extends AppComponent
         // Add IJ information
         $sql = pg_query("SELECT * FROM isj_journal WHERE collectionid=".$collection_id);
         $ij_journalArray = pg_fetch_assoc($sql);
-        
-        // Create the folder for the community        
+
+        // Create the folder for the community
         $community  = MidasLoader::loadModel("Community")->load($communityId);
         $issueDao = MidasLoader::newDao('IssueDao', 'journal');
-        
+
         $issueDao->setParentId($parentFolderid);
         $issueDao->setName($name);
         $this->getLogger()->warn("-- Creating ".$name);
         MidasLoader::loadModel("Folder")->save($issueDao);
         $issueDao->InitValues();
-        
+
         $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
-        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($anonymousGroup, $issueDao, MIDAS_POLICY_READ); 
-        
+        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($anonymousGroup, $issueDao, MIDAS_POLICY_READ);
+
         $editorGroup = MidasLoader::loadModel("Group")->createGroup($communityDao, "Issue_".$issueDao->getKey());
         MidasLoader::loadModel("Folderpolicygroup")->createPolicy($editorGroup, $issueDao, MIDAS_POLICY_ADMIN);
-        
 
-        if(isset($ij_journalArray['paperdue_date'])) 
+
+        if(isset($ij_journalArray['paperdue_date']))
           {
           $date = $ij_journalArray['paperdue_date'];
           $datearray = array('year' => substr($date, 6, 4), 'month' => substr($date, 0, 2), 'day' => substr($date, 3, 2));
@@ -408,7 +408,7 @@ class Journal_MigrationComponent extends AppComponent
           $date = $date->toString("c");
           $issueDao->paperdue_date = $date;
           }
-        if(isset($ij_journalArray['decision_date'])) 
+        if(isset($ij_journalArray['decision_date']))
           {
           $date = $ij_journalArray['decision_date'];
           $datearray = array('year' => substr($date, 6, 4), 'month' => substr($date, 0, 2), 'day' => substr($date, 3, 2));
@@ -424,14 +424,14 @@ class Journal_MigrationComponent extends AppComponent
           $date = $date->toString("c");
           $issueDao->publication_date = $date;
           }
-          
+
         $issueDao->short_description = $short_description;
         $issueDao->introductory_text = $introductory_text;
         $issueDao->readerLicense = $license;
-        
+
         $issueDao->initialized = true;
         $issueDao->save();
-        
+
         // Assign the policies to the folder as the same as the parent folder
         $folder = $Folder->load($parentFolderid);
         $policyGroup = $folder->getFolderpolicygroup();
@@ -474,7 +474,7 @@ class Journal_MigrationComponent extends AppComponent
             }
           $userDao = $User->getByEmail($email);
           $Folderpolicyuser->createPolicy($userDao, $issueDao, $policyValue);
-          }         
+          }
         }
       catch(Zend_Exception $e)
         {
@@ -520,7 +520,7 @@ class Journal_MigrationComponent extends AppComponent
       {
       throw new Zend_Exception("Password prefix cannot be set because MIDAS2 doesn't use salt.");
       }
-     
+
     // STEP 1: Import the users
     $this->getLogger()->warn("Importing users");
     $User = MidasLoader::loadModel("User");
@@ -535,7 +535,7 @@ class Journal_MigrationComponent extends AppComponent
       $eperson_id = $query_array['eperson_id'];
       try
         {
-        $userDao = $User->createUser($email, false, $firstname, $lastname, 0, $password);           
+        $userDao = $User->createUser($email, false, $firstname, $lastname, 0, $password);
         $User->save($userDao);
         $this->epersonToUser[$eperson_id] = $userDao->getKey();
         $this->getLogger()->warn("- ".$email." created");
@@ -547,7 +547,7 @@ class Journal_MigrationComponent extends AppComponent
         //we continue
         }
       }
-    
+
     $this->getLogger()->warn("Adding institutions");
     $query = pg_query("SELECT erperson_id, id, institution,  newreviewemail, newsubmissionemail FROM isj_user");
     while($query_array = pg_fetch_array($query))
@@ -558,16 +558,16 @@ class Journal_MigrationComponent extends AppComponent
       $newreviewemail = $query_array["newreviewemail"];
       $newsubmissionemail = $query_array["newsubmissionemail"];
       try
-        {      
+        {
         if(!isset($this->epersonToUser[$eperson_id]))continue;
         $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$eperson_id]);
         $userDao->setCompany($institution);
         $this->getLogger()->warn("- Adding ".$institution." to ".$userDao->getEmail());
         MidasLoader::loadModel("User")->save($userDao);
-        
+
         $this->getLogger()->warn("- Adding Email preferences".$newreviewemail." ".$newsubmissionemail);
-        
-        MidasLoader::loadComponent("Notification", "journal")->setUserNotificationStatus($userDao, 
+
+        MidasLoader::loadComponent("Notification", "journal")->setUserNotificationStatus($userDao,
               $newsubmissionemail, $newreviewemail);
         $this->ijuserToUser[$id] = $userDao->getKey();
         }
@@ -578,7 +578,7 @@ class Journal_MigrationComponent extends AppComponent
         //we continue
         }
       }
-      
+
     // STEP 2: Import Categories & tookits
     $this->getLogger()->warn("Adding categories");
     $categoryDao = MidasLoader::newDao('CategoryDao', 'journal');
@@ -586,12 +586,12 @@ class Journal_MigrationComponent extends AppComponent
     $categoryDao->setParentId(-1);
     MidasLoader::loadModel("Category", "journal")->save($categoryDao);
 
-    
+
     $toolkitDao = MidasLoader::newDao('CategoryDao', 'journal');
     $toolkitDao->setName("Packages");
     $toolkitDao->setParentId(-1);
     MidasLoader::loadModel("Category", "journal")->save($toolkitDao);
-      
+
     $query = pg_query("SELECT * from isj_category");
     while($query_array = pg_fetch_array($query))
       {
@@ -601,7 +601,7 @@ class Journal_MigrationComponent extends AppComponent
       $c->setName($name);
       $c->setParentId($categoryDao->getKey());
       MidasLoader::loadModel("Category", "journal")->save($c);
-      
+
       $this->categoriesReference[$id] = $c->getKey();
       }
 
@@ -614,10 +614,10 @@ class Journal_MigrationComponent extends AppComponent
       $c->setName($name);
       $c->setParentId($toolkitDao->getKey());
       MidasLoader::loadModel("Category", "journal")->save($c);
-      
+
       $this->tookitReference[$id] = $c->getKey();
       }
-      
+
     // STEP 3: Import the communities. The MIDAS2 TopLevel communities are communities in MIDAS3
     $this->getLogger()->warn("Adding communities");
     $Community = MidasLoader::loadModel("Community");
@@ -643,7 +643,7 @@ class Journal_MigrationComponent extends AppComponent
         $this->getLogger()->warn("- Adding ".$name);
         $communityDao = $Community->createCommunity($name, $short_description, $privacy, NULL); // no user
 
-        
+
         if(!$communityDao)
           {
           $this->getLogger()->warn("Unable to create community. It will fail.");
@@ -710,23 +710,23 @@ class Journal_MigrationComponent extends AppComponent
       $date = date('c', strtotime($query_array['date']));
       $epersonId = $query_array['eperson_id'];
       $userDao = MidasLoader::loadModel("User")->load($this->epersonToUser[$epersonId]);
-      
+
       if($item && $userDao)
         {
         MidasLoader::loadModel('Itemcomment', 'comments')->addComment($userDao, $item, $query_array['comment']);
         }
-      }    
+      }
 
     // Close the database connection
     pg_close($pgdb);
     } // end function migrate()
-    
+
   public function getItemByAllId($id)
     {
     $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "old_id");
     if(!$metadataDao)return false;
     $db = Zend_Registry::get('dbAdapter');
-    
+
     $db = Zend_Registry::get('dbAdapter');
     $row = $db->fetchRow($db->select()
               ->from("metadatavalue", array("itemrevision_id"))
@@ -738,11 +738,11 @@ class Journal_MigrationComponent extends AppComponent
       {
       $revision = MidasLoader::loadModel("ItemRevision")->load($row['itemrevision_id']);
       if(!$revision)return false;
-      return $revision->getItem();    
-      }    
+      return $revision->getItem();
+      }
     return false;
     }
-    
+
   private function getBitStreamRevision($description)
     {
     $description=substr($description,11);
