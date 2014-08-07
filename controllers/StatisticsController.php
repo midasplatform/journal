@@ -117,7 +117,6 @@ class Journal_StatisticsController extends Journal_AppController
       $item = MidasLoader::loadModel(('Item'))->load($res["item_id"]);
       $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
       $revision = $resourceDao->getRevision();
-      $authors = $resourceDao->getAuthorsFullNames();
       $code = false;
       foreach ($revision->getBitstreams() as $bitstream)
         {
@@ -138,7 +137,7 @@ class Journal_StatisticsController extends Journal_AppController
         $count_noncode++;
         }
 
-      foreach($authors as $name) $submitters[] = $name;
+      $submitters[] = $revision->getUser()->getFullName();
 
       $pub = array();
       $pub['id'] = $resourceDao->getKey();;
