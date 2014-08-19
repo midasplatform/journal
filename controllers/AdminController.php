@@ -22,16 +22,64 @@ class Journal_AdminController extends Journal_AppController
   // Initialization method. Called before every Action
   function init()
     {
-    parent::init();    
+    parent::init();
     }
-    
+
   /** Generate Sitemap (hidden action) */
   function generatesitemapAction()
     {
     $this->requireAdminPrivileges();
     MidasLoader::loadComponent("Sitemap", "journal")->generate();
     }
-    
+
+  /** Add code, and peer review metadata (hidden action) */
+  function updatecodemetadataAction()
+    {
+    $this->requireAdminPrivileges();
+    $this->disableLayout();
+    $this->disableView();
+    try
+        {
+        $index = MidasLoader::loadComponent('Solr', 'solr')->getSolrIndex();
+        $response = $index->search("text-journal.enable:true  A", 0, 100000, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+        foreach($response->response->docs as $doc)
+          {
+          $item = MidasLoader::loadModel("Item")->load($doc->key);
+          if($item)
+            {
+            $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
+            foreach($resourceDao->getRevision()->getBitstreams() as $b)
+              {
+              $type = MidasLoader::loadComponent("Bitstream", "journal")->getType($b);
+              if($type == BITSTREAM_TYPE_SOURCECODE || $type == BITSTREAM_TYPE_SOURCECODE_GITHUB)
+                {
+                $resourceDao->setHasCode();
+                }
+              else if($type == BITSTREAM_TYPE_TESTING_SOURCECODE)
+                {
+                $resourceDao->setTestHasCode();
+                }
+              }
+            $reviews = MidasLoader::loadModel("Review", "reviewosehra")->getByRevision($resourceDao->getRevision());
+            foreach($reviews as $review)
+              {
+              if($review->getComplete() == 100)
+                {
+                $resourceDao->setHasReviews();
+                break;
+                }
+              }
+            MidasLoader::loadModel("Item")->save($resourceDao);
+            }
+
+          }
+        }
+      catch(Exception $e)
+        {
+        throw new Exception('Syntax error in query ', -1);
+        }
+    }
+
   // List publications waiting for approval
   function approvalAction()
     {
@@ -43,23 +91,23 @@ class Journal_AdminController extends Journal_AppController
       {
       throw new Zend_Exception("No approval required", 404);
       }
-     
+
     $articles = array();
     foreach($this->view->waitingApproval as $item)
       {
       $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
-      $articles[] = array('total' => count($this->view->waitingApproval), 'title' => $item->getName(), 
+      $articles[] = array('total' => count($this->view->waitingApproval), 'title' => $item->getName(),
             'type' => $item->getType(), 'logo' => $resourceDao->getLogo(), 'id' => $item->getKey(), 'description' => $item->getDescription(), 'authors' => $authors,
             'view' => $item->getView() ,'downloads' => $item->getDownload(),
             'revisionId' =>  $resourceDao->getRevision()->getKey());
       }
-     
+
     $this->view->json["articles"] = $articles;
     }
-    
+
   /** Manage journals and issues*/
   function issuesAction()
-    {   
+    {
     if(!$this->logged)
       {
       throw new Zend_Exception("Please log in.", 404);
@@ -67,26 +115,26 @@ class Journal_AdminController extends Journal_AppController
     $this->view->communities = MidasLoader::loadModel('Community')->getAll();
     $this->view->isAdmin = $this->userSession->Dao->isAdmin();
     }
-    
+
   /** Manage journals and issues editors and members*/
   function groupusersAction()
-    {   
-    $groupId = $this->_getParam('groupId');  
+    {
+    $groupId = $this->_getParam('groupId');
     $showUsers = $this->_getParam("showmembers");
     $group = MidasLoader::loadModel('Group')->load($groupId);
     if($group === false)
       {
       throw new Zend_Exception("This group doesn't exist.", 404);
-      }      
+      }
 
     $community = $group->getCommunity();
-    if(!$this->logged ||  (!$this->userSession->Dao->isAdmin() 
+    if(!$this->logged ||  (!$this->userSession->Dao->isAdmin()
             && !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup())))
       {
       throw new Zend_Exception("Permission error.", 404);
       }
-      
-    if($this->_request->isPost())      
+
+    if($this->_request->isPost())
       {
       $this->disableLayout();
       $this->disableView();
@@ -107,7 +155,7 @@ class Journal_AdminController extends Journal_AppController
         MidasLoader::loadModel('Group')->removeUser($group, $user);
         echo JsonComponent::encode(array(true, 'Removed user '.$user->getFullName().' from group '.$group->getName()));
         }
-      
+
       if(isset($add))
         {
         MidasLoader::loadModel('Group')->addUser($group, $user);
@@ -127,7 +175,7 @@ class Journal_AdminController extends Journal_AppController
     $this->view->json['membergroup'] = $this->view->membergroup ->toArray();
     $this->view->json['community'] = $community->toArray();
     }
-    
+
   /** Edit help/faq content */
   function helpAction()
     {
@@ -152,30 +200,30 @@ class Journal_AdminController extends Journal_AppController
       $settingModel->setConfig('faq_text', $_POST['faqcontent'], 'journal');
       $settingModel->setConfig('about_text', $_POST['aboutcontent'], 'journal');
       $this->_redirect("/journal/help");
-      }      
+      }
     }
-    
+
   /** Edit disclaimers */
   function disclaimerAction()
     {
     $this->requireAdminPrivileges();
     $this->view->disclaimers = MidasLoader::loadModel("Disclaimer", "journal")->getAll();
     }
-    
+
   /** Edit disclaimers */
   function editdisclaimerAction()
     {
     $this->requireAdminPrivileges();
     $disclaimerId = $this->_getParam("disclaimerId");
-    
+
     $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($disclaimerId);
-    if(!$disclaimer || !$disclaimer->saved) 
+    if(!$disclaimer || !$disclaimer->saved)
       {
       $disclaimer = MidasLoader::newDao("DisclaimerDao", "journal");
       $disclaimer->setName("");
       $disclaimer->setDescription("");
       }
-            
+
     if($this->_request->isPost())
       {
       if(isset($_POST['delete']) && !empty($_POST['delete']) && is_numeric($disclaimerId))
@@ -189,24 +237,24 @@ class Journal_AdminController extends Journal_AppController
         MidasLoader::loadModel("Disclaimer", "journal")->save($disclaimer);
         }
       $this->_redirect("/journal/admin/disclaimer");
-      }    
-    
+      }
+
     $this->view->disclaimer = $disclaimer;
     }
-    
+
   /** Edit an issue */
   function editissueAction()
-    {  
+    {
     $this->view->disablePolicySelector = false;
     // load resource if it exists
-    $folderId = $this->_getParam('folderId');  
-    $communityId = $this->_getParam('communityId');  
+    $folderId = $this->_getParam('folderId');
+    $communityId = $this->_getParam('communityId');
     if(isset($folderId))
       {
       $folder = MidasLoader::loadModel("Folder")->load($folderId);
       $issueDao = MidasLoader::loadModel("Folder")->initDao("Issue", $folder->toArray(), "journal");
       $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($folder));
-      }   
+      }
     else
       {
       $issueDao = MidasLoader::newDao('IssueDao', 'journal');
@@ -217,15 +265,15 @@ class Journal_AdminController extends Journal_AppController
         $issueDao->setDefaultPolicy(1);
         }
       }
-      
-    
-    if(!$community || !$this->logged 
+
+
+    if(!$community || !$this->logged
             || !$this->userSession->Dao->isAdmin()
             || !MidasLoader::loadModel('Group')->userInGroup($this->userSession->Dao, $community->getAdminGroup()))
       {
       throw new Zend_Exception("Permission error.", 404);
       }
-      
+
     if($this->_request->isPost())
       {
       $deleteIssue = $this->_getParam("deleteIssue");
@@ -243,19 +291,19 @@ class Journal_AdminController extends Journal_AppController
         MidasLoader::loadModel("Folder")->save($issueDao);
         $issueDao->InitValues();
         $anonymousGroup = MidasLoader::loadModel("Group")->load(MIDAS_GROUP_ANONYMOUS_KEY);
-        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($anonymousGroup, $issueDao, MIDAS_POLICY_READ);        
+        MidasLoader::loadModel("Folderpolicygroup")->createPolicy($anonymousGroup, $issueDao, MIDAS_POLICY_READ);
         $editorGroup = MidasLoader::loadModel("Group")->createGroup($community, "Issue_".$issueDao->getKey());
         MidasLoader::loadModel("Folderpolicygroup")->createPolicy($editorGroup, $issueDao, MIDAS_POLICY_ADMIN);
         }
-        
+
       if(!isset($_POST['defaultpolicy']) || $_POST['defaultpolicy'] != 1)
         {
         $_POST['defaultpolicy'] = 0;
         }
-        
+
       foreach($_POST as $key => $value)
         {
-        if(isset($issueDao->$key)) 
+        if(isset($issueDao->$key))
           {
           $issueDao->$key = $value;
           }
@@ -264,23 +312,23 @@ class Journal_AdminController extends Journal_AppController
       $issueDao->save();
       $this->_redirect("/journal/admin/issues");
       }
-    
+
     $this->view->isNew = !isset($folderId);
     $this->view->issue = $issueDao;
     }
-    
-    
+
+
   /** Manage the categories*/
   function categoriesAction()
     {
     $this->requireAdminPrivileges();
-    
+
     $cacheFile = UtilityComponent::getTempDirectory()."/treeCache.json";
     if(file_exists($cacheFile))
       {
       unlink($cacheFile);
       }
-      
+
     // if add a new tree
     if($this->_request->isPost() && !empty($_POST['newtree']))
       {
@@ -290,14 +338,14 @@ class Journal_AdminController extends Journal_AppController
       $categoryDao->setParentId(-1);
       MidasLoader::loadModel("Category", "journal")->save($categoryDao);
       }
-      
+
     // if add a new category
     if($this->_request->isPost() && !empty($_POST['newCategory']))
       {
       //save the new tree
       $categoryDao = MidasLoader::newDao('CategoryDao', 'journal');
       $categoryDao->setName($_POST['newCategory']);
-      
+
       $parentDao = MidasLoader::loadModel("Category", "journal")->load($_POST['parentCategory']);
       if($parentDao)
         {
@@ -305,17 +353,17 @@ class Journal_AdminController extends Journal_AppController
         MidasLoader::loadModel("Category", "journal")->save($categoryDao);
         }
       }
-    
+
     if($this->_request->isPost() && isset($_POST['deleteChild']) && is_numeric($_POST['deleteChild']))
       {
       $categoryDao = MidasLoader::loadModel("Category", "journal")->load($_POST['deleteChild']);
       MidasLoader::loadModel("Category", "journal")->delete($categoryDao);
       }
-    
+
     // fetch all the keywords and send them to the view
     $this->view->tree = MidasLoader::loadComponent("Tree", "journal")->getAllTrees();
     // send the tree to the JS files
     $this->view->json['trees'] = $this->view->tree;
     }
-  
+
 }//end class

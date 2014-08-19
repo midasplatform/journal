@@ -19,20 +19,20 @@
 
 /** Cateogyr Tree  component */
 class Journal_TreeComponent extends AppComponent
-{  
+{
   /**
    * Get formatted tree
-   * @param bool $includeDao include or nor the DAO 
+   * @param bool $includeDao include or nor the DAO
    * (we don't want to do it if we plan to sent the array to the json format)
    * @return array
    */
   public function getAllTrees($includeDao = false, $selected = array(), $showCertification = false)
-    {    
+    {
     $trees = array();
     $allEntries = MidasLoader::loadModel('Category', 'journal')->getAll();
-    
+
     $cacheFile = UtilityComponent::getTempDirectory()."/treeCache.json";
-    
+
     if(empty($selected) && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
       {
       $trees = JsonComponent::decode(file_get_contents($cacheFile));
@@ -40,32 +40,44 @@ class Journal_TreeComponent extends AppComponent
     else
       {
       foreach($allEntries as $entry)
-        {      
+        {
         if($entry->getParentId() == -1)
           {
           $select = 0;
           if(in_array($entry->getKey(), $selected)) $select = 1;
-          if($includeDao) $trees[] = array('dao' => $entry, 'select' => $select, 'title' => $entry->getName(), 'key' => $entry->getKey(), 
+          if($includeDao) $trees[] = array('dao' => $entry, 'select' => $select, 'title' => $entry->getName(), 'key' => $entry->getKey(),
               'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
-          else $trees[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(), 
+          else $trees[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(),
               'children' => $this->getChildren($allEntries, $entry, $includeDao, $selected));
           }
         }
       if(empty($selected)) file_put_contents($cacheFile, JsonComponent::encode($trees));
       }
- 
+
     if($showCertification)
       {
-      $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified", 'key' => -1, 
+      $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified", 'key' => -1,
             'children' => array(
-                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 1", 'key' => "certified-1", 
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 1", 'key' => "certified-1",
                 'children' => array()),
-                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 2", 'key' => "certified-2", 
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 2", 'key' => "certified-2",
                 'children' => array()),
-                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 3", 'key' => "certified-3", 
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 3", 'key' => "certified-3",
                 'children' => array()),
-                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 4", 'key' => "certified-4", 
-                'children' => array())                
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Level 4", 'key' => "certified-4",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "With peer reviews", 'key' => "with_review",
+                'children' => array())
+            ));
+
+      $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "Code", 'key' => -1,
+            'children' => array(
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Code in Flight", 'key' => "code_in_flight",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "With code", 'key' => "with_code",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "With testing code", 'key' => "with_test_code",
+                'children' => array())
             ));
       }
     return $trees;
@@ -75,7 +87,7 @@ class Journal_TreeComponent extends AppComponent
    * Get childens recursively
    * @param array $tree
    * @param CategoryDao $parent
-   * @param bool $includeDao include or nor the DAO 
+   * @param bool $includeDao include or nor the DAO
    * @return array
    */
   private function getChildren($tree, $parent, $includeDao, $selected)
@@ -87,9 +99,9 @@ class Journal_TreeComponent extends AppComponent
         {
         $select = 0;
         if(in_array($entry->getKey(), $selected)) $select = 1;
-        if($includeDao) $children[] = array('dao' => $entry, 'select' => $select, 'title' => $entry->getName(), 'key' => $entry->getKey(), 
+        if($includeDao) $children[] = array('dao' => $entry, 'select' => $select, 'title' => $entry->getName(), 'key' => $entry->getKey(),
             'children' => $this->getChildren($tree, $entry, $includeDao, $selected));
-        else $children[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(), 
+        else $children[] = array('title' => $entry->getName(), 'select' => $select, 'key' => $entry->getKey(),
             'children' => $this->getChildren($tree, $entry, $includeDao, $selected));
         }
       }

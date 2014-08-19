@@ -27,11 +27,11 @@ Zend_Loader::loadClass("ItemDao", BASE_PATH.'/core/models/dao');
 class Journal_ResourceDao extends ItemDao
   {
   public $_model = 'Item';
-  
+
   public $_associatedResources = false;
   public $_metadata = false;
   public $_revision = false;
-  
+
   /** Constructor */
   public function __construct()
     {
@@ -40,7 +40,7 @@ class Journal_ResourceDao extends ItemDao
     $this->setDescription('');
     $this->setType(RESOURCE_TYPE_NOT_DEFINED);
     }
- 
+
   /**
    * The goal of this method is to enable the resource.
    * The user will then be able to find it using the search and filter (based on solr)
@@ -55,7 +55,7 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /** Get Categories
-   * 
+   *
    * @return array of ids
    */
   function getCategories()
@@ -72,9 +72,9 @@ class Journal_ResourceDao extends ItemDao
     {
     if(is_array($categories))$this->setMetaDataByQualifier("categories", join(' ', $categories));
     }
-    
+
    /** Get Authors
-   * 
+   *
    * @return array of names
    */
   function getAuthors()
@@ -86,7 +86,7 @@ class Journal_ResourceDao extends ItemDao
     return $authors;
     }
    /** Get Authors
-   * 
+   *
    * @return array of names
    */
   function getAuthorsFullNames()
@@ -106,13 +106,13 @@ class Journal_ResourceDao extends ItemDao
     $authorsArray = array();
     foreach($authors[0] as $key => $author)
       {
-      if(!empty($authors[0][$key]) && !empty($authors[1][$key]))$authorsArray[] = $authors[0][$key]." --- ".$authors[1][$key];    
+      if(!empty($authors[0][$key]) && !empty($authors[1][$key]))$authorsArray[] = $authors[0][$key]." --- ".$authors[1][$key];
       }
     $this->setMetaDataByQualifier("authors", join(" ;;; ", $authorsArray));
     }
-    
+
   /** Get Tags
-   * 
+   *
    * @return array of string
    */
   function getTags()
@@ -129,10 +129,10 @@ class Journal_ResourceDao extends ItemDao
     {
     if(isset($tags))$this->setMetaDataByQualifier("tags", join(' --- ', array_filter($tags)));
     }
-    
+
   /** Get Institution
-   * 
-   * @return 
+   *
+   * @return
    */
   function getInstitution()
     {
@@ -142,16 +142,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Institution
-   * @param 
+   * @param
    */
   function setInstitution($institution)
     {
     $this->setMetaDataByQualifier("insitution", $institution);
     }
-    
+
   /** Get Github
-   * 
-   * @return 
+   *
+   * @return
    */
   function getGithub()
     {
@@ -161,16 +161,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Institution
-   * @param 
+   * @param
    */
   function setGithub($github)
     {
     $this->setMetaDataByQualifier("github", $github);
     }
-    
+
   /** Get Handle
-   * 
-   * @return 
+   *
+   * @return
    */
   function getHandle()
     {
@@ -180,16 +180,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Handle
-   * @param 
+   * @param
    */
   function setHandle($handle)
     {
     $this->setMetaDataByQualifier("handle", $handle);
     }
-    
+
   /** Get Certification level
-   * 
-   * @return 
+   *
+   * @return
    */
   function getCertificationLevel()
     {
@@ -199,17 +199,41 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Institution
-   * @param 
+   * @param
    */
   function setCertificationLevel($handle)
     {
     $this->setMetaDataByQualifier("certification_level", $handle);
     }
-    
-  /** Get Approval Status 
+
+   /* Set Has reviews
+   * @param
+   */
+  function setHasReviews()
+    {
+    $this->setMetaDataByQualifier("has_reviews", "true");
+    }
+
+   /* Set Has code
+   * @param
+   */
+  function setHasCode()
+    {
+    $this->setMetaDataByQualifier("has_code", "true");
+    }
+
+   /* Set Has code
+   * @param
+   */
+  function setTestHasCode()
+    {
+    $this->setMetaDataByQualifier("has_test_code", "true");
+    }
+
+  /** Get Approval Status
    *  1 = waiting for approval
    *  0 = already approved or not complete
-   * @return 
+   * @return
    */
   function getApprovalStatus()
     {
@@ -218,18 +242,18 @@ class Journal_ResourceDao extends ItemDao
     return $metadata->getValue();
     }
 
-   /* Set Approval Status 
-   * @param 
+   /* Set Approval Status
+   * @param
    */
   function setApprovalStatus($status)
     {
     $this->setMetaDataByQualifier("approval_status", $status);
     }
-    
+
 
   /** Get source code license
-   * 
-   * @return 
+   *
+   * @return
    */
   function getSourceLicense()
     {
@@ -239,13 +263,13 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set source code license
-   * @param 
+   * @param
    */
   function setSourceLicense($handle)
     {
     $this->setMetaDataByQualifier("source_license", $handle);
     }
-    
+
 
   /** Generate new handle */
   function initHandle()
@@ -272,10 +296,10 @@ class Journal_ResourceDao extends ItemDao
       }
     $this->setHandle($baseHandle."/".$value);
     }
-    
+
   /** Get Dislcaimer Id
-   * 
-   * @return 
+   *
+   * @return
    */
   function getDisclaimer()
     {
@@ -285,16 +309,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Dislcaimer Id
-   * @param 
+   * @param
    */
   function setDisclaimer($disclaimer)
     {
     $this->setMetaDataByQualifier("disclaimer", $disclaimer);
     }
-    
+
   /** Get Copyright
-   * 
-   * @return 
+   *
+   * @return
    */
   function getCopyright()
     {
@@ -304,16 +328,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Dislcaimer Id
-   * @param 
+   * @param
    */
   function setCopyright($copyright)
     {
     $this->setMetaDataByQualifier("copyright", $copyright);
     }
-    
+
   /** Get Related
-   * 
-   * @return 
+   *
+   * @return
    */
   function getRelated()
     {
@@ -323,16 +347,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Related work
-   * @param 
+   * @param
    */
   function setRelated($value)
     {
     $this->setMetaDataByQualifier("related_work", $value);
     }
-    
+
   /** Get Grant
-   * 
-   * @return 
+   *
+   * @return
    */
   function getGrant()
     {
@@ -342,16 +366,16 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Grant
-   * @param 
+   * @param
    */
   function setGrant($value)
     {
     $this->setMetaDataByQualifier("grant", $value);
     }
-    
+
   /** Get Logo
-   * 
-   * @return 
+   *
+   * @return
    */
   function getLogo()
     {
@@ -361,15 +385,15 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Logo
-   * @param 
+   * @param
    */
   function setLogo($value)
     {
     $this->setMetaDataByQualifier("logo", $value->getKey());
     }
-    
+
   /** Get Submitter
-   * 
+   *
    * @return UserDao
    */
   function getSubmitter()
@@ -380,14 +404,14 @@ class Journal_ResourceDao extends ItemDao
     }
 
    /* Set Submitter
-   * @param 
+   * @param
    */
   function setSubmitter($userDao)
     {
     if($userDao) $this->setMetaDataByQualifier("submitter", $userDao->getKey());
     }
-    
-    
+
+
   /**
    * Get Revision
    * @return ItemRevision
@@ -397,7 +421,7 @@ class Journal_ResourceDao extends ItemDao
     if(!$this->_revision)  $this->_revision = $this->getModel()->getLastRevision($this);
     return $this->_revision;
     }
-    
+
 
   /**
    * Set Revision
@@ -414,7 +438,7 @@ class Journal_ResourceDao extends ItemDao
       if(Zend_Registry::get('userSession') != null)
         {
         $revision->setUser_id(Zend_Registry::get('userSession')->Dao->getKey());
-        }      
+        }
       $revision->setDate(date('c'));
       $revision->setLicenseId(null);
       $lastRevision = false;
@@ -422,9 +446,9 @@ class Journal_ResourceDao extends ItemDao
       if(!$lastRevision)$this->_metadata = array();
       else $this->_metadata = MidasLoader::loadModel('ItemRevision')->getMetadata($lastRevision);
       }
-    $this->_revision = $revision;    
+    $this->_revision = $revision;
     }
-    
+
   /**
    * Check if the user is an Admin
    * @param User
@@ -452,8 +476,8 @@ class Journal_ResourceDao extends ItemDao
       }
     return false;
     }
-    
-  /** 
+
+  /**
    * Get Resource Admin group
    * @return group
    */
@@ -463,8 +487,8 @@ class Journal_ResourceDao extends ItemDao
     $community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
     return $community->getAdminGroup();
     }
-    
-  /** 
+
+  /**
    * Get Resource Member group
    * @return group
    */
@@ -475,7 +499,7 @@ class Journal_ResourceDao extends ItemDao
     return $community->getMemberGroup();
     }
 
-    
+
   /**
    * Get Metadata object
    * @param type $type
@@ -492,7 +516,7 @@ class Journal_ResourceDao extends ItemDao
         }
       }
     return false;
-    }   
+    }
   /**
    * Save metadata value
    * @param string $type
@@ -506,9 +530,9 @@ class Journal_ResourceDao extends ItemDao
     if(!$metadataDao)  $metadataDao= MidasLoader::loadModel('Metadata')->addMetadata(MIDAS_METADATA_TEXT, "journal", $type, "");
     $metadataDao->setItemrevisionId($this->getRevision()->getKey());
     $metadataDao->setValue($value);
-    return MidasLoader::loadModel('Metadata')->saveMetadataValue($metadataDao);  
-    }   
-        
+    return MidasLoader::loadModel('Metadata')->saveMetadataValue($metadataDao);
+    }
+
   /**
    * Return all the item matadata (categories, keywords...)
    * @return array of metadata

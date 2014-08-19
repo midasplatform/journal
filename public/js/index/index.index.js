@@ -2,7 +2,7 @@
 var selectIssue = false;
 var resizeEvent;
 
-$(document).ready(function(){  
+$(document).ready(function(){
   $('.issueTitle').each(function(){
     $(this).dotdotdot({
     callback	: function( isTruncated, orgContent ) {
@@ -16,9 +16,9 @@ $(document).ready(function(){
         }
     }}
     );
- });  
+ });
 
-  
+
   resizeEvent = function(){
     $.each($('.SearchResultEntry'),function(){
       $(this).find('.ResultTitle').dotdotdot( {'height': 20});
@@ -26,15 +26,15 @@ $(document).ready(function(){
     })
 
   }
-  
+
   $(window).resize(resizeEvent);
 
   $('.issuePage').fancybox({type: 'ajax'});
-  
-  
+
+
   // Create the root html element of each tree
   $.each(json.trees, function(key, tree)
-    {    
+    {
     $('#treeWrapper').append('<div class="TreeEntry"><img class="tooggleButton" src="'+json.global.webroot+'/privateModules/journal/public/images/arrow-bottom.png"/><h4>'+tree.title+' </h4><div id="categoryTree-'+tree.key+'" class="categoryTree"></div>');
     /* Init trees */
     $("div.categoryTree:last").dynatree({
@@ -49,19 +49,19 @@ $(document).ready(function(){
       onDblClick: function(node, event) {
         node.toggleExpand();
       },
-     
+
         cookieId: "dynatreeEdit-"+key,
         idPrefix: "dynatreeEdit-"+key
       });
-      
-    if(tree.children.length > 4)
+
+    if(tree.children.length > 5)
       {
       $("div.categoryTree:last").hide();
       $("div.categoryTree:last").parent().find('img.tooggleButton').attr('src', json.global.webroot+'/privateModules/journal/public/images/arrow-right.png');
       }
     }
-  );  
-    
+  );
+
   $('.issueButton .issueTitle, .issueButton .issueSubTitle').click(function(){
     var container = $(this).parents('.issueButton');
     var key = parseInt(container.attr('key'));
@@ -85,13 +85,13 @@ $(document).ready(function(){
     $('.issueButton[key='+selectIssue+']').addClass('issueSelected');
     }
 
-   
+
   // Init instant search
   $('#live_search').keyup(function(){
       $('#infoElement').hide();
       searchDatabase(false);
     });
-      
+
   // Init tree toogle
   $('img.tooggleButton').click(function(){
     var tree = $(this).parent('div.TreeEntry').find('div.categoryTree');
@@ -105,7 +105,7 @@ $(document).ready(function(){
       }
     tree.toggle();
   });
-  
+
   searchDatabase(false)
 })
 
@@ -136,7 +136,7 @@ function searchDatabase(append)
     {
     fullQuery += "AND (name:"+query+" OR description:"+query+") ";
     }
-    
+
   var categories = getSelectedCategories();
   if(categories.length != 0)
     {
@@ -145,8 +145,24 @@ function searchDatabase(append)
       $.each(val, function(index, value){
         if(index != 0) fullQuery += " OR ";
         if(value.indexOf("certified") != -1)
-          {          
-          fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";          
+          {
+          fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";
+          }
+        else if(value.indexOf("code_in_flight") != -1)
+          {
+          fullQuery+= "name:\"Code in Flight\" ";
+          }
+        else if(value.indexOf("with_code") != -1)
+          {
+          fullQuery+= "text-journal.has_code:true ";
+          }
+        else if(value.indexOf("with_test_code") != -1)
+          {
+          fullQuery+= "text-journal.has_test_code:true ";
+          }
+        else if(value.indexOf("with_review") != -1)
+          {
+          fullQuery+= "text-journal.has_test_code:true ";
           }
         else
           {
@@ -156,7 +172,7 @@ function searchDatabase(append)
       fullQuery+= ")";
     });
     }
-    
+
   if(selectIssue)
     {
     fullQuery+= " AND (";
@@ -169,7 +185,7 @@ function searchDatabase(append)
     fullQuery+= " text-journal.community:"+json.selectedCommunity+" ";
     fullQuery+= ")";
     }
-    
+
   $('img#searchLoadingImg').show();
   var shown = $('.resourceLink').length;
   if(!append) shown = 0;
@@ -191,9 +207,9 @@ function searchDatabase(append)
             'description': value.description, 'statistics': value.statistics,
             'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel})
           })
-          
+
           var shown = $('.resourceLink').length;
-          
+
           if(total != shown)
             {
             $('#showMoreResults').show();
@@ -205,7 +221,7 @@ function searchDatabase(append)
             {
             $('#showMoreResults').hide();
             }
-               
+
           if(total == "")
             {
             $('.SearchCount').hide();
@@ -213,14 +229,14 @@ function searchDatabase(append)
           else if(total > 1)
             {
             $('.SearchCount').show();
-            $('.SearchCount').html(total+ " resources available.")  
+            $('.SearchCount').html(total+ " resources available.")
             }
           else
             {
             $('.SearchCount').show();
-            $('.SearchCount').html(total+ " resource available.") 
+            $('.SearchCount').html(total+ " resource available.")
             }
-            
+
           resizeEvent();
           setTimeout(resizeEvent, 200);
         },
@@ -246,7 +262,7 @@ function addAndFormatResult(container, values) {
   container.append(str);
   var newElement = $('div.SearchResultEntry:last');
   newElement.find('.ResultTitle').dotdotdot( {'height': 20});
-            
+
   if(values.logo == "")
     {
     newElement.find('.ResultLogo:first').remove();
@@ -255,7 +271,7 @@ function addAndFormatResult(container, values) {
     {
     newElement.find('.ResultLogo:last').remove();
     }
-    
+
   if(values.isCertified == 0)
     {
     newElement.find('.CertifiedWrapper').remove();
@@ -263,9 +279,9 @@ function addAndFormatResult(container, values) {
     }
   else
     {
-    newElement.find('.CertifiedLevel').html("(Level "+values.certifiedLevel+")");  
+    newElement.find('.CertifiedLevel').html("(Level "+values.certifiedLevel+")");
     }
-    
+
   newElement.find('.ResultDescription').dotdotdot();
-  return str; 
+  return str;
 };

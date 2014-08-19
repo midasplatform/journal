@@ -37,13 +37,14 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
   <b>What type of file to you want to upload? </b>
   <select id="typeFile">
     <option></option>
-    <option value="<?php echo BITSTREAM_TYPE_THUMBNAIL ?>">Thumbnail (Logo)</option>    
-    <option value="<?php echo BITSTREAM_TYPE_PAPER ?>">Paper</option>    
-    <option value="<?php echo BITSTREAM_TYPE_PAPER_TECHNICAL ?>">Major technique paper for reference</option>    
-    <option value="<?php echo BITSTREAM_TYPE_SOURCECODE ?>">Source Code</option>    
-    <option value="<?php echo BITSTREAM_TYPE_SOURCECODE_GITHUB ?>">Github repository</option>    
-    <option value="<?php echo BITSTREAM_TYPE_DATA ?>">Data</option>    
-    <option value="<?php echo BITSTREAM_TYPE_MISC ?>">Other</option>    
+    <option value="<?php echo BITSTREAM_TYPE_THUMBNAIL ?>">Thumbnail (Logo)</option>
+    <option value="<?php echo BITSTREAM_TYPE_PAPER ?>">Paper</option>
+    <option value="<?php echo BITSTREAM_TYPE_PAPER_TECHNICAL ?>">Major technique paper for reference</option>
+    <option value="<?php echo BITSTREAM_TYPE_SOURCECODE ?>">Source Code</option>
+    <option value="<?php echo BITSTREAM_TYPE_TESTING_SOURCECODE ?>">Testing Code</option>
+    <option value="<?php echo BITSTREAM_TYPE_SOURCECODE_GITHUB ?>">Github repository</option>
+    <option value="<?php echo BITSTREAM_TYPE_DATA ?>">Data</option>
+    <option value="<?php echo BITSTREAM_TYPE_MISC ?>">Other</option>
   </select><br/><br/>
   <div id='uploadContentBlock' style="display:none;width:700px;">
     <!-- The fileinput-button span is used to style the file input field as button -->
@@ -51,7 +52,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
       <i class="icon-plus icon-white"></i>
       <span>Select files...</span>
       <!-- The file input field used as target for the file upload widget -->
-      <input id="fileupload" type="file" name="files[]" multiple> 
+      <input id="fileupload" type="file" name="files[]" multiple>
     </span>
 
     <!-- The global progress bar -->
@@ -82,13 +83,14 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
               </tr>
             </thead>
             <tbody>";
-    
+
 
     $typeToString = array(
         BITSTREAM_TYPE_THUMBNAIL => "Thumbnail (Logo)",
         BITSTREAM_TYPE_PAPER => "Paper",
         BITSTREAM_TYPE_PAPER_TECHNICAL => "Major technique paper for reference",
         BITSTREAM_TYPE_SOURCECODE => "Source Code",
+        BITSTREAM_TYPE_TESTING_SOURCECODE => "Testing Code",
         BITSTREAM_TYPE_SOURCECODE_GITHUB => "Github repository",
         BITSTREAM_TYPE_DATA => "Data",
         BITSTREAM_TYPE_MISC => "Other",
@@ -113,20 +115,20 @@ I have the right to distribute these files
     <label style="display:inline;" for="acceptRights"> I certify that I have the right to distribute these files.</label>
     <br/>
     <input type="checkbox" class="checkbox" id="acceptLicense" value="0" <?php if ($this->resource->getSourceLicense()) echo "checked='true'";?>>
-    <label style="display:inline;" > I certify that all source code files/repositories uploaded here are under 
+    <label style="display:inline;" > I certify that all source code files/repositories uploaded here are under
     <select id="licenseChoice">
       <option value="<?php echo OTJ_SOURCE_LICENSE_APACHE_2 ?>"
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_APACHE_2) echo "selected"; ?>>
         Apache 2
-      </option>    
+      </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN ?> "
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN) echo "selected"; ?>>
               Public Domain
-      </option>    
+      </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_OTHER ?>"
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER) echo "selected"; ?>>
               Other
-      </option>    
+      </option>
     </select>
      License (optional).</label>
     <br/>
@@ -151,7 +153,7 @@ I have the right to distribute these files
       }
     ?>
 
-      <input name="source-license" type="hidden" id="hiddenSourceLicense" 
-             value='<?php if ($this->resource->getSourceLicense()) echo $this->resource->getSourceLicense(); else echo 0 ?>'/> 
+      <input name="source-license" type="hidden" id="hiddenSourceLicense"
+             value='<?php if ($this->resource->getSourceLicense()) echo $this->resource->getSourceLicense(); else echo 0 ?>'/>
   </form>
-</div> 
+</div>

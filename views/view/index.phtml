@@ -43,17 +43,17 @@ foreach ($cssArray as $module => $list)
 <LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
 <div class="ContentWithRightPanel">
   <div class="Panel">
-    
+
 
     <h4>Resources</h4>
     <ul>
-      <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download All</a> 
+      <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download All</a>
         (<?php echo MidasLoader::loadComponent("Utility")->formatSize($this->resource->getSizebytes()); ?>)</li>
       <?php
       if($this->paper)
         {
         ?>
-      <li><a href="<?php echo $this->webroot ?>/download?bitstream=<?php echo $this->paper->getKey() ?>">Download Paper</a> 
+      <li><a href="<?php echo $this->webroot ?>/download?bitstream=<?php echo $this->paper->getKey() ?>">Download Paper</a>
       </li>
       <?php
         }
@@ -62,7 +62,7 @@ foreach ($cssArray as $module => $list)
         {
         ?>
         <li><a href="<?php echo $github ?>" target="_blank">
-             Github <img  style='border:none;position:relative;top:-2px;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/github-small.png" /></a> 
+             Github <img  style='border:none;position:relative;top:-2px;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/github-small.png" /></a>
         </li>
       <?php
         }
@@ -70,7 +70,7 @@ foreach ($cssArray as $module => $list)
     </ul>
 
 
-    <h4>Export citation:</h4> 
+    <h4>Export citation:</h4>
     <ul><li>
     <form action="" method="post" name="form1" id="form1">
      <select name="exportType">
@@ -81,7 +81,7 @@ foreach ($cssArray as $module => $list)
     </form>
     </li></ul>
 
-    <h4>Statistics</h4> 
+    <h4>Statistics</h4>
     <ul>
       <li>Views: <?php echo $this->resource->getView() ?></li>
       <li>Downloads: <?php echo $this->resource->getDownload() ?></li>
@@ -92,7 +92,7 @@ foreach ($cssArray as $module => $list)
     echo '</div>';
     ?>
 
-    <h4>Information</h4> 
+    <h4>Information</h4>
     <ul>
        <?php
       if($this->isPrivate)
@@ -106,7 +106,7 @@ foreach ($cssArray as $module => $list)
          RESOURCE_TYPE_PUBLICATION => "Publication",
          RESOURCE_TYPE_TUTORIAL => "Tutorial",
          RESOURCE_TYPE_DATASET => "Dataset");?>
-      
+
       <?php
       $level = $this->resource->getCertificationLevel();
       if(is_numeric($level))
@@ -114,11 +114,11 @@ foreach ($cssArray as $module => $list)
         echo "<li><b>Certified</b> (level ".$level.")</li>";
         }
       ?>
-       
+
       <li>Type: <?php echo $articleType[$this->resource->getType()] ?></li>
-      <li>Categories: <?php 
+      <li>Categories: <?php
       $categories = $this->resource->getCategories();
-      foreach($categories as &$category)   
+      foreach($categories as &$category)
         {
         $tmpCat = MidasLoader::loadModel('Category', 'journal')->load($category);
         if($tmpCat) $category = '<a href="'.$this->webroot.'/journal/?category='.$tmpCat->getKey().'">'.$tmpCat->getName().'</a>';
@@ -173,17 +173,17 @@ foreach ($cssArray as $module => $list)
       ?>
       <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>
-    <h4>Share</h4> 
+    <h4>Share</h4>
     <ul style="list-style: none;"><li>
     <div id="shareDiv"></div>
     </li></ul>
-    
+
     <?php
     if($this->isAdmin || $this->isAuthor)
       {
       echo '<h4>Manage</h4>';
       echo "<ul>";
-      if($this->isAdmin || $this->isAuthor)
+      if($this->isApproved && ($this->isAdmin || $this->isAuthor))
         {
         echo "<li><a href='" . $this->webroot . "/journal/submit?itemId=" . $this->resource->getKey() . "'>New revision</a></li>";
         }
@@ -198,7 +198,7 @@ foreach ($cssArray as $module => $list)
       echo "</ul>";
       }
       ?>
-    
+
     <?php
     if($this->oldWebsiteUrl)
       {
@@ -210,16 +210,16 @@ foreach ($cssArray as $module => $list)
       }
       ?>
   </div>
-  
-  
-  
+
+
+
   <div class="MainContent">
     <div id="publication">
       <br/>
       <div class="title" >
-        <?php echo $this->resource->getName() ?>       
+        <?php echo $this->resource->getName() ?>
       </div>
-      <div class="authors"><?php 
+      <div class="authors"><?php
       $authors = $this->resource->getAuthors();
       foreach($authors as &$author) $author = '<a href="'.$this->webroot.'/journal/?q=text-journal.authors:'.$author[0].' '.$author[1].'">'.ucfirst($author[1]).' '.ucfirst($author[0][0]).'.</a>';
       echo join(', ', $authors);
@@ -234,7 +234,7 @@ foreach ($cssArray as $module => $list)
           }
         $handleUrl = "http://hdl.handle.net/".$this->resource->getHandle();
         ?>
-        
+
         <span style="background-color: #F2F3F3;">Please use this identifier to cite or link to this publication: <a href="<?php echo $handleUrl?>"><?php echo $handleUrl?></a></span><br/>
         <?php
         if(!$this->isApproved)
@@ -246,22 +246,22 @@ foreach ($cssArray as $module => $list)
 
       <div class="journal">
         Published in <a href="<?php echo $this->webroot ?>/journal?community=<?php echo $this->community->getKey() ?>"
-                        ><?php echo $this->community->getName(); ?></a> - <a 
+                        ><?php echo $this->community->getName(); ?></a> - <a
                         href="<?php echo $this->webroot ?>/journal?issue=<?php echo $this->issue->getKey() ?>"><?php echo $this->issue->getName() ?></a>.
 
       </div>
       <div class="submittedby">Submitted by <?php echo $this->resource->getRevision()->getUser()->getFullName() ?> on <?php echo date("m-d-Y", strtotime($this->resource->getRevision()->getDate())) ?>.</div>
       <div class="abstract" style="text-align: justify;"><?php echo str_replace("<br>", "<br/>", nl2br($this->resource->getDescription())) ?></div>
     </div> <!-- End publication -->
-    
+
     <?
     $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_REVIEW', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
-    $element = end($elements);   
+    $element = end($elements);
     if(is_array($element))
       {
       echo $this->action($element['action'], $element['controller'], $element['module'], $element['params']);
       }?>
-    
+
     <?php
     if($this->hasOldReview)
       {
@@ -279,8 +279,8 @@ foreach ($cssArray as $module => $list)
     echo '<div id="commentsContainer" >';
     echo $this->element("comment", "comments");
     echo '</div>';
-    ?>    
-  </div>  
+    ?>
+  </div>
 </div>
 
 
@@ -298,9 +298,9 @@ if($this->resource->getDisclaimer() != -1)
            <td> <a href='#' onclick='$.fancybox.close();'>Agree</a></td>
               <td>|</td>
                <td><div align='center'><a href='".$this->webroot."/journal'>Decline</a></div></td>
-            
+
           </tr>
         </tbody></table>";
     echo "</div>";
-    }  
+    }
   }
