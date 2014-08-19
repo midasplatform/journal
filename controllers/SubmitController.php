@@ -5,20 +5,20 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
   // Initialization method. Called before every Action
   function init()
     {
-    parent::init();    
+    parent::init();
     }
-   
+
   function indexAction()
-    {  
+    {
     $revision_id = $this->_getParam('revision_id');
     $review_id = $this->_getParam('review_id');
     $review = false;
     if(isset($revision_id) && !$this->logged)
       {
       $this->haveToBeLogged();
-      return;      
+      return;
       }
-      
+
     if(isset($review_id))
       {
       $review = MidasLoader::loadModel("Review", 'reviewosehra')->load($review_id);
@@ -27,7 +27,7 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
         $revision_id = $review->getRevisionId();
         }
       }
-      
+
     if(!isset($revision_id) || !is_numeric($revision_id))
       {
       throw new Zend_Exception("revision_id should be a number");
@@ -41,22 +41,22 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       }
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $resourceDao->setRevision($revision);
-    
+
     $reviewPhase = $resourceDao->getMetaDataByQualifier("reviewPhase");
     if($reviewPhase) $reviewPhase = $reviewPhase->getValue();
     else $reviewPhase = OSERHAREVIEW_LIST_PEERREVIEW;
-    $this->getLogger()->info("Current review phase is " . $reviewPhase); 
+    $this->getLogger()->info("Current review phase is " . $reviewPhase);
     if($this->_request->isPost())
       {
       $this->disableLayout();
       $this->disableView();
-      
+
       if(!$this->logged)
         {
         throw new Zend_Exception("Please log in");
         return;
         }
-        
+
       $content = $this->_getParam("content");
       $cacheSummary = $this->_getParam("cache_summary");
       $is_complete = $this->_getParam("is_complete");
@@ -82,13 +82,15 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       $reviewDao->setComplete($is_complete);
       MidasLoader::loadModel("Review", 'reviewosehra')->save($reviewDao);
       Zend_Registry::get('notifier')->callback('CALLBACK_REVIEW_ADDED', array('review' => $reviewDao));
+      $resourceDao->setHasReviews();
+      MidasLoader::loadModel("Item")->save($resourceDao);
       echo JsonComponent::encode($this->view->webroot."/journal/view/?revisionId=".$reviewDao->getRevisionId());
       return;
       }
-      
+
     $isEditable = true;
 
-    // look for existing review    
+    // look for existing review
     $questionslists = MidasLoader::loadModel("Questionlist", 'reviewosehra')->getAll();
     if($review)
       {
@@ -117,14 +119,14 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
           if($cat == $list->getCategoryId() && $list->getType() == $reviewPhase)   $mainListTmp = $list;
           }
         }
-        
+
       if(!$mainListTmp)
         {
         throw new Zend_Exception("Unable to match a question list for this article. Please contact an administrator.");
         }
       $mainList = $mainListTmp->toArray();
       }
-    
+
     $this->view->isEditable = $isEditable;
     $this->view->resource = $resourceDao;
     $this->view->listArray = $mainList;
@@ -141,15 +143,15 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       {
       return;
       }
-    
-    $userDao = $this->userSession->Dao;    
+
+    $userDao = $this->userSession->Dao;
     $revision = MidasLoader::loadModel("ItemRevision")->load($_GET['revision_id']);
-    
+
     if(!$revision)
       {
       return;
       }
-    
+
     // Get PrivateFolder
     $item = $revision->getItem();
     $itemFolder = end($item->getFolders());
@@ -160,12 +162,12 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       {
       if($f->getName() == "Private")$privateFolder = $f;
       }
-      
+
     if(!$privateFolder)
       {
       return;
       }
-      
+
     $uploadRootFolder = $this->getTempDirectory()."/reviewosehrafiles";
     if(!file_exists($uploadRootFolder))
       {
@@ -173,7 +175,7 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
       }
     $uploadFolder = $uploadRootFolder."/".time()."/";
     mkdir($uploadFolder);
-      
+
     require_once __DIR__.'/components/UploadHandler.php';
     $upload_handler = new UploadHandler(array('upload_dir' => $uploadFolder,
                                               'max_number_of_files' => 1,
@@ -188,13 +190,13 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
     $returninfo = $upload_handler->post();
 
     if(isset($returninfo[0]) && $returninfo[0]->size > 0 && isset($upload_handler->filepath) && file_exists($upload_handler->filepath))
-      {        
+      {
       $userDao = MidasLoader::loadModel("Item")->load($this->userSession->Dao->getKey());
       $userDao->setAdmin(1);
       $item = MidasLoader::loadComponent("Upload")->createUploadedItem($userDao, $upload_handler->filename,
-                                $upload_handler->filepath, $privateFolder); 
+                                $upload_handler->filepath, $privateFolder);
       $anonymousGroup = MidasLoader::loadModel('Group')->load(MIDAS_GROUP_ANONYMOUS_KEY);
-      MidasLoader::loadModel('Itempolicygroup')->createPolicy($anonymousGroup, $item, MIDAS_POLICY_READ);  
+      MidasLoader::loadModel('Itempolicygroup')->createPolicy($anonymousGroup, $item, MIDAS_POLICY_READ);
       $returninfo[0]->item_id = $item->getKey();
       unlink($uploadFolder);
       }
