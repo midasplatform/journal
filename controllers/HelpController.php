@@ -22,9 +22,9 @@ class Journal_HelpController extends Journal_AppController
   // Initialization method. Called before every Action
   function init()
     {
-    parent::init();    
+    parent::init();
     }
-    
+
   /** Index. Main help page */
   function indexAction()
     {
@@ -39,7 +39,7 @@ class Journal_HelpController extends Journal_AppController
       $this->view->content = "";
       }
     }
-    
+
   /** About the website*/
   function aboutAction()
     {
@@ -69,8 +69,8 @@ class Journal_HelpController extends Journal_AppController
       $this->view->content = "";
       }
     }
-   
-  
+
+
   /** Send a feedback */
   function feedbackAction()
     {
@@ -83,11 +83,11 @@ class Journal_HelpController extends Journal_AppController
     else
       {
       $forms['email']='';
-      } 
+      }
     $forms['where']='';
-    $forms['what']='';  
+    $forms['what']='';
     $this->view->error = "";
-    
+
     if($this->_request->isPost())
       {
       $forms['email'] = $_POST['email'];
@@ -98,25 +98,31 @@ class Journal_HelpController extends Journal_AppController
         $this->view->forms = $forms;
         $this->view->error = 'Hello M Robot (Wait 5 seconds and re submit).';
         return;
-        }  
+        }
       if(!empty($_POST['name'])||!empty($_POST['mail'])||!empty($_POST['age']))
         {
         $this->view->forms = $forms;
         $this->view->error = 'Hello M Robot.';
         return;
         }
-        
+
       $adminEmail = MidasLoader::loadModel("Setting")->getValueByName('adminEmail', "journal");
-        
+
       $headers  = "From: ".$adminEmail."\n";
       $from = $forms['email'];
       $message  = Zend_Registry::get('configGlobal')->application->name." Feedback from ".trim($from)."\n\n";
       $message .= "Where: ".$forms['where']."\n";
       $message .= "What happened: ".$forms['what']."\n\n";
       $message .= "System: ".$_SERVER["HTTP_USER_AGENT"]."\n";
-      
+
+      if(strpos($forms['what'], "<a href"))
+        {
+        echo "Please do not send URL in the  problem text area.";
+        exit;
+        }
+
       if(mail($adminEmail, Zend_Registry::get('configGlobal')->application->name, " Feedback", $message, $headers))
-        {  
+        {
         $this->view->error = '<br/>Feedback sent successfully. We will get back to you shortly.<br/>';
         $this->view->sent = 1;
         }

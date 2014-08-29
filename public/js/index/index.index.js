@@ -162,7 +162,7 @@ function searchDatabase(append)
           }
         else if(value.indexOf("with_review") != -1)
           {
-          fullQuery+= "text-journal.has_test_code:true ";
+          fullQuery+= "text-journal.has_reviews:true ";
           }
         else
           {
