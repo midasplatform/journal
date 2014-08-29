@@ -115,7 +115,7 @@ class Journal_HelpController extends Journal_AppController
       $message .= "What happened: ".$forms['what']."\n\n";
       $message .= "System: ".$_SERVER["HTTP_USER_AGENT"]."\n";
 
-      if(strpos($forms['what'], "<a href"))
+      if(strpos($forms['what'], "<a href") !== false)
         {
         echo "Please do not send URL in the  problem text area.";
         exit;
