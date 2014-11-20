@@ -1,19 +1,58 @@
 
 $(document).ready(function(){
     $('#acceptRights').change(function(){
-      $('input[type=submit]').attr('disabled', !$(this).is(':checked'));
+      $('input[type=submit]').attr('disabled', !$(this).is(':checked') || 
+                                            ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
     })
     
     $('#acceptRights').change();
     
+    $('#acceptAttributionPolicy').change(function(){
+      $('input[type=submit]').attr('disabled', ($(this).is(":visible") && !$(this).is(':checked')) || !$('#acceptRights').is(':checked'));
+    })
+    
+    $('#acceptAttributionPolicy').change();
+    
     $('#acceptLicense').change(function(){
       var license = $("#licenseChoice").val();
       $('#hiddenSourceLicense').attr('value', $(this).is(':checked') ? license: 0);
-    })
+      
+      if(license == 1 && $(this).is(':checked'))
+        {
+        $('#acceptAttributionPolicy').show();
+        $('#acceptAttributionPolicyLabel').show();
+        }
+      else
+        {
+        $('#acceptAttributionPolicy').hide();
+        $('#acceptAttributionPolicyLabel').hide();
+        }
+        
+      $('input[type=submit]').attr('disabled', !$('#acceptRights').is(':checked') || 
+                                            ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
+    });
+
     $('#licenseChoice').change(function(){
       var license = $(this).val();
       $('#hiddenSourceLicense').attr('value', $('#acceptLicense').is(':checked') ? license: 0);
-    })
+     
+      if(license == 1 && $('#acceptLicense').is(':checked'))
+        {
+        $('#acceptAttributionPolicy').show();
+        $('#acceptAttributionPolicyLabel').show();
+        }
+      else
+        {
+        $('#acceptAttributionPolicy').hide();
+        $('#acceptAttributionPolicyLabel').hide();
+        }
+        
+      $('input[type=submit]').attr('disabled', !$('#acceptRights').is(':checked') || 
+                                            ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
+      });
+   
+    $('#licenseChoice').change();
+    
     $('#typeFile').change(function(){      
       if($(this).val() == 6)
         {
