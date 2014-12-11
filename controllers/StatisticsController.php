@@ -145,6 +145,23 @@ class Journal_StatisticsController extends Journal_AppController
       $pub['date'] = $revision->getDate();
       $pub['views'] = $resourceDao->getView();;
       $pub['downloads'] = $resourceDao->getDownload();
+
+      $pub['licence'] = "No License Specified";
+      $pub['attribution'] = "No";
+      if($resourceDao->getSourceLicense() == OTJ_SOURCE_LICENSE_APACHE_2)
+        {
+        $pub['licence'] = "Apache 2";
+        $pub['attribution'] = "Yes";
+        }
+      if($resourceDao->getSourceLicense() == OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN)
+        {
+        $pub['licence'] = "Public Domain";
+        }
+      if($resourceDao->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER)
+        {
+        $pub['licence'] = "Other";
+        }
+
       $publications[$pub['title']] = $pub;
       }
     $submitters = array_unique($submitters);

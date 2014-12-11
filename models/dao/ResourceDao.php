@@ -288,13 +288,37 @@ class Journal_ResourceDao extends ItemDao
             ->order('metadatavalue_id  DESC')->limit(1);
 
     $row = $db->fetchRow($sql);
-    $value = "1000";
+    $value = 1000;
     if(isset($row['value']))
       {
       $value = end(explode("/", $row['value']));
       $value = $value + 1;
       }
+
+    // Make sure the value doesn't exist
+    $exist = $this->isHandleExist($baseHandle."/".$value);
+    while($exist == true)
+      {
+      $value++;
+      $exist = $this->isHandleExist($baseHandle."/".$value);
+      }
+
     $this->setHandle($baseHandle."/".$value);
+    }
+
+  function isHandleExist($handle)
+    {
+    $metadataDao = MidasLoader::loadModel('Metadata')->getMetadata(MIDAS_METADATA_TEXT, "journal", "handle");
+    if(!$metadataDao)  $metadataDao = MidasLoader::loadModel('Metadata')->addMetadata(MIDAS_METADATA_TEXT, "journal", "handle", "");
+    $db = Zend_Registry::get('dbAdapter');
+    $sql = $db->select()
+            ->from('metadatavalue')
+            ->where('value  = ?', $handle)
+            ->where('metadata_id  = '.$metadataDao->getKey())
+            ->order('metadatavalue_id  DESC')->limit(1);
+
+    $row = $db->fetchRow($sql);
+    return isset($row['value']);
     }
 
   /** Get Dislcaimer Id

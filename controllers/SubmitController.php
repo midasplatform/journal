@@ -343,7 +343,7 @@ class Journal_SubmitController extends Journal_AppController
             if(is_numeric($type) && $bitstream->getName() == $file->name && (strtotime($bitstream->getDate()) + 5) >= strtotime(date("c")))
               {
               MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstream, $type);
-              
+
               if($type == BITSTREAM_TYPE_SOURCECODE || $type == BITSTREAM_TYPE_SOURCECODE_GITHUB)
                 {
                 $resourceDao->setHasCode();

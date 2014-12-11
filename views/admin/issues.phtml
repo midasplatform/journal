@@ -20,21 +20,21 @@
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/admin/admin.issues.js');
 ?>
 
-<div >   
+<div >
   <br/>
   <div align="center">
     <font size="+1"><strong>Manage Journals and Issues</strong>
     </font>
   </div>
-  <br/>   
-  
-  <?php 
+  <br/>
+
+  <?php
   if($this->isAdmin)
     {
     echo '<a class="createCommunity">Create Journal</a>';
     }
     ?>
-  
+
   <h4>Journals (also called communities):</h4>
   <ul>
     <?php
@@ -42,8 +42,9 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
       {
       $isEditor = $this->isAdmin
               || !MidasLoader::loadModel('Group')->userInGroup($this->userDao, $community->getAdminGroup());
-      
+
       $adminGroup = $community->getAdminGroup();
+      if(!$adminGroup) continue;
 
       echo "<li style='margin-bottom:10px;'>".$community->getName();
       if($this->isAdmin)

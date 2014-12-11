@@ -26,13 +26,13 @@ class Journal_ViewController extends Journal_AppController
     if(isset($actionName) && is_numeric($actionName))
       {
       $this->_forward('index', null, null, array('revisionId' => $actionName));
-      }      
-    parent::init();   
-    }    
-        
+      }
+    parent::init();
+    }
+
   /** List all the journals */
   function journalsAction()
-    {  
+    {
     $communities = MidasLoader::loadModel("Community")->getAll();
     foreach($communities as $key => $community)
       {
@@ -42,22 +42,22 @@ class Journal_ViewController extends Journal_AppController
         }
       }
     $this->view->communities = $communities;
-    }    
-    
+    }
+
   /** Show issue information (ajax) */
   function issueAction()
     {
     $this->disableLayout();
-    $folderId = $this->_getParam('folderId');  
+    $folderId = $this->_getParam('folderId');
     $folder = MidasLoader::loadModel("Folder")->load($folderId);
     $this->view->issue = MidasLoader::loadModel("Folder")->initDao("Issue", $folder->toArray(), "journal");
     }
-    
+
   function biglogoAction()
     {
     $this->_forward("logo", "view", "journal", array('revisionId' => $_GET['revisionId'], 'size' => 300));
     }
-    
+
   function logoAction()
     {
     $revisionId = $this->_getParam("revisionId");
@@ -72,7 +72,7 @@ class Journal_ViewController extends Journal_AppController
       {
       throw new Zend_Exception("This item doesn't exist.", 404);
       }
-    $itemDao = $revisionDao->getItem();    
+    $itemDao = $revisionDao->getItem();
     if(!MidasLoader::loadModel("Item")->policyCheck($itemDao, $this->userSession->Dao, MIDAS_POLICY_READ))
       {
       throw new Zend_Exception('Read permission required', 403);
@@ -82,7 +82,7 @@ class Journal_ViewController extends Journal_AppController
     $this->disableView();
     header('Content-Type: image/jpeg');
     header("Content-Disposition: attachment; filename=journal_".$revisionId.".jpg");
-      
+
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $resourceDao->setRevision($revisionDao);
     $logo = $resourceDao->getLogo();
@@ -97,7 +97,7 @@ class Journal_ViewController extends Journal_AppController
       $extension = strtolower(end(explode(".", $logo->getName())));
       switch ( $extension ) {
         case "jpg":
-        case "peg": 
+        case "peg":
           $img_src_resource = imagecreatefromjpeg($logo->getFullPath());
           break;
         case "gif":
@@ -111,7 +111,7 @@ class Journal_ViewController extends Journal_AppController
         }
       list ($x, $y) = getimagesize($logo->getFullPath());  //--- get size of img ---
       }
-    
+
     if(isset($size) && is_numeric($size)) $thumb = $size;
     else $thumb = 50;  //--- max. size of thumb ---
     if($x > $y)
@@ -132,7 +132,7 @@ class Journal_ViewController extends Journal_AppController
     ob_end_clean; // stop this output buffer
     exit;
     }
-    
+
   /** Display a resource*/
   function indexAction()
     {
@@ -144,24 +144,24 @@ class Journal_ViewController extends Journal_AppController
     $revisionDao = MidasLoader::loadModel("ItemRevision")->load($revisionId);
     if($revisionDao === false)
       {
-      $this->disableView();      
+      $this->disableView();
       echo "<br/><b>The requested article doesn't exist.</b>";
       return;
       }
-    $itemDao = $revisionDao->getItem();    
+    $itemDao = $revisionDao->getItem();
     if(!MidasLoader::loadModel("Item")->policyCheck($itemDao, $this->userSession->Dao, MIDAS_POLICY_READ))
       {
       echo "<br/><b>This is a restricted content. This page cannot be shared or accessed directly.</b>";
       $this->disableView();
       return;
-      }     
-      
+      }
+
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
     $resourceDao->setRevision($revisionDao);
     $issue = end($resourceDao->getFolders());
     $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot( $issue));
     $memberGroup = $community->getMemberGroup();
-    
+
     // Check if public or private (If private, it means it requires approval
     $private = true;
     $isApproved = false;
@@ -176,9 +176,9 @@ class Journal_ViewController extends Journal_AppController
         $private = false;
         }
       }
-    
+
     MidasLoader::loadModel("Item")->incrementViewCount($resourceDao);
-    
+
     if(isset($_POST['exportType']))
       {
       $this->disableLayout();
@@ -186,7 +186,7 @@ class Journal_ViewController extends Journal_AppController
       MidasLoader::loadComponent("Export", "journal")->citation($resourceDao, $_POST['exportType']);
       return;
       }
-      
+
     // Try to find paper bitstream
     $bitstreams = $resourceDao->getRevision()->getBitstreams();
     $paper = false;
@@ -199,10 +199,10 @@ class Journal_ViewController extends Journal_AppController
         break;
         }
       }
-      
+
     $oldWebsiteId = $resourceDao->getMetaDataByQualifier("old_id");
     $this->view->hasOldReview = false;
-    $this->view->oldWebsiteUrl = false;    
+    $this->view->oldWebsiteUrl = false;
     if($oldWebsiteId)
       {
       $oldWebsiteUrl = MidasLoader::loadModel("Setting")->getValueByName('oldWebsiteUrl', "journal");
@@ -214,7 +214,7 @@ class Journal_ViewController extends Journal_AppController
         $this->view->hasOldReview = $hasOldReview != false;
         }
       }
-      
+
     // Send resource to the view
     $this->view->title .= ' - '.$resourceDao->getName();
     $this->view->metaDescription = substr($resourceDao->getDescription(), 0, 160);
@@ -240,5 +240,5 @@ class Journal_ViewController extends Journal_AppController
     $this->view->json['item']['isModerator'] = $this->view->isModerator;
     $this->view->json['modules'] = Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_VIEW_JSON', array('item' => $itemDao));
     }
-    
+
 }//end class

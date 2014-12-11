@@ -54,6 +54,8 @@ PURPOSE.  See the above copyright notices for more information.
 <table style="width:98%;">
   <thead>
     <th>Title</th>
+    <th>License</th>
+    <th>Attribution Policy</th>
     <th>Date</th>
     <th>Views</th>
     <th>Downloads</th>
@@ -64,6 +66,8 @@ PURPOSE.  See the above copyright notices for more information.
       {
       echo "<tr>";
       echo "<td><a href=\"".$this->webroot."browse/publication/".$pub['id']."\" target='_blank'>".$pub['title']."</a></td>";
+      echo "<td>".$pub['licence']."</td>";
+      echo "<td>".$pub['attribution']."</td>";
       echo "<td>".substr($pub['date'], 0, 10)."</td>";
       echo "<td>".$pub['views']."</td>";
       echo "<td>".$pub['downloads']."</td>";
