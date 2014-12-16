@@ -8,6 +8,9 @@ $(document).ready(function(){
     $('#acceptRights').change();
     
     $('#acceptAttributionPolicy').change(function(){
+      var acceptAttributionPolicyIsSelected = $(this).is(":visible") && $(this).is(':checked');
+      $('#hiddenAttributionPolicy').attr('value', acceptAttributionPolicyIsSelected ? 1 : 0);
+
       $('input[type=submit]').attr('disabled', ($(this).is(":visible") && !$(this).is(':checked')) || !$('#acceptRights').is(':checked'));
     })
     
@@ -16,7 +19,7 @@ $(document).ready(function(){
     $('#acceptLicense').change(function(){
       var license = $("#licenseChoice").val();
       $('#hiddenSourceLicense').attr('value', $(this).is(':checked') ? license: 0);
-      
+
       if(license == 1 && $(this).is(':checked'))
         {
         $('#acceptAttributionPolicy').show();
@@ -27,7 +30,10 @@ $(document).ready(function(){
         $('#acceptAttributionPolicy').hide();
         $('#acceptAttributionPolicyLabel').hide();
         }
-        
+
+      var acceptAttributionPolicyIsSelected = $('#acceptAttributionPolicy').is(":visible") && $('#acceptAttributionPolicy').is(':checked');
+      $('#hiddenAttributionPolicy').attr('value', acceptAttributionPolicyIsSelected ? 1 : 0);
+
       $('input[type=submit]').attr('disabled', !$('#acceptRights').is(':checked') || 
                                             ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
     });
@@ -35,7 +41,7 @@ $(document).ready(function(){
     $('#licenseChoice').change(function(){
       var license = $(this).val();
       $('#hiddenSourceLicense').attr('value', $('#acceptLicense').is(':checked') ? license: 0);
-     
+
       if(license == 1 && $('#acceptLicense').is(':checked'))
         {
         $('#acceptAttributionPolicy').show();
@@ -46,7 +52,10 @@ $(document).ready(function(){
         $('#acceptAttributionPolicy').hide();
         $('#acceptAttributionPolicyLabel').hide();
         }
-        
+
+      var acceptAttributionPolicyIsSelected = $('#acceptAttributionPolicy').is(":visible") && $('#acceptAttributionPolicy').is(':checked');
+      $('#hiddenAttributionPolicy').attr('value', acceptAttributionPolicyIsSelected ? 1 : 0);
+
       $('input[type=submit]').attr('disabled', !$('#acceptRights').is(':checked') || 
                                             ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
       });
