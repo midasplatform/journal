@@ -50,11 +50,43 @@ class Journal_NotificationComponent extends AppComponent
     $this->getLogger()->debug("editList is " . $editList);
     $name = $resourceDao->getName();
     $description = $resourceDao->getDescription();
+    $sourceLicense = $resourceDao->getSourceLicense();
+    $attributionPolicy = $resourceDao->getAgreedAttributionPolicy();
     $handle = $resourceDao->getHandle();
     $authors = $resourceDao->getAuthors();
     $itemId = $resourceDao->getItemId();
     $revisionId = $resourceDao->getRevision()->itemrevision_id;
     $authList = '';
+
+    if(!empty($sourceLicense))
+      {
+      switch (intval($sourceLicense))
+        {
+        case 1:
+          $license = "Apache 2";
+          break;
+        case 2:
+          $license = "Public Domain";
+          break;
+        case 3:
+          $license = "Other";
+          break;
+        }
+      }
+    else
+      {
+      $license = "No License Specified";
+      }
+
+    if ($attributionPolicy == 1)
+      {
+      $attributionPolicy = "Yes";
+      }
+    else
+      {
+      $attributionPolicy = "No";
+      }
+
     foreach ($authors as $author)
       {
       $authList .= join(" ", $author) . ",";
@@ -64,6 +96,8 @@ class Journal_NotificationComponent extends AppComponent
     $this->_view->assign("name", $name);
     $this->_view->assign("author", $authList);
     $this->_view->assign("description", $description);
+    $this->_view->assign("license", $license);
+    $this->_view->assign("attributionPolicy", $attributionPolicy);
     $this->_view->assign("link", $approveLink);
     $this->_layout->assign("content", $this->_view->render('sendforapproval.phtml'));
     $bodyText = $this->_layout->render('layout.phtml');

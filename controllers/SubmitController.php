@@ -379,6 +379,15 @@ class Journal_SubmitController extends Journal_AppController
         }
       if(isset($_POST['finish']))
         {
+        if (isset($_POST['source-license']))
+          {
+          $resourceDao->setSourceLicense($_POST['source-license']);
+          }
+        if (isset($_POST['attribution-policy']))
+          {
+          $resourceDao->setAgreedAttributionPolicy($_POST['attribution-policy']);
+          }
+
         if($private && $resourceDao->isAdmin($this->userSession->Dao)) // Approve
           {
           $resourceDao->setApprovalStatus(0);
@@ -402,10 +411,6 @@ class Journal_SubmitController extends Journal_AppController
           {
           $resourceDao->setApprovalStatus(1);
           MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao, $this->userSession->Dao);
-          }
-        if (isset($_POST['source-license']))
-          {
-          $resourceDao->setSourceLicense($_POST['source-license']);
           }
         $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
         return;

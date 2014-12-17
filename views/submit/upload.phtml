@@ -158,5 +158,7 @@ I have the right to distribute these files
 
       <input name="source-license" type="hidden" id="hiddenSourceLicense"
              value='<?php if ($this->resource->getSourceLicense()) echo $this->resource->getSourceLicense(); else echo 0 ?>'/>
+      <input name="attribution-policy" type="hidden" id="hiddenAttributionPolicy"
+             value='<?php if ($this->resource->getAgreedAttributionPolicy()) echo $this->resource->getAgreedAttributionPolicy(); else echo 0 ?>'/>
   </form>
 </div>

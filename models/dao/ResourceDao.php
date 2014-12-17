@@ -270,6 +270,26 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("source_license", $handle);
     }
 
+  /** Get Agreed to Attribution Policy
+   *  1 = agreed
+   *  0 = not agreed (or not applicable)
+   * @return
+   */
+  function getAgreedAttributionPolicy()
+    {
+    $metadata = $this->getMetaDataByQualifier("attribution_policy");
+    if(!$metadata) return 0;
+    return $metadata->getValue();
+    }
+
+   /* Set Agreed to Attribution Policy
+   * @param
+   */
+  function setAgreedAttributionPolicy($status)
+    {
+    $this->setMetaDataByQualifier("attribution_policy", $status);
+    }
+
 
   /** Generate new handle */
   function initHandle()
