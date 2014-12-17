@@ -62,8 +62,10 @@ PURPOSE.  See the above copyright notices for more information.
   </thead>
   <tbody>
     <?php
+    $showNaMessage = false;
     foreach($this->publications as $pub)
       {
+      if($pub['licence'] == "N/A*") $showNaMessage = true;
       echo "<tr>";
       echo "<td><a href=\"".$this->webroot."browse/publication/".$pub['id']."\" target='_blank'>".$pub['title']."</a></td>";
       echo "<td>".$pub['licence']."</td>";
@@ -76,5 +78,8 @@ PURPOSE.  See the above copyright notices for more information.
     ?>
   </tbody>
 </table>
-
+<?php
+if($showNaMessage)
+  echo "<br/><i>*The information is not unavailable. The option was added on  December 1, 2014.</i>";
+?>
 </div>
