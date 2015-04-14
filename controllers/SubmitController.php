@@ -81,8 +81,7 @@ class Journal_SubmitController extends Journal_AppController
       $item = $revision->getItem();
       $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
       $resourceDao->setRevision($revision);
-      if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE) ||
-              !$resourceDao->isAdmin($this->userSession->Dao))
+      if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE) )
         {
         throw new Zend_Exception("Permissions error.");
         }

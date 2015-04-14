@@ -36,16 +36,16 @@ class Journal_Notification extends ApiEnabled_Notification
     $this->addCallBack('CALLBACK_COMMENTS_ADDED_COMMENT', 'commentAdded');
     $this->addCallBack('CALLBACK_REVIEW_ADDED', 'reviewAdded');
     }//end init
-    
+
   /** Update sitemap.xml */
   public function updateSitemap($param)
     {
     MidasLoader::loadComponent("Sitemap", "journal")->generate();
     }
-    
+
   /** Backup github*/
   public function processGithub($param)
-    {   
+    {
     if(isset($param[0]['bitstream_id']))
       {
       $bitstream = MidasLoader::loadModel("Bitstream")->load($param[0]['bitstream_id']);
@@ -57,28 +57,28 @@ class Journal_Notification extends ApiEnabled_Notification
           mkdir("/tmp/journal");
           }
         if(file_exists($zipPath)) unlink($zipPath);
-              
+
         $name = str_replace(".zip", "", $bitstream->getName());
         $return = copy("https://github.com/".$name."/archive/master.zip", $zipPath);
         if($return && file_exists($zipPath))
           {
           $bitstream->setName($bitstream->getName().".zip");
           $bitstream->setPath($zipPath);
-          $bitstream->setChecksum(md5($zipPath));
-          $bitstream->fillPropertiesFromPath();        
+          $bitstream->setChecksum(md5_file($zipPath));
+          $bitstream->fillPropertiesFromPath();
           $assetstoreDao = MidasLoader::loadModel('Assetstore')->getDefault();
           MidasLoader::loadComponent("Upload")->uploadBitstream($bitstream, $assetstoreDao, false);
           MidasLoader::loadModel('Bitstream')->save($bitstream);
-          
+
           $revision = $bitstream->getItemrevision();
           $item = $revision->getItem();
           $item->setSizebytes(MidasLoader::loadModel('ItemRevision')->getSize($revision));
           MidasLoader::loadModel('Item')->save($item);
           }
-        }      
+        }
       }
     }
-    
+
   /**
    * The goal is to convert old account to new ones
    */
@@ -86,7 +86,7 @@ class Journal_Notification extends ApiEnabled_Notification
     {
     $email = $params['email'];
     $password = $params['password'];
-    
+
     $userDao = MidasLoader::loadModel("User")->getByEmail($email);
     if($userDao && $userDao->getSalt() == md5($password))
       {

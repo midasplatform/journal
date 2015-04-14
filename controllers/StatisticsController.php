@@ -146,12 +146,13 @@ class Journal_StatisticsController extends Journal_AppController
       $pub['views'] = $resourceDao->getView();;
       $pub['downloads'] = $resourceDao->getDownload();
 
+      $usLocale = new Zend_Locale('en_US');
       $zDate = new Zend_Date($pub['date']);
-      $refDate = new Zend_Date('2014-12-01 01:00:00');
+      $refDate = new Zend_Date('2014-12-01 01:00:00', $usLocale);
 
       $pub['licence'] = "N/A*";
       $pub['attribution'] = "N/A*";
-      if($zDate->compare($refDate) === 1)
+      if($zDate->getTimestamp() > $refDate->getTimestamp())
         {
         $pub['licence'] = "No License Specified";
         $pub['attribution'] = "No";
@@ -169,6 +170,9 @@ class Journal_StatisticsController extends Journal_AppController
           $pub['licence'] = "Other";
           }
         }
+
+      $pub['licence'] .= " ".$refDate->getTimestamp();
+      $pub['attribution'] .= " ".$zDate->getTimestamp();
 
       $publications[$pub['title']] = $pub;
       }
