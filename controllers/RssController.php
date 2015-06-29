@@ -54,8 +54,15 @@ class Journal_RssController extends Journal_AppController {
         // optional, ignored if atom is used
         'ttl' => 60 * 12,
         'entries' => array());
-    
-    $resources = MidasLoader::loadComponent("Api", "journal")->search(array('limit' => 15, "query" => "text-journal.enable:true" ));
+
+    $defaultCommunity = MidasLoader::loadModel("Setting")->getValueByName('defaultJournal', "journal");
+    $query = "text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )";
+
+    $user = Zend_Registry::get('userSession');
+    $user->Dao = null;
+    Zend_Registry::set('userSession', $user);
+
+    $resources = MidasLoader::loadComponent("Api", "journal")->search(array('limit' => 15, "query" => $query ));
     foreach($resources as $resourceRaw)
       {
       $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", MidasLoader::loadModel("Item")->load($resourceRaw['id'])->toArray(), "journal");
@@ -68,9 +75,9 @@ class Journal_RssController extends Journal_AppController {
                   // required, only text, no html
                   'description' => $resourceRaw['description'],
                   // optional
-                  'guid' => $resourceRaw['id'],               
+                  'guid' => $resourceRaw['id'],
                   // optional
-                  'lastUpdate' => strtotime($resourceDao->getRevision()->getDate()),                 
+                  'lastUpdate' => strtotime($resourceDao->getRevision()->getDate()),
                   // optional, list of the attached categories
                   'category' => array(
                       array(
