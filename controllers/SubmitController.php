@@ -95,7 +95,6 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao = MidasLoader::newDao('ResourceDao', 'journal');
       $resourceDao->setRevision("New");
       $isNewRevision = true;
-      $resourceDao->setSubmitter($this->userSession->Dao);
       $folder = MidasLoader::loadModel("Folder")->load($issueId);
       if(!$folder)throw new Zend_Exception("Unable to find issuse.");
       $this->view->json['showlicence'] = 1;
