@@ -198,12 +198,31 @@ class Journal_ResourceDao extends ItemDao
     return $metadata->getValue();
     }
 
-   /* Set Institution
+   /* Set Certification level
    * @param
    */
   function setCertificationLevel($handle)
     {
     $this->setMetaDataByQualifier("certification_level", $handle);
+    }
+
+    /** Get Submission type
+   *
+   * @return
+   */
+  function getSubmissionType()
+    {
+    $metadata = $this->getMetaDataByQualifier("submission_type");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Submission type
+   * @param
+   */
+  function setSubmissionType($handle)
+    {
+    $this->setMetaDataByQualifier("submission_type", $handle);
     }
 
    /* Set Has reviews

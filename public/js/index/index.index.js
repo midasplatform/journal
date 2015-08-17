@@ -148,6 +148,10 @@ function searchDatabase(append)
           {
           fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";
           }
+        else if(value.indexOf("submission_type") != -1)
+          {
+          fullQuery+= "text-journal.submission_type:"+value.charAt(value.length - 1)+" ";
+          }
         else if(value.indexOf("code_in_flight") != -1)
           {
           fullQuery+= "name:\"Code in Flight\" ";
