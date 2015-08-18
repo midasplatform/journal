@@ -38,9 +38,17 @@ class Reviewosehra_AdminController extends Reviewosehra_AppController
         $value = "";
         }
       $resourceDao->setCertificationLevel($value);
+
+      $value = $_POST['submissionType'];
+      if(!isset($_POST['submissionType']) || $_POST['submissionType'] == -1 || empty($_POST['submissionType']))
+        {
+        $value = "";
+        }
+      $resourceDao->setSubmissionType($value);
+
       MidasLoader::loadModel("Item")->save($resourceDao);
       }
-      
+
     $reviewsByRevisions = array();
     $revisions = $itemDao->getRevisions();
     foreach($revisions as $revision)
