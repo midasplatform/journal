@@ -79,6 +79,16 @@ class Journal_TreeComponent extends AppComponent
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "With testing code", 'key' => "with_test_code",
                 'children' => array())
             ));
+
+      $core=OSEHRAREVIEW_TYPE_CORE;
+      $component=OSEHRAREVIEW_TYPE_COMPONENT;
+      $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "OSEHRA VistA", 'key' => -1,
+            'children' => array(
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Core", 'key' => "submission_type-$core",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified Component", 'key' => "submission_type-$component",
+                'children' => array())
+            ));
       }
     return $trees;
     }
