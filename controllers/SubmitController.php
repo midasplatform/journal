@@ -418,6 +418,10 @@ class Journal_SubmitController extends Journal_AppController
           $resourceDao->setApprovalStatus(1);
           MidasLoader::loadComponent("Notification", "journal")->sendForApproval($resourceDao, $this->userSession->Dao);
           }
+        elseif($_POST['send-email'])  // Edited or new revision
+          {
+          MidasLoader::loadComponent("Notification", "journal")->updatedArticle($resourceDao);
+          }
         $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
         return;
         }
