@@ -17,7 +17,6 @@
  *
  *=========================================================================*/
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/jquery-share/jquery.share.js');
-$this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.pack.js');
 $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public/js/view/view.index.js');
 
 $cssArray = Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_VIEW_CSS', array('item' => $this->resource));
@@ -40,23 +39,14 @@ foreach ($cssArray as $module => $list)
 ?>
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/css/view/view.index.css" rel="stylesheet" />
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/jquery-share/jquery.share.css" rel="stylesheet" />
-<LINK rel="stylesheet" type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/fancyapp/source/jquery.fancybox.css">
 <div class="ContentWithRightPanel">
   <div class="Panel">
 
 
     <h4>Resources</h4>
     <ul>
-      <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download All</a>
-        (<?php echo MidasLoader::loadComponent("Utility")->formatSize($this->resource->getSizebytes()); ?>)</li>
+      <?php echo "<li><a href='" . $this->webroot . "/journal/view/download?revisionId=" . $this->resource->getRevision()->getKey() . "'>Download</a></li>"; ?>
       <?php
-      if($this->paper)
-        {
-        ?>
-      <li><a href="<?php echo $this->webroot ?>/download?bitstream=<?php echo $this->paper->getKey() ?>">Download Paper</a>
-      </li>
-      <?php
-        }
       $github = $this->resource->getGithub();
       if(!empty($github))
         {
@@ -282,25 +272,3 @@ foreach ($cssArray as $module => $list)
     ?>
   </div>
 </div>
-
-
-<?php
-if($this->resource->getDisclaimer() != -1)
-  {
-  $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($this->resource->getDisclaimer());
-  if($disclaimer)
-    {
-    echo '<div id="disclaimerWrapper" style="display:none;width:700px;"><h4>Disclaimer</h4>';
-    echo "<pre>".$disclaimer->getDescription().'</pre>';
-    echo "<br>
-      <table style='width:140px;margin:auto;'>
-        <tbody><tr>
-           <td> <a href='#' onclick='$.fancybox.close();'>Agree</a></td>
-              <td>|</td>
-               <td><div align='center'><a href='".$this->webroot."/journal'>Decline</a></div></td>
-
-          </tr>
-        </tbody></table>";
-    echo "</div>";
-    }
-  }

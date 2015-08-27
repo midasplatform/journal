@@ -5,18 +5,6 @@ $(document).ready(function(){
     return confirm("You are about to be redirected to an archive version. The content may not be accurate.");
   })
   
-  if($('#disclaimerWrapper').length != 0)
-  {
-    $.fancybox.open([
-    {
-      href : '#disclaimerWrapper',
-      closeBtn:false,
-      keys : {
-        close  : null
-      }
-    }]);
-  }
-  
   $("#revisionSelector").change(function(){
     window.location.href = json.global.webroot+"/journal/view/"+$(this).val();
   })
