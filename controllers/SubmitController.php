@@ -56,7 +56,7 @@ class Journal_SubmitController extends Journal_AppController
     $item_id = $this->_getParam('itemId');
     $revision_id = $this->_getParam('revisionId');
     $issueId = $this->_getParam('issue');
-    $isNewRevision = false;
+    $isNewSubmission = false;
 
     // New Revision
     if(isset($item_id))
@@ -94,7 +94,7 @@ class Journal_SubmitController extends Journal_AppController
       {
       $resourceDao = MidasLoader::newDao('ResourceDao', 'journal');
       $resourceDao->setRevision("New");
-      $isNewRevision = true;
+      $isNewSubmission = true;
       $folder = MidasLoader::loadModel("Folder")->load($issueId);
       if(!$folder)throw new Zend_Exception("Unable to find issuse.");
       $this->view->json['showlicence'] = 1;
@@ -124,7 +124,7 @@ class Journal_SubmitController extends Journal_AppController
         $itemRevisionDao->setLicenseId(null);
         $lastExistingRevision = MidasLoader::loadModel("Item")->getLastRevision($resourceDao);
         MidasLoader::loadModel("Item")->addRevision($resourceDao, $itemRevisionDao);
-        if($lastExistingRevision) // If new revision, copy previous bitstreams
+        if($lastExistingRevision) // If new revision, copy previous data
           {
           $bitstreams = $lastExistingRevision->getBitstreams();
           foreach($bitstreams as $bitstream)
@@ -136,6 +136,20 @@ class Journal_SubmitController extends Journal_AppController
             MidasLoader::loadModel("ItemRevision")->addBitstream($itemRevisionDao, $bitstream);
             MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstream, $type);
             if($type == BITSTREAM_TYPE_THUMBNAIL) $resourceDao->setLogo($bitstream);
+            }
+
+          // Need to copy anything that's not updated on this view
+          $resourceDao->setHandle($resourceDao->getHandle());
+          $resourceDao->setGithub($resourceDao->getGithub());
+          $resourceDao->setSourceLicense($resourceDao->getSourceLicense());
+          $resourceDao->setAgreedAttributionPolicy($resourceDao->getAgreedAttributionPolicy());
+          if ($resourceDao->getHasCode() == "true")
+            {
+            $resourceDao->setHasCode();
+            }
+          if ($resourceDao->getTestHasCode() == "true")
+            {
+            $resourceDao->setTestHasCode();
             }
           }
         }
@@ -161,8 +175,8 @@ class Journal_SubmitController extends Journal_AppController
             }
           }
         }
-        
-      if($isNewRevision)
+
+      if($isNewSubmission)
         {
         $resourceDao->setSubmitter($this->userSession->Dao);
         }
@@ -224,11 +238,6 @@ class Journal_SubmitController extends Journal_AppController
       {
       throw new Zend_Exception("Permissions error.");
       }
-    if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
-      {
-      throw new Zend_Exception("Permissions error.");
-      }
-
     $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $revision->getItem()->toArray(), "journal");
     $resourceDao->setGithub($github);
 
@@ -304,10 +313,6 @@ class Journal_SubmitController extends Journal_AppController
       throw new Zend_Exception("Unable to find revision.");
       }
     $item = $revision->getItem();
-    if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
-      {
-      throw new Zend_Exception("Permissions error.");
-      }
     if(!MidasLoader::loadModel("Item")->policyCheck($item, $this->userSession->Dao, MIDAS_POLICY_WRITE))
       {
       throw new Zend_Exception("Permissions error.");
