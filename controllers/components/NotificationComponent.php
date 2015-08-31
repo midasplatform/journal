@@ -129,7 +129,7 @@ class Journal_NotificationComponent extends AppComponent
     }
 
   /**
-   * This function is being called when a new journal is submitted.
+   * This function is being called when a new journal article is submitted.
    * @TODO send out email to notify author as well as all users that are
    * subscribe to this notification.
    */
@@ -184,6 +184,65 @@ class Journal_NotificationComponent extends AppComponent
     // send mail to the editors
     mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
     }
+
+  /**
+   * This function is being called when a journal article is edited or a
+   * new revision is created.
+   * @TODO send out email to notify author as well as all users that are
+   * subscribe to this notification.
+   */
+  public function updatedArticle($resourceDao)
+    {
+    $this->getLogger()->info("Article is Updated");
+    // @TODO Check user settings, but I do not think it has been implemented yet
+    $fc = Zend_Controller_Front::getInstance();
+    $baseUrl = UtilityComponent::getServerURL().$fc->getBaseUrl();
+    $scriptpath = BASE_PATH . '/privateModules/journal/views/email';
+    $this->_createEmailView($scriptpath, $baseUrl);
+    $submitter = $resourceDao->getSubmitter();
+    $contactEmail = '';
+    if ($submitter)
+      {
+      $contactEmail = $submitter->getEmail();
+      }
+    $this->getLogger()->debug("Contact Email is " . $contactEmail);
+    $name = $resourceDao->getName();
+    $description = $resourceDao->getDescription();
+    $handle = $resourceDao->getHandle();
+    $authors = $resourceDao->getAuthors();
+    $itemId = $resourceDao->getItemId();
+    $revisionId = $resourceDao->getRevision()->itemrevision_id;
+    $authList = '';
+    foreach ($authors as $author)
+      {
+      $authList .= join(" ", $author) . ",";
+      }
+    if (!empty($authList)) $authList = substr($authList, 0, -1);
+    $handleLink = "http://hdl.handle.net/" . $handle;
+    $this->_view->assign("name", $name);
+    $this->_view->assign("author", $authList);
+    $this->_view->assign("description", $description);
+    $this->_view->assign("link", $handleLink);
+    $this->_layout->assign("content", $this->_view->render('updatedsubmission.phtml'));
+    $bodyText = $this->_layout->render('layout.phtml');
+    $this->getLogger()->debug("Body Text is " . $bodyText);
+    $subject = 'Updated Submission: ' . $name;
+    $to = '';
+    $subList = $this->_getNewSubmissionSubscribeList();
+    $editList = $this->_getSubmissionEditorEmails($resourceDao);
+    $adminList = $this->_getSubmissionAdminEmails($resourceDao);
+    $emailLstArray = array($subList, $editList, $adminList);
+    $bccList = $this->_formBccList($emailLstArray);
+    if (!empty($contactEmail))
+      {
+        $bccList .= ',' . $contactEmail; # append contact email to the last.
+      }
+    $headers = $this->_formMailHeader('', null, $bccList);
+    $this->getLogger()->info("Email Header is " . $headers);
+    // send mail to the editors
+    mail($to, $subject, $bodyText, $headers, $this->defaultAdminEmail);
+    }
+
   /**
    * This function is being called whenever a new comments is added to a
    * journal.

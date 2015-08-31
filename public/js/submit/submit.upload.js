@@ -62,6 +62,14 @@ $(document).ready(function(){
    
     $('#licenseChoice').change();
     
+
+    $('#sendNotificationEmail').change(function(){
+      var sendNotificationEmailIsSelected = $(this).is(":visible") && $(this).is(':checked');
+      $('#hiddenSendNotificationEmail').attr('value', sendNotificationEmailIsSelected ? 1 : 0);
+    })
+
+    $('#sendNotificationEmail').change();
+
     $('#typeFile').change(function(){      
       if($(this).val() == 6)
         {

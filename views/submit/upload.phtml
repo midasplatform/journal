@@ -136,6 +136,18 @@ I have the right to distribute these files
     <label style="display:inline;" for="acceptAttributionPolicy" id="acceptAttributionPolicyLabel"> 
       I certify that I have read and followed the <a href="http://www.osehra.org/sites/default/files/TD-04-01_ContributedSoftwareAttributionPolicy.pdf" target="_blank">Contributed Software Attribution Policy</a>.</label>
     <br/>
+    <br/>
+
+    <?php
+    if (!$this->isPrivate) // Has already been approved and published
+      {
+      echo "
+      <input type='checkbox' checked='true' class='checkbox' id='sendNotificationEmail' value='0'>
+      <label style='display:inline;' for='sendNotificationEmail'> Send notification email</label>
+      <br/>
+      <br/>";
+      }
+    ?>
 
     <form action="" method="POST">
       <?php
@@ -161,5 +173,6 @@ I have the right to distribute these files
              value='<?php if ($this->resource->getSourceLicense()) echo $this->resource->getSourceLicense(); else echo 0 ?>'/>
       <input name="attribution-policy" type="hidden" id="hiddenAttributionPolicy"
              value='<?php if ($this->resource->getAgreedAttributionPolicy()) echo $this->resource->getAgreedAttributionPolicy(); else echo 0 ?>'/>
+      <input name="send-email" type="hidden" id="hiddenSendNotificationEmail" value='0'/>
   </form>
 </div>
