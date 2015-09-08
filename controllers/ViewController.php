@@ -44,6 +44,46 @@ class Journal_ViewController extends Journal_AppController
     $this->view->communities = $communities;
     }
 
+    /** List available downloads */
+    function downloadAction()
+      {
+      $revisionId = $this->_getParam("revisionId");
+      if(!isset($revisionId) || !is_numeric($revisionId))
+        {
+        throw new Zend_Exception("revisionId should be a number");
+        }
+      $revisionDao = MidasLoader::loadModel("ItemRevision")->load($revisionId);
+      if($revisionDao === false)
+        {
+        throw new Zend_Exception("This item doesn't exist.", 404);
+        }
+      $itemDao = $revisionDao->getItem();
+      if(!MidasLoader::loadModel("Item")->policyCheck($itemDao, $this->userSession->Dao, MIDAS_POLICY_READ))
+        {
+        throw new Zend_Exception('Read permission required', 403);
+        }
+
+      $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $itemDao->toArray(), "journal");
+      $resourceDao->setRevision($revisionDao);
+
+      // Try to find paper bitstream
+      $bitstreams = $resourceDao->getRevision()->getBitstreams();
+      $paper = false;
+      foreach($bitstreams as $b)
+        {
+        $type = MidasLoader::loadComponent("Bitstream", "journal")->getType($b);
+        if($type == BITSTREAM_TYPE_PAPER)
+          {
+          $paper = $b;
+          break;
+          }
+        }
+
+      $this->view->resource = $resourceDao;
+      $this->view->paper = $paper;
+      }
+
+
   /** Show issue information (ajax) */
   function issueAction()
     {
