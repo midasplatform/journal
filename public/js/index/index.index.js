@@ -127,14 +127,41 @@ function getSelectedCategories()
 function searchDatabase(append)
   {
   var fullQuery = "text-journal.enable:true ";
+
   var query = $('#live_search').val();
-  if(query.indexOf(":") != -1)
+  if(query != "" && query!="Search...")
     {
-    fullQuery += "AND ( "+query+" ) ";
-    }
-  else if(query != "" && query!="Search...")
-    {
-    fullQuery += "AND (name:"+query+" OR description:"+query+") ";
+    var vals = [];
+
+    // Find all the "" pairs
+    var re = /".*"/i;
+    while (true)
+      {
+      var val = query.match(re);
+      if (val == null)
+        {
+        break;
+        }
+      vals = vals.concat(val);
+      query = query.replace(val, '');
+      }
+
+    vals = vals.concat(query.split(" "));
+
+    // Remove any empty values
+    vals = vals.filter(function(val){
+      return val !== "";
+    });
+
+    // Re-construct query
+    query = vals[0];
+    for (i = 1; i < vals.length; i++)
+      {
+      query += " AND ";
+      query += vals[i];
+      }
+
+    fullQuery += "AND (name:("+query+") OR description:("+query+"))";
     }
 
   var categories = getSelectedCategories();
