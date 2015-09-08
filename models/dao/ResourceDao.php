@@ -201,9 +201,9 @@ class Journal_ResourceDao extends ItemDao
    /* Set Certification level
    * @param
    */
-  function setCertificationLevel($handle)
+  function setCertificationLevel($level)
     {
-    $this->setMetaDataByQualifier("certification_level", $handle);
+    $this->setMetaDataByQualifier("certification_level", $level);
     }
 
     /** Get Submission type
@@ -220,9 +220,9 @@ class Journal_ResourceDao extends ItemDao
    /* Set Submission type
    * @param
    */
-  function setSubmissionType($handle)
+  function setSubmissionType($type)
     {
-    $this->setMetaDataByQualifier("submission_type", $handle);
+    $this->setMetaDataByQualifier("submission_type", $type);
     }
 
    /* Set Has reviews
@@ -233,6 +233,17 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("has_reviews", "true");
     }
 
+  /** Get Has code
+   *
+   * @return
+   */
+  function getHasCode()
+    {
+    $metadata = $this->getMetaDataByQualifier("has_code");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
    /* Set Has code
    * @param
    */
@@ -241,7 +252,18 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("has_code", "true");
     }
 
-   /* Set Has code
+  /** Get has test code
+   *
+   * @return
+   */
+  function getTestHasCode()
+    {
+    $metadata = $this->getMetaDataByQualifier("has_test_code");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set has test code
    * @param
    */
   function setTestHasCode()
@@ -284,9 +306,9 @@ class Journal_ResourceDao extends ItemDao
    /* Set source code license
    * @param
    */
-  function setSourceLicense($handle)
+  function setSourceLicense($license)
     {
-    $this->setMetaDataByQualifier("source_license", $handle);
+    $this->setMetaDataByQualifier("source_license", $license);
     }
 
   /** Get Agreed to Attribution Policy
