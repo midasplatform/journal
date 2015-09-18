@@ -68,5 +68,22 @@ class Journal_AppController extends MIDAS_GlobalModule
       }
     $this->view->footerStats = $cache;    
     }
+    
+  function checkProtectedPage()
+    {
+    function casttoclass($class, $object)
+      {
+      return unserialize(preg_replace('/^O:\d+:"[^"]++"/', 'O:' . strlen($class) . ':"' . $class . '"', serialize($object)));
+      }
+
+    require_once BASE_PATH.'/core/models/dao/UserDao.php';
+    $user = new Zend_Session_Namespace('Auth_User');
+    $dao = casttoclass('stdClass', $user->Dao);
+    if($user->Dao == null || $dao->admin != 1)
+      {
+      echo "Access denied.";
+      exit;
+      }
+    }
   
   } //end class
