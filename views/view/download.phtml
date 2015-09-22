@@ -29,8 +29,16 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
   <br/>
   <br/>
   <ul>
+    <?php
+    $size = 0;
+    $bitstreams = $this->resource->getRevision()->getBitstreams();
+    foreach ($bitstreams as $bitstream)
+      {
+      $size += $bitstream->getSizebytes();
+      }
+    ?>
     <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download All</a>
-      (<?php echo MidasLoader::loadComponent("Utility")->formatSize($this->resource->getSizebytes()); ?>)</li>
+      (<?php echo MidasLoader::loadComponent("Utility")->formatSize($size); ?>)</li>
     <?php
     if($this->paper)
       {
