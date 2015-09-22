@@ -7,6 +7,9 @@ $(document).ready(function(){
     {
       href : '#disclaimerWrapper',
       closeBtn:false,
+      helpers: {
+        overlay: {closeClick: false}
+      },
       keys : {
         close  : null
       }
