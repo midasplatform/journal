@@ -179,10 +179,8 @@ class Journal_ResourceDao extends ItemDao
       {
       // If we don't find it in the current revision, we try the first one
       $firstRevision = $this->getModel()->getRevision($this, 1);
-      $currentRevision = $this->getRevision();
-      $this->setRevision($firstRevision);
-      $metadata = $this->getMetaDataByQualifier("handle");
-      $this->setRevision($currentRevision);
+      $metadataArray = MidasLoader::loadModel('ItemRevision')->getMetadata($firstRevision);
+      $metadata = $this->_getMetaDataByQualifier($metadataArray, "handle");
       if(!$metadata)return '';
       }
     return $metadata->getValue();
@@ -602,6 +600,16 @@ class Journal_ResourceDao extends ItemDao
   function getMetaDataByQualifier($type)
     {
     $metadata = $this->getMetadata();
+    return $this->_getMetaDataByQualifier($metadata, $type);
+    }
+    
+  /**
+   * Get Metadata object implementation
+   * @param type $type
+   * @return type
+   */
+  function _getMetaDataByQualifier($metadata, $type)
+    {
     foreach($metadata as $m)
       {
       if($m->getQualifier() == $type)
@@ -611,6 +619,7 @@ class Journal_ResourceDao extends ItemDao
       }
     return false;
     }
+    
   /**
    * Save metadata value
    * @param string $type
