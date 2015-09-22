@@ -175,7 +175,12 @@ class Journal_ResourceDao extends ItemDao
   function getHandle()
     {    
     $metadata = $this->getMetaDataByQualifier("handle");
-    if(!$metadata)
+    $metadataValue = "";
+    if($metadata)
+      {
+      $metadataValue = $metadata->getValue();
+      }
+    if(empty($metadataValue))
       {
       // If we don't find it in the current revision, we try the first one
       $firstRevision = $this->getModel()->getRevision($this, 1);
