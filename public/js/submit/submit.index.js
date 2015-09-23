@@ -7,6 +7,9 @@ $(document).ready(function(){
     {
       href : '#licenseWrapper',
       closeBtn:false,
+      helpers: {
+        overlay: {closeClick: false}
+      },
       keys : {
         close  : null
       }
