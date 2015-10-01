@@ -210,6 +210,17 @@ class Journal_ResourceDao extends ItemDao
     return $metadata->getValue();
     }
 
+  /** Get Certification level searching through every revision
+   *
+   * @return
+   */
+  function getAllCertificationLevel($level)
+    {
+    list($metadata,$revisionID) = $this->getAllMetaDataByQualifier("certification_level",$level);
+    if(!$metadata) return '';
+    return array($metadata->getValue(),$revisionID);
+    }
+
    /* Set Certification level
    * @param
    */
@@ -635,6 +646,44 @@ class Journal_ResourceDao extends ItemDao
     return $this->_getMetaDataByQualifier($metadata, $type);
     }
     
+
+  /**
+   * Get Metadata object
+   * @param type $type
+   * @return array
+   */
+  function getAllMetaDataByQualifier($type,$level)
+    {
+    $lastRevision = $this->getRevision();
+    try {
+       $revisionNum = $lastRevision->getRevision();
+    } catch (Exception $e) {
+       $revisionNum=1;
+    }
+    if($revisionNum >0)
+        {
+        for($i = $revisionNum; $i > 0; $i--)
+            {
+            $searchReturn = '';
+            $revision = $this->getModel()->getRevision($this, $i);
+            if($revision)
+                {
+                $metadata = MidasLoader::loadModel('ItemRevision')->getMetadata($revision);
+                $searchReturn =  $this->_getMetaDataByQualifier($metadata, $type);
+
+                }
+            if($searchReturn)
+              {
+              $test = strpos($level,$searchReturn->getValue());
+              }
+            if($searchReturn && (strpos($level,$searchReturn->getValue()) !== false))
+                {
+                return array($searchReturn,$i);
+                }
+            }
+        }
+    return array(false,0);
+    }
   /**
    * Get Metadata object implementation
    * @param type $type

@@ -42,13 +42,12 @@ class Journal_ApiComponent extends AppComponent
     else  $authComponent = $componentLoader->loadComponent('Authentication');
     $userDao = $authComponent->getUser($args,
                                        Zend_Registry::get('userSession')->Dao);
-    
     $useCache  = !$userDao && "text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query'];  
     $cacheFile = UtilityComponent::getTempDirectory()."/homeSearch.json";
     $limit = array_key_exists('limit', $args) ? (int)$args['limit'] : 25;
     $offset = array_key_exists('offset', $args) ? (int)$args['offset'] : 0;
+    $targetLevel = array_key_exists('level', $args) ? $args['level'] : 0;
     $itemIds = array();
-    
     if($useCache && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
       {
       $itemIds = JsonComponent::decode(file_get_contents($cacheFile));
@@ -64,8 +63,11 @@ class Journal_ApiComponent extends AppComponent
         if($useCache) $factor = 100000; // Get all the ids when creating the cache
         $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
         UtilityComponent::endIgnoreWarnings();
-
         $totalResults = $response->response->numFound;
+        if(!empty($targetLevel))
+          {
+           $response = $index->search("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )", 0, $limit * $factor + $offset, array('fl' => '*,score'));
+          }
         foreach($response->response->docs as $doc)
           {
           $itemIds[] = $doc->key;
@@ -117,7 +119,15 @@ class Journal_ApiComponent extends AppComponent
         $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
         $rating = MidasLoader::loadModel("Itemrating", 'ratings')->getAggregateInfo($item);
         $authors = join(", ", $resourceDao->getAuthorsFullNames());
-        $level = $resourceDao->getCertificationLevel();
+
+        if(strpos($args['query'],'certification_level') !== false)
+          {
+          list($level,$foundRevision) = $resourceDao->getAllCertificationLevel($args['level']);
+          }
+        else
+          {
+          $level = $resourceDao->getCertificationLevel();
+          }
         $isCertified = 0;
         if(!empty($level) && is_numeric($level))
           {
@@ -125,13 +135,16 @@ class Journal_ApiComponent extends AppComponent
           }
 
         $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
-        $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
+        if($targetLevel == 0 || (strpos($targetLevel,$level) !== false))
+          {
+          $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
             'rating' => (float)$rating['average'], 'type' => $item->getType(), 'logo' => $resourceDao->getLogo(),
             'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
             'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
-            'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, "certifiedLevel" => $level);
+            'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'revisionID' => $foundRevision, "certifiedLevel" => $level);
 
-        $count++;
+          $count++;
+          }
         if($count >= $limit)
           {
           break;
