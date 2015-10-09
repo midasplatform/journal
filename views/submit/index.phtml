@@ -124,7 +124,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
         <tr>
           <td>
             <select name="type" data-required="true">
-              <option value="<?php echo RESOURCE_TYPE_NOT_DEFINED ?>" <?php if ($this->resource->getType() == RESOURCE_TYPE_NOT_DEFINED) echo "selected"; ?>></option>
+              <option value="<?php echo RESOURCE_TYPE_NOT_DEFINED ?>" <?php if ($this->resource->getType() == RESOURCE_TYPE_NOT_DEFINED) echo "selected"; ?>>General</option>
               <option value="<?php echo RESOURCE_TYPE_SOFTWARE ?>" <?php if ($this->resource->getType() == RESOURCE_TYPE_SOFTWARE) echo "selected"; ?>>Software</option>
               <option value="<?php echo RESOURCE_TYPE_PLUGIN ?>" <?php if ($this->resource->getType() == RESOURCE_TYPE_PLUGIN) echo "selected"; ?>>Plugin</option>
               <option value="<?php echo RESOURCE_TYPE_PUBLICATION ?>" <?php if ($this->resource->getType() == RESOURCE_TYPE_PUBLICATION) echo "selected"; ?>>Publication</option>
