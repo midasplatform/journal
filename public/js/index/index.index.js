@@ -229,11 +229,6 @@ function searchDatabase(append)
           var total = 0;
           if(!append) $('.SearchResults').html("");
           if(!append) $('#noResultElement').show();
-          // Sort in descending order by revisionId so
-          // that newest revisions are displayed first.
-          retVal.data.sort(function (a, b) {
-            return +b.revisionId - +a.revisionId
-          });
           $.each(retVal.data, function(index, value)
           {
           total = value.total;
