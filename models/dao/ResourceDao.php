@@ -508,7 +508,6 @@ class Journal_ResourceDao extends ItemDao
     if($userDao) $this->setMetaDataByQualifier("submitter", $userDao->getKey());
     }
 
-
   /**
    * Get Revision
    * @return ItemRevision
@@ -518,7 +517,6 @@ class Journal_ResourceDao extends ItemDao
     if(!$this->_revision)  $this->_revision = $this->getModel()->getLastRevision($this);
     return $this->_revision;
     }
-
 
   /**
    * Set Revision
@@ -544,6 +542,35 @@ class Journal_ResourceDao extends ItemDao
       else $this->_metadata = MidasLoader::loadModel('ItemRevision')->getMetadata($lastRevision);
       }
     $this->_revision = $revision;
+    }
+
+  /**
+   * Get Revision ID
+   *
+   * @return id
+   */
+  function getRevisionId()
+    {
+    $metadata = $this->getMetaDataByQualifier("revision_id");
+    if(!$metadata)
+      {
+      $id = $this->getRevision()->getKey();
+      $this->setRevisionId($id);
+      return $id;
+      }
+    else
+      {
+      return $metadata->getValue();
+      }
+    }
+
+   /**
+   * Set Revision ID
+   * @param id
+   */
+  function setRevisionId($id)
+    {
+    $this->setMetaDataByQualifier("revision_id", $id);
     }
 
   /**

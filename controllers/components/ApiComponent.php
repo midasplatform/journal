@@ -75,17 +75,36 @@ class Journal_ApiComponent extends AppComponent
         {
         throw new Exception('Syntax error in query ', -1);
         }
-      if($useCache) file_put_contents($cacheFile, JsonComponent::encode($itemIds));
-      }
 
-    sort($itemIds);
-    $itemIds = array_reverse($itemIds);
+      if($useCache)
+        {
+        file_put_contents($cacheFile, JsonComponent::encode($itemIds));
+        }
+      }
 
     $modelLoader = new MIDAS_ModelLoader();
     $itemModel = $modelLoader->loadModel('Item');
+
+    $revisionIds = array();
+    foreach($itemIds as $itemId)
+      {
+      $item = $itemModel->load($itemId);
+      if($item && $itemModel->policyCheck($item, $userDao))
+        {
+        $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
+        $revisionId = $resourceDao->getRevisionId();
+        $revisionIds[$revisionId] = $itemId;
+        }
+      }
+
+    // Sort in descending order by revisionId so
+    // that newest revisions are displayed first.
+    ksort($revisionIds);
+    $revisionIds = array_reverse($revisionIds);
+
     $items = array();
     $count = 0;
-    foreach($itemIds as $itemId)
+    foreach($revisionIds as $revisionId => $itemId)
       {
       if($offset != 0)
         {
@@ -104,11 +123,14 @@ class Journal_ApiComponent extends AppComponent
           {
           $isCertified = 1;
           }
+
         $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
-        $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ), 'rating' => (float)$rating['average'],
-            'type' => $item->getType(), 'logo' => $resourceDao->getLogo(), 'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ), 'authors' => $authors,
-            'view' => $item->getView() ,'downloads' => $item->getDownload(), 'statistics' => $statistics,
-            'revisionId' =>  $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, "certifiedLevel" => $level);
+        $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
+            'rating' => (float)$rating['average'], 'type' => $item->getType(), 'logo' => $resourceDao->getLogo(),
+            'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
+            'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
+            'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, "certifiedLevel" => $level);
+
         $count++;
         if($count >= $limit)
           {

@@ -179,6 +179,7 @@ class Journal_SubmitController extends Journal_AppController
       if($isNewSubmission)
         {
         $resourceDao->setSubmitter($this->userSession->Dao);
+        $resourceDao->setRevisionId($itemRevisionDao->getKey());
         }
 
       $resourceDao->setInstitution($_POST['institution']);
