@@ -191,7 +191,7 @@ class Reviewosehra_SubmitController extends Reviewosehra_AppController
 
     if(isset($returninfo[0]) && $returninfo[0]->size > 0 && isset($upload_handler->filepath) && file_exists($upload_handler->filepath))
       {
-      $userDao = MidasLoader::loadModel("Item")->load($this->userSession->Dao->getKey());
+      $userDao = $this->userSession->Dao;
       $userDao->setAdmin(1);
       $item = MidasLoader::loadComponent("Upload")->createUploadedItem($userDao, $upload_handler->filename,
                                 $upload_handler->filepath, $privateFolder);
