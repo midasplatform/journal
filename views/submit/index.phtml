@@ -13,12 +13,19 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/reviewosehra/p
 
 <h3><?php echo ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW) ? "Peer Review": "Final Review"?></h3>
 <div class="abstract" style="text-align: justify;">
-A peer review is an attestation by a fellow developer or community member that contributed software is useful and of high quality.
-The goal is to ensure that it has a demonstrable and useful function, that it is licensed correctly, that it installs correctly and easily,
-that it is documented, that it is tested and that the tests cover a reasonable portion of the code.
-Please use the topics and questions below as guides as you go through your review.
-In the end, use the OSEHRA Certification Standard Matrix to help you select a "Recommended Certification Level."
-All comments and attachments will be reviewed as part of the certification process and will help guide the final certification level determination.
+  <?php if ($this->listArray['list']['type'] == OSERHAREVIEW_LIST_PEERREVIEW):?>
+    A peer review is an attestation by a fellow developer or community member that contributed software is useful and of high quality.
+    The goal is to ensure that it has a demonstrable and useful function, that it is licensed correctly, that it installs correctly and easily,
+    that it is documented, that it is tested and that the tests cover a reasonable portion of the code.
+    Please use the topics and questions below as guides as you go through your review.
+    In the end, use the OSEHRA Certification Standard Matrix to help you select a "Recommended Certification Level."
+    All comments and attachments will be reviewed as part of the certification process and will help guide the final certification level determination.
+  <?php else:?>
+    A Final Review is a necessary confirmation that all required procedures have been executed and the submission is complete.
+    The topics and questions for the Final Review each correspond to one column of the OSEHRA Certification Standard Matrix and is what will determine the Certification level for the submission.
+    The OSEHRA Certification Level achieved by the submission is the highest level in the Standard Matrix that <b>all</b> questions have achieved.
+    For more details on the criteria for each topic, see the <a href="http://www.osehra.org/sites/default/files/OSEHRA_Certification_Standards_V2.pdf">OSEHRA Certification Standards Document</a>.
+  <?php endif;?>
 </div>
 <div id="certificationWrapper">
   <h4>OSEHRA Certification Standard Matrix:</h4>
