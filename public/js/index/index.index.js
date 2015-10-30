@@ -250,7 +250,7 @@ function ajaxSearch(append,fullQuery,certLevel) {
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'revisionID': value.revisionID})
+            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'pastCertificationID': value.pastCertificationID})
           })
           var shown = $('.resourceLink').length;
           if(total > shown)
@@ -322,9 +322,9 @@ function addAndFormatResult(container, values) {
   else
     {
     var revisionText = ''
-    if(values.revisionID !== "")
+    if(values.pastCertificationID !== "")
       {
-      revisionText = "Revision " + values.revisionID + ": ";
+      revisionText = "Revision " + values.pastCertificationID + ": ";
       }
     newElement.find('.CertifiedLevel').html(revisionText + "(Level "+values.certifiedLevel+")");
     }
