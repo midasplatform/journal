@@ -164,7 +164,22 @@ function searchDatabase(append)
     fullQuery += "AND (name:("+query+") OR description:("+query+"))";
     }
 
+
+  if(selectIssue)
+    {
+    fullQuery+= " AND (";
+    fullQuery+= " text-journal.issue:"+selectIssue+" ";
+    fullQuery+= ")";
+    }
+  if(json.selectedCommunity != "")
+    {
+    fullQuery+= " AND (";
+    fullQuery+= " text-journal.community:"+json.selectedCommunity+" ";
+    fullQuery+= ")";
+    }
+  var allQuery = fullQuery;
   var categories = getSelectedCategories();
+  var certLevel =  [];
   if(categories.length != 0)
     {
     $.each(categories, function(idx, val){
@@ -174,6 +189,7 @@ function searchDatabase(append)
         if(value.indexOf("certified") != -1)
           {
           fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";
+          certLevel.push(value.charAt(value.length - 1));
           }
         else if(value.indexOf("submission_type") != -1)
           {
@@ -204,25 +220,23 @@ function searchDatabase(append)
     });
     }
 
-  if(selectIssue)
-    {
-    fullQuery+= " AND (";
-    fullQuery+= " text-journal.issue:"+selectIssue+" ";
-    fullQuery+= ")";
-    }
-  if(json.selectedCommunity != "")
-    {
-    fullQuery+= " AND (";
-    fullQuery+= " text-journal.community:"+json.selectedCommunity+" ";
-    fullQuery+= ")";
-    }
 
   $('img#searchLoadingImg').show();
+  ajaxSearch(append,fullQuery,certLevel);
+  if(certLevel != 0)
+   {
+   ajaxSearch(append, allQuery,certLevel);
+   }
+}
+
+
+function ajaxSearch(append,fullQuery,certLevel) {
+
   var shown = $('.resourceLink').length;
   if(!append) shown = 0;
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
-        args: "offset="+shown+"&query="+fullQuery,
+        args: "offset="+shown+"&query="+fullQuery+"&level="+certLevel,
         log: true,
         success: function (retVal) {
           $('img#searchLoadingImg').hide();
@@ -236,12 +250,10 @@ function searchDatabase(append)
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel})
+            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'pastCertificationID': value.pastCertificationID})
           })
-
           var shown = $('.resourceLink').length;
-
-          if(total != shown)
+          if(total > shown)
             {
             $('#showMoreResults').show();
             $('#showMoreResults a').unbind('click').click(function(){
@@ -277,7 +289,7 @@ function searchDatabase(append)
         complete: function () {
         }
     });
-  }
+}
 
 /** Simple templating mechanism */
 function addAndFormatResult(container, values) {
@@ -309,7 +321,12 @@ function addAndFormatResult(container, values) {
     }
   else
     {
-    newElement.find('.CertifiedLevel').html("(Level "+values.certifiedLevel+")");
+    var revisionText = ''
+    if(values.pastCertificationID !== "")
+      {
+      revisionText = "Revision " + values.pastCertificationID + ": ";
+      }
+    newElement.find('.CertifiedLevel').html(revisionText + "(Level "+values.certifiedLevel+")");
     }
 
   newElement.find('.ResultDescription').dotdotdot();
