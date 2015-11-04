@@ -177,7 +177,7 @@ function searchDatabase(append)
     fullQuery+= " text-journal.community:"+json.selectedCommunity+" ";
     fullQuery+= ")";
     }
-  var allQuery = fullQuery;
+  var allQuery = '';
   var categories = getSelectedCategories();
   var certLevel =  [];
   if(categories.length != 0)
@@ -219,24 +219,19 @@ function searchDatabase(append)
       fullQuery+= ")";
     });
     }
-
-
+  allQuery= fullQuery.replace(/AND \(text-journal.cer[(text\-journal\.certification\_level:1-4OR ]+ \)/,"")
   $('img#searchLoadingImg').show();
-  ajaxSearch(append,fullQuery,certLevel);
-  if(certLevel != 0)
-   {
-   ajaxSearch(true, allQuery,certLevel);
-   }
+  ajaxSearch(append,fullQuery,allQuery,certLevel);
 }
 
 
-function ajaxSearch(append,fullQuery,certLevel) {
+function ajaxSearch(append,fullQuery,allQuery,certLevel) {
 
   var shown = $('.resourceLink').length;
   if(!append) shown = 0;
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
-        args: "offset="+shown+"&query="+fullQuery+"&level="+certLevel,
+        args: "offset="+shown+"&query="+fullQuery+"&level="+certLevel+"&secondQuery="+allQuery,
         log: true,
         success: function (retVal) {
           $('img#searchLoadingImg').hide();
@@ -302,7 +297,7 @@ function addAndFormatResult(container, values) {
      str = str.replace("{"+key+"}", value);
      }
     );
-    container.append(str);}
+    container.append(str);
     var newElement = $('div.SearchResultEntry:last');
     newElement.find('.ResultTitle').dotdotdot( {'height': 20});
 
