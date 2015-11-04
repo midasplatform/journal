@@ -225,7 +225,7 @@ function searchDatabase(append)
   ajaxSearch(append,fullQuery,certLevel);
   if(certLevel != 0)
    {
-   ajaxSearch(append, allQuery,certLevel);
+   ajaxSearch(true, allQuery,certLevel);
    }
 }
 
@@ -293,42 +293,44 @@ function ajaxSearch(append,fullQuery,certLevel) {
 
 /** Simple templating mechanism */
 function addAndFormatResult(container, values) {
-  var str = document.getElementById('SearchResultTemplate').innerHTML;
-  $.each(values, function(key,value)
-   {
-   str = str.replace("{"+key+"}", value);
-   str = str.replace("{"+key+"}", value);
-   str = str.replace("{"+key+"}", value);
-   }
-  );
-  container.append(str);
-  var newElement = $('div.SearchResultEntry:last');
-  newElement.find('.ResultTitle').dotdotdot( {'height': 20});
+  if (container.html().indexOf(values['title']) == -1) {
+    var str = document.getElementById('SearchResultTemplate').innerHTML;
+    $.each(values, function(key,value)
+     {
+     str = str.replace("{"+key+"}", value);
+     str = str.replace("{"+key+"}", value);
+     str = str.replace("{"+key+"}", value);
+     }
+    );
+    container.append(str);}
+    var newElement = $('div.SearchResultEntry:last');
+    newElement.find('.ResultTitle').dotdotdot( {'height': 20});
 
-  if(values.logo == "")
-    {
-    newElement.find('.ResultLogo:first').remove();
-    }
-  else
-    {
-    newElement.find('.ResultLogo:last').remove();
-    }
-
-  if(values.isCertified == 0)
-    {
-    newElement.find('.CertifiedWrapper').remove();
-    newElement.find('.CertifiedLevel').remove();
-    }
-  else
-    {
-    var revisionText = ''
-    if(values.pastCertificationID !== "")
+    if(values.logo == "")
       {
-      revisionText = "Revision " + values.pastCertificationID + ": ";
+      newElement.find('.ResultLogo:first').remove();
       }
-    newElement.find('.CertifiedLevel').html(revisionText + "(Level "+values.certifiedLevel+")");
-    }
+    else
+      {
+      newElement.find('.ResultLogo:last').remove();
+      }
 
-  newElement.find('.ResultDescription').dotdotdot();
-  return str;
+    if(values.isCertified == 0)
+      {
+      newElement.find('.CertifiedWrapper').remove();
+      newElement.find('.CertifiedLevel').remove();
+      }
+    else
+      {
+      var revisionText = ''
+      if(values.pastCertificationID !== "")
+        {
+        revisionText = "Revision " + values.pastCertificationID + ": ";
+        }
+      newElement.find('.CertifiedLevel').html(revisionText + "(Level "+values.certifiedLevel+")");
+      }
+
+    newElement.find('.ResultDescription').dotdotdot();
+    return str;
+  }
 };
