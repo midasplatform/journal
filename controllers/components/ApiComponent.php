@@ -120,7 +120,7 @@ class Journal_ApiComponent extends AppComponent
         $rating = MidasLoader::loadModel("Itemrating", 'ratings')->getAggregateInfo($item);
         $authors = join(", ", $resourceDao->getAuthorsFullNames());
 
-        if(strpos($args['query'],'certification_level') !== false)
+        if($args['level'] !== '')
           {
           list($level,$foundRevision) = $resourceDao->getAllCertificationLevel($args['level']);
           }
