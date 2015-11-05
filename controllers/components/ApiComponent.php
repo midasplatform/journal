@@ -48,6 +48,7 @@ class Journal_ApiComponent extends AppComponent
     $offset = array_key_exists('offset', $args) ? (int)$args['offset'] : 0;
     $targetLevel = array_key_exists('level', $args) ? $args['level'] : 0;
     $itemIds = array();
+    $totalResults = 0;
     if($useCache && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
       {
       $itemIds = JsonComponent::decode(file_get_contents($cacheFile));
@@ -63,10 +64,13 @@ class Journal_ApiComponent extends AppComponent
         if($useCache) $factor = 100000; // Get all the ids when creating the cache
         $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
         UtilityComponent::endIgnoreWarnings();
-        $totalResults = $response->response->numFound;
+        foreach($response->response->docs as $doc)
+          {
+          $itemIds[] = $doc->key;
+          }
         if(!empty($targetLevel))
           {
-           $response = $index->search("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )", 0, $limit * $factor + $offset, array('fl' => '*,score'));
+          $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
           }
         foreach($response->response->docs as $doc)
           {
@@ -137,6 +141,7 @@ class Journal_ApiComponent extends AppComponent
         $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
         if($targetLevel == 0 || (strpos($targetLevel,$level) !== false))
           {
+          $totalResults++;
           $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
             'rating' => (float)$rating['average'], 'type' => $item->getType(), 'logo' => $resourceDao->getLogo(),
             'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
