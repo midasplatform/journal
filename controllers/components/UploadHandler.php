@@ -235,7 +235,10 @@ class UploadHandler
     // works for sizes up to 2^32-1 bytes (4 GiB - 1):
     protected function fix_integer_overflow($size) {
         if ($size < 0) {
-            $size += 2.0 * (PHP_INT_MAX + 1);
+            // Changed from PHP_INT_MAX of a 64bit to the max size of a 32bit
+            // Likely an issue at
+            // way too magic-number, but it works.
+            $size += 2.0 * (2147483647 + 1);
         }
         return $size;
     }
@@ -420,6 +423,7 @@ class UploadHandler
         $content_length = $this->fix_integer_overflow(intval(
             $this->get_server_var('CONTENT_LENGTH')
         ));
+
         $post_max_size = $this->get_config_bytes(ini_get('post_max_size'));
         if ($post_max_size && ($content_length > $post_max_size)) {
             $file->error = $this->get_error_message('post_max_size');
@@ -707,7 +711,9 @@ class UploadHandler
                 );
             }
             $file_size = $this->get_file_size($file_path, $append_file);
-            if ($file_size === $file->size) {
+            //changed from `===` to `==`, due to change of type when resizing after
+            // the overflow.
+            if ($file_size == $file->size) {
                 $file->url = $this->get_download_url($file->name);
                 list($img_width, $img_height) = @getimagesize($file_path);
                 if (is_int($img_width) &&
