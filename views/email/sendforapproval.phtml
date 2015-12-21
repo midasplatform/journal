@@ -17,7 +17,7 @@
                   <p style="text-align:justify;text-justify:inter-word;">A new submission needs your approval. </p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>Title:</b> <?php echo $this->name ?>. </p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>Authors:</b> <?php echo $this->author ?>. </p>
-                  <p style="text-align:justify;text-justify:inter-word;"><b>Abstract:</b> <?php echo iconv("UTF-8", "ISO-8859-1//TRANSLIT",($this->description)) ?></p>
+                  <p style="text-align:justify;text-justify:inter-word;"><b>Abstract:</b> <?php echo iconv("UTF-8", "ISO-8859-1//TRANSLIT",$this->description) ?></p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>License:</b> <?php echo $this->license ?></p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>Agreed to Contributed Software Attribution Policy:</b> <?php echo $this->attributionPolicy ?></p>
                   <br>
