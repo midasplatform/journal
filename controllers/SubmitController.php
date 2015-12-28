@@ -190,6 +190,7 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao->setTags($_POST['tag']);
       $resourceDao->setRelated($_POST['related']);
       $resourceDao->setGrant($_POST['grant']);
+      $resourceDao->setRevisionNotes($_POST['revisionnotes']);
 
       // Update search index
       Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_SAVED', array(
