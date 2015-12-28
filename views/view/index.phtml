@@ -124,7 +124,7 @@ foreach ($cssArray as $module => $list)
       if(!empty($grant))
         {
         ?>
-        <li>Grand: <?php echo $grant ?></li>
+        <li>Grant: <?php echo $grant ?></li>
       <?php
         }
       $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);

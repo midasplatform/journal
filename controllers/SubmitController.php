@@ -24,7 +24,7 @@ class Journal_SubmitController extends Journal_AppController
 
     }
 
-  /** The first step of the submission process is  to select an issue */
+  /** The first step of the submission process is to select an issue */
   function selectissueAction()
     {
     if(!$this->logged)
@@ -96,7 +96,7 @@ class Journal_SubmitController extends Journal_AppController
       $resourceDao->setRevision("New");
       $isNewSubmission = true;
       $folder = MidasLoader::loadModel("Folder")->load($issueId);
-      if(!$folder)throw new Zend_Exception("Unable to find issuse.");
+      if(!$folder)throw new Zend_Exception("Unable to find issue.");
       $this->view->json['showlicence'] = 1;
       }
 
@@ -153,7 +153,6 @@ class Journal_SubmitController extends Journal_AppController
             }
           }
         }
-
       MidasLoader::loadModel('Folder')->addItem($this->view->issueDao, $resourceDao, false);
       $resourceDao->enable();
 
@@ -325,7 +324,7 @@ class Journal_SubmitController extends Journal_AppController
     $community =  MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot($issue));
     $memberGroup = $community->getMemberGroup();
 
-    // Check if public or private (If private, it means it requires approval
+    // Check if public or private (If private, it means it requires approval)
     $private = true;
     foreach($resourceDao->getItempolicygroup() as $policy)
       {
@@ -435,7 +434,7 @@ class Journal_SubmitController extends Journal_AppController
 
     $submitter = $resourceDao->getSubmitter();
 
-    // sent to theview
+    // sent to the view
     $this->view->isPrivate = $private;
     $this->view->isAdmin = $resourceDao->isAdmin($this->userSession->Dao);
     $this->view->isSubmitter = $submitter && $submitter->getKey() == $this->userSession->Dao->getKey();

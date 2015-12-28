@@ -202,7 +202,7 @@ class Journal_ViewController extends Journal_AppController
     $community = MidasLoader::loadModel("Folder")->getCommunity(MidasLoader::loadModel("Folder")->getRoot( $issue));
     $memberGroup = $community->getMemberGroup();
 
-    // Check if public or private (If private, it means it requires approval
+    // Check if public or private (If private, it means it requires approval)
     $private = true;
     $isApproved = false;
     foreach($resourceDao->getItempolicygroup() as $policy)
@@ -265,7 +265,7 @@ class Journal_ViewController extends Journal_AppController
     $this->view->resource = $resourceDao;
     $this->view->issue =  $issue;
     $this->view->paper = $paper;
-    $this->view->revisions =  $itemDao->getRevisions();;
+    $this->view->revisions =  $itemDao->getRevisions();
     $this->view->community =  $community;
     $this->view->creationDate = MidasLoader::loadComponent("Date")->formatDate(strtotime($resourceDao->getDateCreation()));
     $this->view->termFrequency = file_get_contents("http://localhost:8983/solr/admin/luke?fl=text-journal.tags&wt=json&numTerms=200&reportDocCount=false");
