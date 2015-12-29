@@ -173,7 +173,7 @@ class Journal_ResourceDao extends ItemDao
    * @return
    */
   function getHandle()
-    {    
+    {
     $metadata = $this->getMetaDataByQualifier("handle");
     $metadataValue = "";
     if($metadata)
@@ -229,7 +229,27 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("certification_level", $level);
     }
 
-    /** Get Submission type
+  /** Get Revision Notes
+   *
+   * @return
+   */
+  function getRevisionNotes()
+    {
+    $metadata = $this->getMetaDataByQualifier("revision_notes");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Revision Notes
+   * @param
+   */
+  function setRevisionNotes($notes)
+    {
+    if ($notes == null) $notes = '';
+    $this->setMetaDataByQualifier("revision_notes", $notes);
+    }
+
+   /** Get Submission type
    *
    * @return
    */
@@ -519,6 +539,7 @@ class Journal_ResourceDao extends ItemDao
     if($userDao) $this->setMetaDataByQualifier("submitter", $userDao->getKey());
     }
 
+
   /**
    * Get Revision
    * @return ItemRevision
@@ -528,6 +549,34 @@ class Journal_ResourceDao extends ItemDao
     if(!$this->_revision)  $this->_revision = $this->getModel()->getLastRevision($this);
     return $this->_revision;
     }
+
+   /**
+   * Check if is a revision (i.e. not the original submission, revision number > 1)
+   * @return true or false
+   */
+    function isRevision()
+      {
+      try
+        {
+        $this->getModel()->getRevision($this, 1);  // First, check if any revisions exist
+        }
+      catch(Exception $e)
+        {
+        // New submission, no revisions exist yet
+        return false;
+        }
+
+      try
+        {
+        $revisionNum = $this->getRevision()->getRevision();
+        return $revisionNum != 1;  // Editing existing submission or revision
+        }
+      catch (Exception $e)
+        {
+        // New revision, hasn't been assigned a revision number yet
+        return true;
+        }
+      }
 
   /**
    * Set Revision
@@ -645,7 +694,6 @@ class Journal_ResourceDao extends ItemDao
     $metadata = $this->getMetadata();
     return $this->_getMetaDataByQualifier($metadata, $type);
     }
-    
 
   /**
    * Get Metadata object

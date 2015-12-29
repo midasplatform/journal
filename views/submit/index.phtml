@@ -33,6 +33,37 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
 
     <form action="" method="POST" id="submitForm" data-validate="parsley">
       <table width="100%"  border="0">
+      <?php
+      if ($this->resource->isRevision())
+      {
+      ?>
+        <tr>
+          <td>
+            <div class="submission">
+              <div class="title">Revision Notes <span style="color:#A60000;">*</span></div>
+              <div class="caption"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <?php
+            try
+            {
+              $this->resource->getRevision()->getRevision();    // Check if revision exists...
+              $revisionNotes = $this->resource->getRevisionNotes(); // ... and then get notes.
+            }
+            catch(Exception $e)
+            {
+              $revisionNotes = "";  // New revision,hasn't been assigned a revision number or notes yet
+            }
+            echo '<textarea class="bigInput" data-required="true" name="revisionnotes">'.$revisionNotes.'</textarea>';
+            ?>
+          </td>
+        </tr>
+      <?php
+      }
+      ?>
         <tr>
           <td>
             <div class="submission">
