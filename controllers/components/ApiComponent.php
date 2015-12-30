@@ -60,7 +60,7 @@ class Journal_ApiComponent extends AppComponent
         $index = $solrComponent->getSolrIndex();
         UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
         
-        $factor = 10;        
+        $factor = 10;
         if($useCache) $factor = 100000; // Get all the ids when creating the cache
         $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
         UtilityComponent::endIgnoreWarnings();
@@ -70,6 +70,8 @@ class Journal_ApiComponent extends AppComponent
           }
         if(!empty($targetLevel))
           {
+          // Increase the factor to capture all available submissions for searching the target level
+          $factor = 100000;
           $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
           }
         foreach($response->response->docs as $doc)
