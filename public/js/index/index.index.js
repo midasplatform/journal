@@ -245,7 +245,8 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'pastCertificationID': value.pastCertificationID})
+            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
+            'pastCertificationRevisionKey': value.pastCertificationRevisionKey})
           })
           var shown = $('.resourceLink').length;
           if(total > shown)
@@ -290,6 +291,10 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
 function addAndFormatResult(container, values) {
   if (container.html().indexOf(values['title']) == -1) {
     var str = document.getElementById('SearchResultTemplate').innerHTML;
+      if(values.pastCertificationRevisionKey !== "")
+        {
+        values.id = values.pastCertificationRevisionKey;
+        }
     $.each(values, function(key,value)
      {
      str = str.replace("{"+key+"}", value);
@@ -320,7 +325,7 @@ function addAndFormatResult(container, values) {
       var revisionText = ''
       if(values.pastCertificationID !== "")
         {
-        revisionText = "Revision " + values.pastCertificationID + ": ";
+        revisionText = "Revision " + values.pastCertificationRevisionNum + ": ";
         }
       newElement.find('.CertifiedLevel').html(revisionText + "(Level "+values.certifiedLevel+")");
       }
