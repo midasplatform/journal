@@ -216,9 +216,9 @@ class Journal_ResourceDao extends ItemDao
    */
   function getAllCertificationLevel($level)
     {
-    list($metadata,$revisionID) = $this->getAllMetaDataByQualifier("certification_level",$level);
+    list($metadata,$foundRevisionID,$foundRevisionKey) = $this->getAllMetaDataByQualifier("certification_level",$level);
     if(!$metadata) return '';
-    return array($metadata->getValue(),$revisionID);
+    return array($metadata->getValue(),$foundRevisionID,$foundRevisionKey);
     }
 
    /* Set Certification level
@@ -718,15 +718,10 @@ class Journal_ResourceDao extends ItemDao
                 {
                 $metadata = MidasLoader::loadModel('ItemRevision')->getMetadata($revision);
                 $searchReturn =  $this->_getMetaDataByQualifier($metadata, $type);
-
                 }
-            if($searchReturn)
-              {
-              $test = strpos($level,$searchReturn->getValue());
-              }
             if($searchReturn && (strpos($level,$searchReturn->getValue()) !== false))
                 {
-                return array($searchReturn,$i);
+                return array($searchReturn,$i,$revision->getKey());
                 }
             }
         }

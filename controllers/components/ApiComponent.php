@@ -128,7 +128,7 @@ class Journal_ApiComponent extends AppComponent
 
         if($args['level'] !== '')
           {
-          list($level,$foundRevision) = $resourceDao->getAllCertificationLevel($args['level']);
+          list($level,$foundRevisionID,$foundRevisionKey) = $resourceDao->getAllCertificationLevel($args['level']);
           }
         else
           {
@@ -148,7 +148,8 @@ class Journal_ApiComponent extends AppComponent
             'rating' => (float)$rating['average'], 'type' => $item->getType(), 'logo' => $resourceDao->getLogo(),
             'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
             'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
-            'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'pastCertificationID' => $foundRevision, "certifiedLevel" => $level);
+            'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'pastCertificationRevisionNum' => $foundRevisionID, "certifiedLevel" => $level,
+            'pastCertificationRevisionKey' => $foundRevisionKey);
 
           $count++;
           }
