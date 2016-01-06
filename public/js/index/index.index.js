@@ -323,7 +323,7 @@ function addAndFormatResult(container, values) {
     else
       {
       var revisionText = ''
-      if(values.pastCertificationID !== "")
+      if(values.pastCertificationRevisionNum !== "")
         {
         revisionText = "Revision " + values.pastCertificationRevisionNum + ": ";
         }
