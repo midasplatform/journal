@@ -211,6 +211,7 @@ class Journal_NotificationComponent extends AppComponent
     $handle = $resourceDao->getHandle();
     $authors = $resourceDao->getAuthors();
     $itemId = $resourceDao->getItemId();
+    $revision_notes = $resourceDao->getRevisionNotes();
     $revisionId = $resourceDao->getRevision()->itemrevision_id;
     $authList = '';
     foreach ($authors as $author)
@@ -223,6 +224,7 @@ class Journal_NotificationComponent extends AppComponent
     $this->_view->assign("author", $authList);
     $this->_view->assign("description", $description);
     $this->_view->assign("link", $handleLink);
+    $this->_view->assign("revision_notes", $revision_notes);
     $this->_layout->assign("content", $this->_view->render('updatedsubmission.phtml'));
     $bodyText = $this->_layout->render('layout.phtml');
     $this->getLogger()->debug("Body Text is " . $bodyText);
