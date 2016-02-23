@@ -87,7 +87,7 @@ $(document).ready(function(){
 
 
   // Init instant search
-  $('#live_search').keyup(function(){
+  $('#search_button').click(function(){
       $('#infoElement').hide();
       searchDatabase(false);
     });
