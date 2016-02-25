@@ -92,6 +92,12 @@ $(document).ready(function(){
       searchDatabase(false);
     });
 
+  $('#clear_button').click(function(){
+      $('#infoElement').hide();
+      $('#live_search').val("")
+      searchDatabase(false);
+    });
+
   // Init tree toogle
   $('img.tooggleButton').click(function(){
     var tree = $(this).parent('div.TreeEntry').find('div.categoryTree');

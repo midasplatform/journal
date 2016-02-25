@@ -291,10 +291,12 @@ echo $this->doctype()
 
      
     <div class="HeaderSearch">
-          <input type="button" class="" id="search_button" value="Search"/>
+
           <input type="text" class="panelsBackground" id="live_search" value="<?php echo (isset($this->query))? $this->query:'Search...'; ?>" autocomplete="off" autocorrect="off" autocapitalize="off" />
           <input type="hidden" id="live_search_value" value="init"  />
           <div id="searchloading" style="display:none"></div>
+          <input type="button" class="" id="search_button" value="Search"/>
+          <input type="button" class="" id="clear_button" value="Clear"/>
     </div>
   </div>
         
