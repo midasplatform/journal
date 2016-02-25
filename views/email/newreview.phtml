@@ -14,7 +14,7 @@
                 <div>
                   <br>
                   <p style="text-align:justify;text-justify:inter-word;">Hello,</p>
-                  <p style="text-align:justify;text-justify:inter-word;">A new review has beed added to OSEHRA Technical Journal submission: <?php echo $this->title?>.</p>
+                  <p style="text-align:justify;text-justify:inter-word;">A new review has beed added to OSEHRA Technical Journal submission: <?php echo iconv("UTF-8", "ISO-8859-1//TRANSLIT",$this->title) ?>.</p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>Reviewed By:</b> <?php echo $this->name ?>. </p>
                   <br>
                   <p style="text-align:justify;text-justify:inter-word;">You can see the detail of the review
