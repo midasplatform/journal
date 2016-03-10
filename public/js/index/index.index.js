@@ -167,7 +167,7 @@ function searchDatabase(append)
       query += vals[i];
       }
 
-    fullQuery += "AND (name:("+query+") OR description:("+query+"))";
+    fullQuery += "AND (name:("+query+") OR description:("+query+") OR ngram_search:("+query+"))";
     }
 
 
