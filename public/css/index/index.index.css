@@ -130,6 +130,7 @@ div.SearchResultEntry:hover{
 
 div#infoElement{
   height:90px;
+  min-width: 450px;
   overflow-x: hidden;
   overflow-y: hidden;
   -webkit-box-shadow: #AAA 0 0 3px;

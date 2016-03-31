@@ -197,7 +197,7 @@ echo $this->doctype()
         
            </div>
         </div>
-          <div id="topbar"><ul id="Nav" class="nav"><li id='browseLink'><a href="<?php echo $this->webroot ?>/journal">Home</a></li>
+          <div id="topbar"><ul id="Nav" class="nav navbar-nav"><li id='browseLink'><a href="<?php echo $this->webroot ?>/journal">Home</a></li>
 
            <li>
              <a  href="<?php echo $this->webroot."/journal/view/journals"?>">Journal</a>
@@ -290,7 +290,7 @@ echo $this->doctype()
           </ul>
 
      
-    <div class="HeaderSearch">
+    <div class="HeaderSearch nav navbar-nav navbar-right">
 
           <input type="text" class="panelsBackground" id="live_search" value="<?php echo (isset($this->query))? $this->query:'Search...'; ?>" autocomplete="off" autocorrect="off" autocapitalize="off" />
           <input type="hidden" id="live_search_value" value="init"  />
