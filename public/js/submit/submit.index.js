@@ -1,6 +1,8 @@
 // When page ready
 $(document).ready(function(){
   
+  var claFlag = false;
+  var perFlag = false;
   if(json.showlicence == 1)
   {
     $.fancybox.open([
@@ -21,6 +23,18 @@ $(document).ready(function(){
     $('#disclaimer_description_'+$(this).val()).show();    
   })
    
+
+  $('input[type="radio"').on('click', function(e)
+  {
+    if ( e.target.id == "PubClaNo") { claFlag = false; }
+    else if( e.target.id == "PubClaYes" || e.target.id == "PubClaInd"){claFlag = true; }
+
+    if ( e.target.id == "PubPermissionsNo") { perFlag = false; }
+    else if( e.target.id == "PubPermissionsYes"){perFlag = true;}
+
+    $('input[type=submit]').attr('disabled', !perFlag || !claFlag);
+  });
+
   $("#authors").dynamiclist();
   $("#tags").dynamiclist();
 
