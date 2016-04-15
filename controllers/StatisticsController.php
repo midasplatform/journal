@@ -30,16 +30,23 @@ class Journal_StatisticsController extends Journal_AppController
 
     $byMonth = array();
     $publications = array();
+    $quarterStats = array();
     for($i = 1; $i < 13; $i++)
       {
       $tmpData = $date."-".(($i < 10)? "0".$i:$i );
-      $byMonth[$i] = $this->getPubliations($tmpData);
+      $byMonth[$i] = $this->getPublications($tmpData);
       $publications = array_merge($publications, $byMonth[$i][3]);
       $byMonth[$i][3] = $this->getDownloads($tmpData);
+      }
+    for($i = 1; $i < 13; $i=$i+3)
+      {
+      $tmpData = (($i < 10)? "0".$i:$i );
+      $quarterStats[$i]= $this->getTopDownloads($date, $tmpData);
       }
 
     ksort($publications);
     $this->view->publications = $publications;
+    $this->view->quarterStats = $quarterStats;
     $this->view->byMonth = $byMonth;
     $this->view->date = $date;
     $this->view->date_next = $date_next;
@@ -91,7 +98,6 @@ class Journal_StatisticsController extends Journal_AppController
     $end_date_formatted = $date."-".date("t", strtotime($start_date_formatted));
     $db = Zend_Registry::get('dbAdapter');
     $results = $db->query("SELECT count(*) as total FROM statistics_download  WHERE date BETWEEN '".$start_date_formatted."' AND '".$end_date_formatted."' ")->fetchAll();
-
     if(count($results) != 0)
       {
       return $results[0]["total"];
@@ -99,7 +105,7 @@ class Journal_StatisticsController extends Journal_AppController
     return 0;
 
     }
-  private function getPubliations($date)
+  private function getPublications($date)
     {
     $start_date_formatted = $date."-01";
     $end_date_formatted = $date."-".date("t", strtotime($date));
@@ -111,7 +117,6 @@ class Journal_StatisticsController extends Journal_AppController
     $count_code = 0;
 
     $publications = array();
-
     foreach($results as $res)
       {
       $item = MidasLoader::loadModel(('Item'))->load($res["item_id"]);
@@ -186,4 +191,40 @@ class Journal_StatisticsController extends Journal_AppController
       }
     return array($count_code, $count_noncode, $submitters, $publications);
     }
+
+  private function getTopDownloads($year,$month)
+    {
+    //Start date is the first day of the first month of the quarter
+    $start_date_formatted = $year."-".$month."-01";
+    // Go to the end of the quarter by increasing month by two
+    $month=$month+2;
+    //Stage most of the end date so that we can get the last day of the quarter
+    $end_date = $year."-".$month;
+    //append the last day of the last month of the quarter
+    $end_date_formatted = $end_date."-".date("t", strtotime($end_date));
+    $db = Zend_Registry::get('dbAdapter');
+    $query = "SELECT item_id,COUNT(*) as 'num' FROM statistics_download WHERE date BETWEEN '". $start_date_formatted."'AND '". $end_date_formatted."' GROUP BY item_id";
+    $results = $db->query($query)->fetchAll();
+
+    $publications = array();
+    foreach($results as $res)
+      {
+      $item = MidasLoader::loadModel(('Item'))->load($res["item_id"]);
+      $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
+      $pub = array();
+      $pub['id'] = $resourceDao->getKey();
+      $pub['title'] = $resourceDao->getName();
+      $pub['downloads'] = $res["num"];
+
+      $publications[$pub['title']] = $pub;
+      }
+    foreach($publications as $key => $row)
+    {
+      $views[$key] = $row['downloads'];
+    }
+
+    array_multisort($views,SORT_DESC, $publications);
+    $blah = array_slice($publications,0,10);
+    return $blah;
+  }
 }//end class
