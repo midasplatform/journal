@@ -49,6 +49,34 @@ PURPOSE.  See the above copyright notices for more information.
 </table>
 <p>Note: The number of download between May 2013 and February 2014 is incorrect.</p>
 
+<h4>Quarterly Download Statistics</h4>
+    <?php
+    $showNaMessage = false;
+    $quarter = 1;
+    foreach($this->quarterStats as $quarterPub)
+      {
+      echo "<h5> Quarter ".$quarter."</h5>";
+      echo "<table style='width:98%;'>";
+      echo "<thead>";
+      echo "<th>Title</th>";
+      echo "<th>Downloads</th>";
+      echo "</thead>";
+      echo "<tbody>";
+      foreach($quarterPub as $pub)
+        {
+        if($pub['licence'] == "N/A*") $showNaMessage = true;
+        echo "<tr>";
+        echo "<td><a href=\"".$this->webroot."browse/publication/".$pub['id']."\" target='_blank'>".$pub['title']."</a></td>";
+        echo "<td>".$pub['downloads']."</td>";
+        echo "<tr>";
+        }
+      echo "</tbody>";
+      echo "</table>";
+      $quarter++;
+      }
+    ?>
+
+
 
 <h4>Submission Statistics</h4>
 <table style="width:98%;">
@@ -57,8 +85,8 @@ PURPOSE.  See the above copyright notices for more information.
     <th>License</th>
     <th>Attribution Policy</th>
     <th>Date</th>
-    <th>Views</th>
-    <th>Downloads</th>
+    <th>Total Views</th>
+    <th>Total Downloads</th>
   </thead>
   <tbody>
     <?php
