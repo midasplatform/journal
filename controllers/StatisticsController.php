@@ -210,13 +210,16 @@ class Journal_StatisticsController extends Journal_AppController
     foreach($results as $res)
       {
       $item = MidasLoader::loadModel(('Item'))->load($res["item_id"]);
-      $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
-      $pub = array();
-      $pub['id'] = $resourceDao->getKey();
-      $pub['title'] = $resourceDao->getName();
-      $pub['downloads'] = $res["num"];
+      if($item)
+        {
+        $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
+        $pub = array();
+        $pub['id'] = $resourceDao->getKey();
+        $pub['title'] = $resourceDao->getName();
+        $pub['downloads'] = $res["num"];
 
-      $publications[$pub['title']] = $pub;
+        $publications[$pub['title']] = $pub;
+        }
       }
     foreach($publications as $key => $row)
     {
