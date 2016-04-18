@@ -66,7 +66,8 @@ PURPOSE.  See the above copyright notices for more information.
         {
         if($pub['licence'] == "N/A*") $showNaMessage = true;
         echo "<tr>";
-        echo "<td><a href=\"".$this->webroot."browse/publication/".$pub['id']."\" target='_blank'>".$pub['title']."</a></td>";
+        $handleUrl = "http://hdl.handle.net/".$pub['handle'];
+        echo "<td><a href=\"".$handleUrl."\" target='_blank'>".$pub['title']."</a></td>";
         echo "<td>".$pub['downloads']."</td>";
         echo "<tr>";
         }
@@ -95,7 +96,8 @@ PURPOSE.  See the above copyright notices for more information.
       {
       if($pub['licence'] == "N/A*") $showNaMessage = true;
       echo "<tr>";
-      echo "<td><a href=\"".$this->webroot."browse/publication/".$pub['id']."\" target='_blank'>".$pub['title']."</a></td>";
+      $handleUrl = "http://hdl.handle.net/".$pub['handle'];
+      echo "<td><a href=\"".$handleUrl."\" target='_blank'>".$pub['title']."</a></td>";
       echo "<td>".$pub['licence']."</td>";
       echo "<td>".$pub['attribution']."</td>";
       echo "<td>".substr($pub['date'], 0, 10)."</td>";

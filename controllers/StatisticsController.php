@@ -150,6 +150,7 @@ class Journal_StatisticsController extends Journal_AppController
       $pub['date'] = $revision->getDate();
       $pub['views'] = $resourceDao->getView();;
       $pub['downloads'] = $resourceDao->getDownload();
+      $pub['handle'] = $resourceDao->getHandle();
 
       $usLocale = new Zend_Locale('en_US');
       $zDate = new Zend_Date($pub['date']);
@@ -217,6 +218,7 @@ class Journal_StatisticsController extends Journal_AppController
         $pub['id'] = $resourceDao->getKey();
         $pub['title'] = $resourceDao->getName();
         $pub['downloads'] = $res["num"];
+        $pub['handle'] = $resourceDao->getHandle();
 
         $publications[$pub['title']] = $pub;
         }
