@@ -93,33 +93,20 @@ class Journal_ApiComponent extends AppComponent
     $modelLoader = new MIDAS_ModelLoader();
     $itemModel = $modelLoader->loadModel('Item');
 
-    $revisionIds = array();
-    foreach($itemIds as $itemId)
-      {
-      $item = $itemModel->load($itemId);
-      if($item && $itemModel->policyCheck($item, $userDao))
-        {
-        $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
-        $revisionId = $resourceDao->getRevisionId();
-        $revisionIds[$revisionId] = $itemId;
-        }
-      }
-
-    // Sort in descending order by revisionId so
-    // that newest revisions are displayed first.
-    ksort($revisionIds);
-    $revisionIds = array_reverse($revisionIds);
+    $db = Zend_Registry::get('dbAdapter');
+    $query = "SELECT MAX(itemrevision_id) as 'revision_id',item_id from itemrevision GROUP BY item_id ORDER BY revision_id DESC ";
+    $results = $db->query($query)->fetchAll();
 
     $items = array();
     $count = 0;
-    foreach($revisionIds as $revisionId => $itemId)
+    foreach($results as $entry)
       {
       if($offset != 0)
         {
         $offset--;
         continue;
         }
-      $item = $itemModel->load($itemId);
+      $item = $itemModel->load($entry["item_id"]);
       if($item && $itemModel->policyCheck($item, $userDao))
         {
         $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
