@@ -61,45 +61,50 @@ class Journal_ApiComponent extends AppComponent
         UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
         
         $factor = 10;
-        if($useCache) $factor = 100000; // Get all the ids when creating the cache
-        $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
-        UtilityComponent::endIgnoreWarnings();
-        foreach($response->response->docs as $doc)
+        if("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query']) 
           {
-          $itemIds[] = $doc->key;
+          $factor = 100000; // Get all the ids when creating the cache
+          $db = Zend_Registry::get('dbAdapter');
+          $query = "SELECT MAX(itemrevision_id) as 'revision_id',item_id from itemrevision GROUP BY item_id ORDER BY revision_id DESC ";
+          $itemIds = $db->query($query)->fetchAll();
           }
-        if(!empty($targetLevel))
+        else
           {
-          // Increase the factor to capture all available submissions for searching the target level
-          $factor = 100000;
-          $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
-          }
-        foreach($response->response->docs as $doc)
-          {
-          $itemIds[] = $doc->key;
+          $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+          UtilityComponent::endIgnoreWarnings();
+          foreach($response->response->docs as $doc)
+            {
+            $itemIds[] = array("item_id" => $doc->key);
+            }
+          if(!empty($targetLevel))
+            {
+            // Increase the factor to capture all available submissions for searching the target level
+            $factor = 100000;
+            $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+            }
+          foreach($response->response->docs as $doc)
+            {
+            $itemIds[] = array("item_id" => $doc->key);
+            }
           }
         }
-      catch(Exception $e)
-        {
-        throw new Exception('Syntax error in query ', -1);
-        }
+        catch(Exception $e)
+          {
+          throw new Exception('Syntax error in query ', -1);
+          }
 
-      if($useCache)
-        {
-        file_put_contents($cacheFile, JsonComponent::encode($itemIds));
-        }
+        if($useCache)
+          {
+          file_put_contents($cacheFile, JsonComponent::encode($itemIds));
+          }
       }
 
     $modelLoader = new MIDAS_ModelLoader();
     $itemModel = $modelLoader->loadModel('Item');
 
-    $db = Zend_Registry::get('dbAdapter');
-    $query = "SELECT MAX(itemrevision_id) as 'revision_id',item_id from itemrevision GROUP BY item_id ORDER BY revision_id DESC ";
-    $results = $db->query($query)->fetchAll();
-
     $items = array();
     $count = 0;
-    foreach($results as $entry)
+    foreach($itemIds as $entry)
       {
       if($offset != 0)
         {
