@@ -59,7 +59,6 @@ class Journal_ApiComponent extends AppComponent
         {
         $index = $solrComponent->getSolrIndex();
         UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
-        
         $factor = 10;
         if("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query']) 
           {
@@ -142,12 +141,7 @@ class Journal_ApiComponent extends AppComponent
             'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
             'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'pastCertificationRevisionNum' => $foundRevisionID, "certifiedLevel" => $level,
             'pastCertificationRevisionKey' => $foundRevisionKey);
-
           $count++;
-          }
-        if($count >= $limit)
-          {
-          break;
           }
         }
       }
