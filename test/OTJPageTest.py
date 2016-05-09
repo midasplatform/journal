@@ -33,12 +33,12 @@ class test_otj(unittest.TestCase):
   def clickAndCheck(self,item,countClass):
       numElements = len(driver.find_elements_by_class_name(countClass))
       item.click()
-      time.sleep(5);
+      time.sleep(5)
       numElements_post = len(driver.find_elements_by_class_name(countClass))
       print "started with %s elements, found %s elements after" % (numElements,numElements_post)
-      self.assertFalse(numElements == numElements_post)
       item.click()
-      time.sleep(3);
+      self.assertFalse(numElements == numElements_post)
+      time.sleep(3)
 
   def test_text_search(self):
     searchbox = driver.find_element_by_id("live_search")
