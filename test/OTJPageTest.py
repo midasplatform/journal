@@ -24,6 +24,7 @@ import re
 import time
 
 class test_otj(unittest.TestCase):
+  search_key = 'test'
 
   @classmethod
   def tearDownClass(cls):
@@ -43,7 +44,7 @@ class test_otj(unittest.TestCase):
   def test_text_search(self):
     searchbox = driver.find_element_by_id("live_search")
     searchbox.clear()
-    searchbox.send_keys("test")
+    searchbox.send_keys(self.search_key)
     self.clickAndCheck(driver.find_element_by_id("search_button"),"resourceLink")
     driver.find_element_by_id("clear_button").click()
     print searchbox
@@ -63,10 +64,14 @@ class test_otj(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  parser =argparse.ArgumentParser(description="Access the 'About' Text of the ViViaN(TM) webpage")
-  parser.add_argument("-r",dest = 'webroot', required=True, help="Web root of the OTJ instance to test.")
+  parser = argparse.ArgumentParser(description="Access the 'About' Text of the ViViaN(TM) webpage")
+  parser.add_argument("-r", dest='webroot', required=True, help="Web root of the OTJ instance to test.")
+  parser.add_argument("--search_keyword", dest='search_key', required=False, help="Keyword to look for in live search.")
   result = vars(parser.parse_args())
+
   driver = webdriver.Firefox()
   driver.get(result['webroot'])
+
+  test_otj.search_key = result['search_key']
   suite = unittest.TestLoader().loadTestsFromTestCase(test_otj)
   unittest.TextTestRunner(verbosity=2).run(suite)
