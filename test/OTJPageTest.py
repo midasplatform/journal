@@ -58,9 +58,14 @@ class test_otj(unittest.TestCase):
 
   def test_issue_switch(self):
     issueButtons = driver.find_elements_by_class_name("issueButton")
+    selected_issue = issueButtons[0]
+    for button in issueButtons:
+      if button.is_selected():
+        selected_issue = button
     for button in issueButtons[1:]:
-      self.clickAndCheck(button,"resourceLink")
-    print "even more blah"
+      print "===> Select issue: '" + button.text + "'"
+      self.clickAndCheck(button, "resourceLink")
+    selected_issue.click()
 
 
 if __name__ == '__main__':
