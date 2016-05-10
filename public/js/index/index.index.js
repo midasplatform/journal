@@ -1,6 +1,7 @@
 // When page ready
 var selectIssue = false;
 var resizeEvent;
+var lastIndex=0;
 
 $(document).ready(function(){
   $('.issueTitle').each(function(){
@@ -232,30 +233,38 @@ function searchDatabase(append)
 
 
 function ajaxSearch(append,fullQuery,allQuery,certLevel) {
+  var limit = 25;
+  var shown = 0;
 
-  var shown = $('.resourceLink').length;
-  if(!append) shown = 0;
+  if(!append) {
+    shown = 0;
+    lastIndex = 0;
+  }
+  else {
+    lastIndex = lastIndex + limit;
+  }
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
-        args: "offset="+shown+"&query="+fullQuery+"&level="+certLevel+"&secondQuery="+allQuery,
+        args: "offset="+lastIndex-1+"&query="+fullQuery+"&level="+certLevel+"&secondQuery="+allQuery,
         log: true,
         success: function (retVal) {
           $('img#searchLoadingImg').hide();
-          var total = 0;
           if(!append) $('.SearchResults').html("");
           if(!append) $('#noResultElement').show();
-          $.each(retVal.data, function(index, value)
+          $.each(retVal.data.slice(lastIndex), function(index, value)
           {
-          total = value.total;
+          shown = $('.resourceLink').length;
+          if(shown >= (limit + lastIndex)) return false;
           $('#noResultElement').hide();
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
+            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,
+            'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
             'pastCertificationRevisionKey': value.pastCertificationRevisionKey})
           })
-          var shown = $('.resourceLink').length;
-          if(total > shown)
+
+          if(shown == (limit + lastIndex))
             {
             $('#showMoreResults').show();
             $('#showMoreResults a').unbind('click').click(function(){
@@ -267,19 +276,19 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             $('#showMoreResults').hide();
             }
 
-          if(total == "")
+          if(shown == 0)
             {
             $('.SearchCount').hide();
             }
-          else if(total > 1)
+          else if(shown > 1)
             {
             $('.SearchCount').show();
-            $('.SearchCount').html(total+ " resources available.")
+            $('.SearchCount').html(shown + " resources available.")
             }
           else
             {
             $('.SearchCount').show();
-            $('.SearchCount').html(total+ " resource available.")
+            $('.SearchCount').html(shown + " resource available.")
             }
 
           resizeEvent();
@@ -289,6 +298,7 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             midas.createNotice(retVal.message, 3000, 'error');
         },
         complete: function () {
+
         }
     });
 }
