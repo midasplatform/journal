@@ -234,14 +234,14 @@ function searchDatabase(append)
 
 function ajaxSearch(append,fullQuery,allQuery,certLevel) {
   var limit = 25;
-  var shown = $('.resourceLink').length;
+  var shown = 0;
 
   if(!append) {
     shown = 0;
     lastIndex = 0;
   }
   else {
-    lastIndex =lastIndex+limit ;
+    lastIndex = lastIndex + limit;
   }
   ajaxWebApi.ajax({
         method: 'midas.journal.search',
@@ -249,24 +249,22 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
         log: true,
         success: function (retVal) {
           $('img#searchLoadingImg').hide();
-          var total = 0;
           if(!append) $('.SearchResults').html("");
           if(!append) $('#noResultElement').show();
           $.each(retVal.data.slice(lastIndex), function(index, value)
           {
-          if(index >= limit) return false;
-          total = value.total;
+          shown = $('.resourceLink').length;
+          if(shown >= (limit + lastIndex)) return false;
           $('#noResultElement').hide();
           addAndFormatResult($('.SearchResults'), {'rating': value.rating, 'type': value.type,
             'id':value.revisionId, 'title': value.title, "logo": value.logo,
             'description': value.description, 'statistics': value.statistics,
-            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
+            'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,
+            'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
             'pastCertificationRevisionKey': value.pastCertificationRevisionKey})
-
           })
 
-          var shown = $('.resourceLink').length;
-          if(total >= lastIndex)
+          if(shown == (limit + lastIndex))
             {
             $('#showMoreResults').show();
             $('#showMoreResults a').unbind('click').click(function(){
@@ -278,19 +276,19 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             $('#showMoreResults').hide();
             }
 
-          if(total == "")
+          if(shown == 0)
             {
             $('.SearchCount').hide();
             }
-          else if(total > 1)
+          else if(shown > 1)
             {
             $('.SearchCount').show();
-            $('.SearchCount').html(shown+ " resources available.")
+            $('.SearchCount').html(shown + " resources available.")
             }
           else
             {
             $('.SearchCount').show();
-            $('.SearchCount').html(shown+ " resource available.")
+            $('.SearchCount').html(shown + " resource available.")
             }
 
           resizeEvent();
