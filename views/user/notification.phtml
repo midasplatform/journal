@@ -43,6 +43,13 @@ echo '<script type="text/javascript" src="' . $this->webroot . '/privateModules/
           <input type="radio" name="NewReviewsEmail" value="0" <?php if($this->status[1] == 0) echo "checked='checked'"?>>
           No</td>
       </tr>
+      <tr>
+        <td height="17" valign="top">Receive email when there a new comment is posted:
+          <input type="radio" name="NewCommentEmail" value="1" <?php if($this->status[2] == 1) echo "checked='checked'"?>>
+          Yes
+          <input type="radio" name="NewCommentEmail" value="0" <?php if($this->status[2] == 0) echo "checked='checked'"?>>
+          No</td>
+      </tr>
             
       <tr>
         <td>&nbsp;&nbsp;&nbsp;
