@@ -46,7 +46,7 @@ class Journal_UserController extends Journal_AppController
     if(isset($_POST) && !empty($_POST))
       {
       MidasLoader::loadComponent("Notification", "journal")->setUserNotificationStatus($this->userSession->Dao, 
-              $_POST['NewSubmissionEmail'], $_POST['NewReviewsEmail']);
+              $_POST['NewSubmissionEmail'], $_POST['NewReviewsEmail'], $_POST['NewCommentEmail']);
       $this->disableView();
       echo JsonComponent::encode(array(1, "Changes saved."));
       }

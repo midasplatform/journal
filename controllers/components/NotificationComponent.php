@@ -285,9 +285,10 @@ class Journal_NotificationComponent extends AppComponent
     $subject = 'Comment Added - Submission: ' . $title;
     $to = '';
     // form the email headers part
-    $editList = $this->_getSubmissionEditorEmails($resourceDao);
+    //$editList = $this->_getSubmissionEditorEmails($resourceDao);
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
-    $emailLstArray = array($subList, $editList, $adminList);
+    $commentList = $this->_getCommentSubscribeList($resourceDao);
+    $emailLstArray = array($commentList,$adminList);
     $bccList = $this->_formBccList($emailLstArray);
     if (!empty($contactEmail))
       {
@@ -362,20 +363,19 @@ class Journal_NotificationComponent extends AppComponent
     if(!$user instanceof UserDao) return array();
     $db = Zend_Registry::get('dbAdapter');
     $results = $db->query("SELECT journalmodule_notification_submission as submission, 
-      journalmodule_notification_review as review FROM user
-      WHERE user_id='".$user->getKey()."'")
-               ->fetchAll();
+      journalmodule_notification_review as review, journalmodule_notification_comments as comment
+      FROM user WHERE user_id='".$user->getKey()."'")->fetchAll();
     
     if(empty($results))return array();
-    return array($results[0]['submission'], $results[0]['review']);    
+    return array($results[0]['submission'], $results[0]['review'],$results[0]['comment']);
     }
     
 
-  public function setUserNotificationStatus($user, $submission, $review)
+  public function setUserNotificationStatus($user, $submission, $review,$comments)
     {
-    if(!$user instanceof UserDao || !is_numeric($submission) || !is_numeric($review)) return;
+    if(!$user instanceof UserDao || !is_numeric($submission) || !is_numeric($review) || !is_numeric($comments)) return;
     $db = Zend_Registry::get('dbAdapter');
-    $sql = "UPDATE `user` set journalmodule_notification_submission = ".$db->quote($submission).",
+    $sql = "UPDATE `user` set journalmodule_notification_comments = ".$db->quote($comments).",journalmodule_notification_submission = ".$db->quote($submission).",
       journalmodule_notification_review = ".$db->quote($review)."where user_id=".$user->getKey();
     $db->query($sql);   
     }
@@ -420,7 +420,24 @@ class Journal_NotificationComponent extends AppComponent
      
     return $return;
     }
-    
+
+public function findWithCommentsNotification()
+    {
+    $db = Zend_Registry::get('dbAdapter');
+    $results = $db->query("SELECT user_id FROM user
+      WHERE journalmodule_notification_comments='1'")
+               ->fetchAll();
+
+    $return = array();
+
+    foreach($results as $result)
+      {
+      $return[] = MidasLoader::loadModel("User")->load($result['user_id']);
+      }
+
+    return $return;
+    }
+
   /**
    * private functions
    */
@@ -512,6 +529,22 @@ class Journal_NotificationComponent extends AppComponent
     {
     $allSubscriberLst = '';
     $subscribers = $this->findWithReviewNotification();
+    if (!empty($subscribers))
+      {
+        foreach ($subscribers as $subscriber)
+          {
+          $allSubscriberLst .= $subscriber->getEmail() . ',';
+          }
+
+        if (!empty($allSubscriberLst)) $allSubscriberLst = substr($allSubscriberLst, 0, -1);
+      }
+    return $allSubscriberLst;
+    }
+
+  private function _getCommentSubscribeList()
+    {
+    $allSubscriberLst = '';
+    $subscribers = $this->findWithCommentsNotification();
     if (!empty($subscribers))
       {
         foreach ($subscribers as $subscriber)
