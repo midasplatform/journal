@@ -93,14 +93,20 @@ class Journal_NotificationComponent extends AppComponent
       }
     if (!empty($authList)) $authList = substr($authList, 0, -1);
     $approveLink = "/journal/submit?revisionId=" . $revisionId;
+    $baseUrl = UtilityComponent::getServerURL().$fc->getBaseUrl();
+    $surveyLink = $baseUrl."/journal/survey?id=".$handle;
+    Zend_Registry::get('notifier')->notifyEvent('EVENT_JOURNAL_SUBMIT_APPROVAL', array('revision_id' => $revisionId, 'handle' => $handle));
+
     $this->_view->assign("name", $name);
     $this->_view->assign("author", $authList);
     $this->_view->assign("description", $description);
     $this->_view->assign("license", $license);
     $this->_view->assign("attributionPolicy", $attributionPolicy);
     $this->_view->assign("link", $approveLink);
+    $this->_view->assign("surveyLink", $surveyLink);
     $this->_layout->assign("content", $this->_view->render('sendforapproval.phtml'));
     $bodyText = $this->_layout->render('layout.phtml');
+
 
     $this->getLogger()->debug("Body Text is " . $bodyText);
     $subject = 'New Submission - Pending Approval: ' . $name;

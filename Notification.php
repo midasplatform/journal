@@ -27,6 +27,8 @@ class Journal_Notification extends ApiEnabled_Notification
   public function init()
     {
     $this->enableWebAPI($this->moduleName);
+    $this->addTask('TASK_JOURNAL_SUBMIT_APPROVAL', 'runSurvey', "");
+    $this->addEvent('EVENT_JOURNAL_SUBMIT_APPROVAL', 'TASK_JOURNAL_SUBMIT_APPROVAL');
     $this->addTask('TASK_JOURNAL_UPLOAD_GITHUB', 'processGithub', "");
     $this->addEvent('EVENT_JOURNAL_UPLOAD_GITHUB', 'TASK_JOURNAL_UPLOAD_GITHUB');
     $this->addTask('TASK_JOURNAL_UPDATESITEMAP', 'updateSitemap', "");
@@ -41,6 +43,38 @@ class Journal_Notification extends ApiEnabled_Notification
   public function updateSitemap($param)
     {
     MidasLoader::loadComponent("Sitemap", "journal")->generate();
+    }
+
+
+  /** Run OTJ Survey Script on Submission */
+  public function runSurvey($param)
+    {
+    $handle = $param['handle'];
+    $revisionId = $param['revision_id'];
+    // Execute the OTJ survey on the submission
+    // First get the bitstream paths needed
+    $db = Zend_Registry::get('dbAdapter');
+    $journalDir = BASE_PATH.'/privateModules/journal/';
+    $surveyDir = UtilityComponent::getTempDirectory();
+    $results = $db->query("SELECT path from bitstream WHERE itemrevision_id='".$revisionId."'")->fetchAll();
+    $commandArgs = '-d '.$surveyDir.' -z /usr/bin/7z';
+
+    // Capture each path and only take the first 6 characters to capture the folder information
+    foreach($results as $result)
+      {
+        $commandArgs .= " -p ".BASE_PATH."/data/assetstore/".substr($result['path'],0,5);
+      }
+    //Generate the commands to be executed to run the survey script and to move the file to
+    // where the survey page will expect it to be
+
+    $fullSurveyCmd = "/usr/bin/python ".$journalDir."otjSurvey.py ".$commandArgs;
+    $surveyCommand = escapeshellcmd($fullSurveyCmd);
+    exec($surveyCommand);
+    // Move file to the OTJ_Survey directory
+    $filelocation = BASE_PATH.'/privateModules/journal/OTJ_Survey'.$handle."_Results.txt";
+    $fullMvCmd = 'mv '.$surveyDir.'/SurveyResult.txt '.$filelocation;
+    $mvCommand = escapeshellcmd($fullMvCmd);
+    exec($mvCommand);
     }
 
   /** Backup github*/
