@@ -287,7 +287,23 @@ class Journal_NotificationComponent extends AppComponent
     // form the email headers part
     //$editList = $this->_getSubmissionEditorEmails($resourceDao);
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
-    $commentList = $this->_getCommentSubscribeList($resourceDao);
+
+    //Only sends the comment email to the general public if the submission is marked as public
+    // Method for determining private status taken from controllers/ViewController.php line 205
+    $isPrivate = true;
+    foreach($resourceDao->getItempolicygroup() as $policy)
+      {
+      if($policy->getGroupId() == MIDAS_GROUP_ANONYMOUS_KEY)
+        {
+        $isPrivate = false;
+        }
+      }
+    // end determining section
+
+    if (!$isPrivate)
+      {
+      $commentList = $this->_getCommentSubscribeList($resourceDao);
+      }
     $emailLstArray = array($commentList,$adminList);
     $bccList = $this->_formBccList($emailLstArray);
     if (!empty($contactEmail))
