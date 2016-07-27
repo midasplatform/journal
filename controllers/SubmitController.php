@@ -126,21 +126,8 @@ class Journal_SubmitController extends Journal_AppController
         MidasLoader::loadModel("Item")->addRevision($resourceDao, $itemRevisionDao);
         if($lastExistingRevision) // If new revision, copy previous data
           {
-          $bitstreams = $lastExistingRevision->getBitstreams();
-          foreach($bitstreams as $bitstream)
-            {
-            $type = MidasLoader::loadComponent("Bitstream", "journal")->getType($bitstream);
-            $bitstream->saved = false;
-            $bitstream->bitstream_id = null;
-            if($bitstream->getName() == "")continue;
-            MidasLoader::loadModel("ItemRevision")->addBitstream($itemRevisionDao, $bitstream);
-            MidasLoader::loadComponent("Bitstream", "journal")->setType($bitstream, $type);
-            if($type == BITSTREAM_TYPE_THUMBNAIL) $resourceDao->setLogo($bitstream);
-            }
-
           // Need to copy anything that's not updated on this view
           $resourceDao->setHandle($resourceDao->getHandle());
-          $resourceDao->setGithub($resourceDao->getGithub());
           $resourceDao->setSourceLicense($resourceDao->getSourceLicense());
           $resourceDao->setAgreedAttributionPolicy($resourceDao->getAgreedAttributionPolicy());
           if ($resourceDao->getHasCode() == "true")
