@@ -94,8 +94,8 @@ class Journal_NotificationComponent extends AppComponent
     if (!empty($authList)) $authList = substr($authList, 0, -1);
     $approveLink = "/journal/submit?revisionId=" . $revisionId;
     $baseUrl = UtilityComponent::getServerURL().$fc->getBaseUrl();
-    $surveyLink = $baseUrl."/journal/survey?id=".$handle;
-    Zend_Registry::get('notifier')->notifyEvent('EVENT_JOURNAL_SUBMIT_APPROVAL', array('revision_id' => $revisionId, 'handle' => $handle));
+    $surveyLink = $baseUrl."/journal/survey?id=".$revisionId;
+    Zend_Registry::get('notifier')->notifyEvent('EVENT_JOURNAL_SUBMIT_APPROVAL', array('revision_id' => $revisionId));
 
     $this->_view->assign("name", $name);
     $this->_view->assign("author", $authList);

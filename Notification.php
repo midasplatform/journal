@@ -49,7 +49,6 @@ class Journal_Notification extends ApiEnabled_Notification
   /** Run OTJ Survey Script on Submission */
   public function runSurvey($param)
     {
-    $handle = $param['handle'];
     $revisionId = $param['revision_id'];
     // Execute the OTJ survey on the submission
     // First get the bitstream paths needed
@@ -71,7 +70,7 @@ class Journal_Notification extends ApiEnabled_Notification
     $surveyCommand = escapeshellcmd($fullSurveyCmd);
     exec($surveyCommand);
     // Move file to the OTJ_Survey directory
-    $filelocation = BASE_PATH.'/privateModules/journal/OTJ_Survey'.$handle."_Results.txt";
+    $filelocation = BASE_PATH.'/privateModules/journal/OTJ_Survey/'.$revisionId."_Results.txt";
     $fullMvCmd = 'mv '.$surveyDir.'/SurveyResult.txt '.$filelocation;
     $mvCommand = escapeshellcmd($fullMvCmd);
     exec($mvCommand);
