@@ -211,10 +211,10 @@ foreach ($cssArray as $module => $list)
       </div>
       <div class="authors"><?php
       $authors = $this->resource->getAuthors();
-      foreach($authors as &$author) $author = '<a href="'.$this->webroot.'/journal/?q=text-journal.authors:'.$author[0].' '.$author[1].'">'.ucfirst($author[1]).' '.ucfirst($author[0][0]).'.</a>';
+      foreach($authors as &$author) $author = '<a href="'.$this->webroot.'/journal/?q=authors:'.$author[0].' '.$author[1].'">'.ucfirst($author[1]).' '.ucfirst($author[0][0]).'.</a>';
       echo join(', ', $authors);
       ?></div>
-      <div class="institution" > <a href="<?php echo $this->webroot ?>/journal/?q=text-journal.insitution:<?php echo ucfirst($this->resource->getInstitution()) ?>">
+      <div class="institution" > <a href="<?php echo $this->webroot ?>/journal/?q=institution:<?php echo ucfirst($this->resource->getInstitution()) ?>">
           <?php echo ucfirst($this->resource->getInstitution()) ?></a></div>
       <center>
         <?php
