@@ -155,22 +155,46 @@ function searchDatabase(append)
 
     vals = vals.concat(query.split(" "));
 
+    fullQuery += "AND ("
+    // Account for the "Institution" and "Author" links from the submission page
+    // Replace the string with the correct SOLR field
+    // Assumes that only one of the values will be searched for at a time for now
+    var re = /(.*)\:(.*)/i;
+    var val = re.exec(query);
+    if (val != null)
+      {
+      if(val[1] == "institution")
+        {
+        query = query.replace(val[1], 'text-journal.insitution');
+        query = query.replace(val[2], "("+val[2]+")");
+        fullQuery += query +" OR ";
+        }
+      else if (val[1] == "authors")
+        {
+        query = query.replace(val[1], 'text-journal.authors');
+        query = query.replace(val[2], "("+val[2]+")");
+        fullQuery += query +" OR ";
+        }
+       }
+
     // Remove any empty values
     vals = vals.filter(function(val){
       return val !== "";
     });
 
     // Re-construct query
-    query = vals[0];
-    for (i = 1; i < vals.length; i++)
+    if( vals.length > 0 )
       {
-      query += " AND ";
-      query += vals[i];
+      query = vals[0];
+      for (i = 1; i < vals.length; i++)
+        {
+        query += " AND ";
+        query += vals[i];
+        }
+      fullQuery += "name:("+query+") OR description:("+query+") OR ngram_search:("+query+")";
       }
-
-    fullQuery += "AND (name:("+query+") OR description:("+query+") OR ngram_search:("+query+"))";
+    fullQuery += ")"
     }
-
 
   if(selectIssue)
     {
