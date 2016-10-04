@@ -15,8 +15,9 @@ OTJ_SURVEY_EXPRESSIONS = (("Do not [Re]*distribute",[]),
 )
 
 OTJ_FILE_EXCLUDES = ("dat","dll", "DAT","exe", "EXE", "mdf", "pdb", "class", "jpeg",
-    "jpg","png","gif","bmp","docx","pdf","vsd","doc", "xls", "xlsx", "ppt", "pptx")
-OTJ_UNZIP_EXCLUDES= ("EAP","dll")
+    "jpg","png","gif","bmp","docx","pdf","vsd","doc", "xls", "xlsx", "ppt", "pptx",
+    ".db","xml","XML")
+OTJ_UNZIP_EXCLUDES= ("EAP","dll","docx")
 OTJ_SURVEY_HISTORY = []
 global seven_zip
 
