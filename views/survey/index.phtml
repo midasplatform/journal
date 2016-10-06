@@ -36,7 +36,8 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
           foreach($result as $file)
             {
             $surveyResults = fopen($file,'r');
-            echo fread($surveyResults,filesize($file));
+            $data = mb_convert_encoding(fread($surveyResults,filesize($file)), 'UTF-8', 'ASCII');
+            echo htmlentities($data);
             fclose($surveyResults);
             };
           }
