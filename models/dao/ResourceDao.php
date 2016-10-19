@@ -345,6 +345,34 @@ class Journal_ResourceDao extends ItemDao
     if(!$metadata) return '';
     return $metadata->getValue();
     }
+  function getSourceLicenseString()
+    {
+    $metadata = $this->getMetaDataByQualifier("source_license");
+    if(!$metadata) return '';
+    switch (intval($metadata->getValue()))
+      {
+      case 1:
+        return "Apache 2";
+        break;
+      case 2:
+        return "Public Domain";
+        break;
+      case 3:
+        return "Other";
+        break;
+      case 4:
+        return "GPL (Any Version)";
+        break;
+      case 5:
+        return "LGPL (Any Version)";
+        break;
+      case 6:
+        return "BSD";
+        break;
+      default:
+        return "None Specified";
+      }
+    }
 
    /* Set source code license
    * @param
