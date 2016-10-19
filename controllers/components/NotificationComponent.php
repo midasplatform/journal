@@ -60,18 +60,7 @@ class Journal_NotificationComponent extends AppComponent
 
     if(!empty($sourceLicense))
       {
-      switch (intval($sourceLicense))
-        {
-        case 1:
-          $license = "Apache 2";
-          break;
-        case 2:
-          $license = "Public Domain";
-          break;
-        case 3:
-          $license = "Other";
-          break;
-        }
+        $license = $resourceDao->getSourceLicenseString();
       }
     else
       {

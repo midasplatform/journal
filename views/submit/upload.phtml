@@ -129,6 +129,18 @@ I have the right to distribute these files
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN) echo "selected"; ?>>
               Public Domain
       </option>
+      <option value="<?php echo OTJ_SOURCE_LICENSE_GPL ?> "
+              <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_GPL) echo "selected"; ?>>
+              GPL (Any Version)
+      </option>
+      <option value="<?php echo OTJ_SOURCE_LICENSE_LGPL ?> "
+              <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_LGPL) echo "selected"; ?>>
+              LGPL (Any Version)
+      </option>
+      <option value="<?php echo OTJ_SOURCE_LICENSE_BSD ?> "
+              <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_BSD) echo "selected"; ?>>
+              BSD
+      </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_OTHER ?>"
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER) echo "selected"; ?>>
               Other
