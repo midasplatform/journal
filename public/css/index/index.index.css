@@ -183,8 +183,14 @@ div.SearchResultEntry div.ResultAuthors{
   font-size: 12px;
   font-weight: bold;
 }
+div.SearchResultEntry div.ResultLicense{
+  float:right;
+  color: #333;
+  font-size: 13px;
+  font-weight: bold;
+}
 div.SearchResultEntry div.ResultDescription{
-  height: 61px;
+  height: 46px;
   margin-top:3px;
   line-height: 16px;
   font-size: 12px;

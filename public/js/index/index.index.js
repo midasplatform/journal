@@ -285,7 +285,8 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             'description': value.description, 'statistics': value.statistics,
             'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,
             'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
-            'pastCertificationRevisionKey': value.pastCertificationRevisionKey})
+            'pastCertificationRevisionKey': value.pastCertificationRevisionKey,
+            'license': value.license})
           })
 
           if(shown == (limit + lastIndex))
