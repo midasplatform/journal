@@ -147,17 +147,18 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
               <div class="ResultTop">
                 <a class="resourceLink" href="<?php echo $this->webroot ?>/journal/view/{id}"></a>
 
-                <span class="ResultTitle">{title}</span>          
+                <span class="ResultTitle">{title}</span>
               </div>
+                <div class="ResultLicense">
+                  Released under: {license}
+                </div>
               <div class="ResultAuthors">
                 {authors}
               </div>
               <div class="ResultDescription">
                 {description}
               </div>
-              <div class="ResultLicense">
-                Released under: {license}
-              </div>
+
             </td>
           </tr>
         </table>
