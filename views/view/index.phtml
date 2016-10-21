@@ -156,7 +156,9 @@ foreach ($cssArray as $module => $list)
             echo "<li>License: Public Domain</li>";
             break;
           case 3:
-            echo "<li>License: Other</li>";
+            $license_string = $this->resource->getMetaDataByQualifier("source_license_string");
+            if(!$license_string) echo 'License: Other';
+            echo "<li>License: ".htmlentities($license_string->getValue())."</li>";
             break;
           case 4:
             echo "<li>License: <a href='https://opensource.org/licenses/gpl-license'>GPL (Any Version)</a></li>";

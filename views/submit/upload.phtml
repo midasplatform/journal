@@ -147,6 +147,8 @@ I have the right to distribute these files
       </option>
     </select>
      License (optional).</br></label>
+    <label style="display:inline;" for='otherLicenseInput' id='otherLicenseInputLabel'>Enter 'Other' License:</label>
+    <input type='text' id='otherLicenseInput' name="source-license-text">
     <input type="checkbox" <?php if ($this->resource->getAgreedAttributionPolicy()) echo "checked='true'";?>
            class="checkbox" id="acceptAttributionPolicy" value="1">
     <label style="display:inline;" for="acceptAttributionPolicy" id="acceptAttributionPolicyLabel"> 
@@ -187,6 +189,8 @@ I have the right to distribute these files
 
       <input name="source-license" type="hidden" id="hiddenSourceLicense"
              value='<?php if ($this->resource->getSourceLicense()) echo $this->resource->getSourceLicense(); else echo 0 ?>'/>
+      <input name="source-license-text" type="hidden" id="hiddenSourceLicenseText"
+             value='<?php if ($this->resource->getSourceLicenseString()) echo $this->resource->getSourceLicenseString(); else echo "" ?>'/>
       <input name="attribution-policy" type="hidden" id="hiddenAttributionPolicy"
              value='<?php if ($this->resource->getAgreedAttributionPolicy()) echo $this->resource->getAgreedAttributionPolicy(); else echo 0 ?>'/>
       <input name="send-email" type="hidden" id="hiddenSendNotificationEmail" value='0'/>
