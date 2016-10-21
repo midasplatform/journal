@@ -140,7 +140,7 @@ class Journal_ApiComponent extends AppComponent
             'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
             'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
             'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'pastCertificationRevisionNum' => $foundRevisionID, "certifiedLevel" => $level,
-            'pastCertificationRevisionKey' => $foundRevisionKey);
+            'pastCertificationRevisionKey' => $foundRevisionKey, 'license' => $resourceDao->getSourceLicenseString());
           $count++;
           }
         }
