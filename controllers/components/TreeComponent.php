@@ -26,7 +26,7 @@ class Journal_TreeComponent extends AppComponent
    * (we don't want to do it if we plan to sent the array to the json format)
    * @return array
    */
-  public function getAllTrees($includeDao = false, $selected = array(), $showCertification = false)
+  public function getAllTrees($includeDao = false, $selected = array(), $showFilters = false)
     {
     $trees = array();
     $allEntries = MidasLoader::loadModel('Category', 'journal')->getAll();
@@ -54,7 +54,7 @@ class Journal_TreeComponent extends AppComponent
       if(empty($selected)) file_put_contents($cacheFile, JsonComponent::encode($trees));
       }
 
-    if($showCertification)
+    if($showFilters)
       {
       $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified", 'key' => -1,
             'children' => array(
@@ -87,6 +87,31 @@ class Journal_TreeComponent extends AppComponent
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "Core", 'key' => "submission_type-$core",
                 'children' => array()),
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "Certified Component", 'key' => "submission_type-$component",
+                'children' => array())
+            ));
+
+      $apache2 = OTJ_SOURCE_LICENSE_APACHE_2;
+      $public_domain = OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN;
+      $other = OTJ_SOURCE_LICENSE_OTHER;
+      $gpl = OTJ_SOURCE_LICENSE_GPL;
+      $lgpl = OTJ_SOURCE_LICENSE_LGPL;
+      $bsd = OTJ_SOURCE_LICENSE_BSD;
+      $none = OTJ_SOURCE_LICENSE_NOT_DEFINED;
+      $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "License", 'key' => -1,
+            'children' => array(
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Apache 2", 'key' => "license-$apache2",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Public Domain", 'key' => "license-$public_domain",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Other", 'key' => "license-$other",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "GPL (Any Version)", 'key' => "license-$gpl",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "LGPL (Any Version)", 'key' => "license-$lgpl",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "BSD", 'key' => "license-$bsd",
+                'children' => array()),
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "No License Specified", 'key' => "license-$none",
                 'children' => array())
             ));
       }
