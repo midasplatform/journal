@@ -345,6 +345,22 @@ class Journal_ResourceDao extends ItemDao
     if(!$metadata) return '';
     return $metadata->getValue();
     }
+
+   /* Set source code license
+   * @param
+   */
+  function setSourceLicense($license)
+    {
+    $this->setMetaDataByQualifier("source_license", $license);
+    }
+
+
+
+  /**
+   * Get the text of the source license
+   * @return
+   *
+   */
   function getSourceLicenseString()
     {
     $metadata = $this->getMetaDataByQualifier("source_license");
@@ -358,7 +374,9 @@ class Journal_ResourceDao extends ItemDao
         return "Public Domain";
         break;
       case 3:
-        return "Other";
+        $license_string = $this->getMetaDataByQualifier("source_license_string");
+        if(!$license_string) return 'Other';
+        return htmlentities($license_string->getValue());
         break;
       case 4:
         return "GPL (Any Version)";
@@ -374,12 +392,13 @@ class Journal_ResourceDao extends ItemDao
       }
     }
 
-   /* Set source code license
+  /**
+   * Set the source_license_string
    * @param
    */
-  function setSourceLicense($license)
+  function setSourceLicenseString($license_string)
     {
-    $this->setMetaDataByQualifier("source_license", $license);
+    $this->setMetaDataByQualifier("source_license_string", htmlentities($license_string));
     }
 
   /** Get Agreed to Attribution Policy

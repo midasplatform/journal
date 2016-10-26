@@ -381,6 +381,10 @@ class Journal_SubmitController extends Journal_AppController
         if (isset($_POST['source-license']))
           {
           $resourceDao->setSourceLicense($_POST['source-license']);
+          if (($_POST['source-license'] == 3) && (isset($_POST['source-license-text'])))
+            {
+            $resourceDao->setSourceLicenseString($_POST['source-license-text']);
+            }
           }
         if (isset($_POST['attribution-policy']))
           {
