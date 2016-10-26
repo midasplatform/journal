@@ -1,8 +1,7 @@
 
 $(document).ready(function(){
     $('#acceptRights').change(function(){
-      $('input[type=submit]').attr('disabled', !$(this).is(':checked') || 
-                                            ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
+      submitCheck();
     })
     
     $('#acceptRights').change();
@@ -10,8 +9,7 @@ $(document).ready(function(){
     $('#acceptAttributionPolicy').change(function(){
       var acceptAttributionPolicyIsSelected = $(this).is(":visible") && $(this).is(':checked');
       $('#hiddenAttributionPolicy').attr('value', acceptAttributionPolicyIsSelected ? 1 : 0);
-
-      $('input[type=submit]').attr('disabled', ($(this).is(":visible") && !$(this).is(':checked')) || !$('#acceptRights').is(':checked'));
+      submitCheck();
     })
     
     $('#acceptAttributionPolicy').change();
@@ -42,9 +40,7 @@ $(document).ready(function(){
         }
       var acceptAttributionPolicyIsSelected = $('#acceptAttributionPolicy').is(":visible") && $('#acceptAttributionPolicy').is(':checked');
       $('#hiddenAttributionPolicy').attr('value', acceptAttributionPolicyIsSelected ? 1 : 0);
-
-      $('input[type=submit]').attr('disabled', !$('#acceptRights').is(':checked') || 
-                                            ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')));
+      submitCheck();
     });
 
     $('#licenseChoice').change(function(){
@@ -74,12 +70,7 @@ $(document).ready(function(){
         }
       var acceptAttributionPolicyIsSelected = $('#acceptAttributionPolicy').is(":visible") && $('#acceptAttributionPolicy').is(':checked');
       $('#hiddenAttributionPolicy').attr('value', acceptAttributionPolicyIsSelected ? 1 : 0);
-
-
-
-      $('input[type=submit]').attr('disabled', !$('#acceptRights').is(':checked') || 
-                                            ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')) ||
-                                            ( $("#otherLicenseInput").is(":visible") && $("#otherLicenseInput").val() ));
+      submitCheck()
       });
    
     $('#licenseChoice').change();
@@ -96,6 +87,7 @@ $(document).ready(function(){
     $("#otherLicenseInput").change(function(){
     var otherLicenseIsFilled = $("#otherLicenseInput").is(":visible") && $("#otherLicenseInput").val();
     $('#hiddenSourceLicenseText').attr('value', otherLicenseIsFilled ? $("#otherLicenseInput").val() : "Other");
+    submitCheck();
     })
     // Set up change function to run when text area loses focus
     $("#otherLicenseInput").change()
@@ -157,7 +149,12 @@ $(document).ready(function(){
   KeepAlive();
 });
 
-
+function submitCheck()
+  {
+  $('input[type=submit]').attr('disabled',!$('#acceptRights').is(':checked') ||
+                                        ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')) ||
+                                        ($("#otherLicenseInput").is(":visible") && !$("#otherLicenseInput").val() ));
+  }
 function KeepAlive()
   {
   $.get(json.global.webroot+'/journal/help', function(data) { });
