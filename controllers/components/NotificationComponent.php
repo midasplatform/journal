@@ -58,14 +58,7 @@ class Journal_NotificationComponent extends AppComponent
     $revisionId = $resourceDao->getRevision()->itemrevision_id;
     $authList = '';
 
-    if(!empty($sourceLicense))
-      {
-        $license = $resourceDao->getSourceLicenseString();
-      }
-    else
-      {
-      $license = "No License Specified";
-      }
+    $license = $resourceDao->getSourceLicenseString();
 
     if ($attributionPolicy == 1)
       {

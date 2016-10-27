@@ -145,32 +145,25 @@ foreach ($cssArray as $module => $list)
         echo "</select></li>";
         }
       $sourceLicense = $this->resource->getSourceLicense();
-      if(!empty($sourceLicense))
+      $sourceLicenseString = $this->resource->sourceLicenseToString($sourceLicense);
+      switch (intval($sourceLicense))
         {
-        switch (intval($sourceLicense))
-          {
-          case 1:
-            echo "<li>License: <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2</a></li>";
-            break;
-          case 2:
-            echo "<li>License: Public Domain</li>";
-            break;
-          case 3:
-            $license_string = $this->resource->getMetaDataByQualifier("source_license_string");
-            if(!$license_string) echo 'License: Other';
-            echo "<li>License: ".htmlentities($license_string->getValue())."</li>";
-            break;
-          case 4:
-            echo "<li>License: <a href='https://opensource.org/licenses/gpl-license'>GPL (Any Version)</a></li>";
-            break;
-          case 5:
-            echo "<li>License: <a href='https://opensource.org/licenses/lgpl-license'>LGPL (Any Version)</a></li>";
-            break;
-          case 6:
-            echo "<li>License: BSD</li>";
-            break;
+        case OTJ_SOURCE_LICENSE_APACHE_2:
+          echo "<li>License: <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>$sourceLicenseString</a></li>";
+          break;
+        case OTJ_SOURCE_LICENSE_GPL:
+          echo "<li>License: <a href='https://opensource.org/licenses/gpl-license'>$sourceLicenseString</a></li>";
+          break;
+        case OTJ_SOURCE_LICENSE_LGPL:
+          echo "<li>License: <a href='https://opensource.org/licenses/lgpl-license'>$sourceLicenseString</a></li>";
+          break;
+        case OTJ_SOURCE_LICENSE_OTHER:
+        case OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN:
+        case OTJ_SOURCE_LICENSE_BSD:
+        default:
+          echo "<li>License: $sourceLicenseString</li>";
+          break;
           }
-        }
       ?>
       <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>

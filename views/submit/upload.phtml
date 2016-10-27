@@ -123,27 +123,27 @@ I have the right to distribute these files
     <select id="licenseChoice">
       <option value="<?php echo OTJ_SOURCE_LICENSE_APACHE_2 ?>"
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_APACHE_2) echo "selected"; ?>>
-        Apache 2
+              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_APACHE_2) ?>
       </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN ?> "
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN) echo "selected"; ?>>
-              Public Domain
+              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN) ?>
       </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_GPL ?> "
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_GPL) echo "selected"; ?>>
-              GPL (Any Version)
+              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_GPL) ?>
       </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_LGPL ?> "
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_LGPL) echo "selected"; ?>>
-              LGPL (Any Version)
+              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_LGPL) ?>
       </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_BSD ?> "
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_BSD) echo "selected"; ?>>
-              BSD
+              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_BSD) ?>
       </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_OTHER ?>"
               <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER) echo "selected"; ?>>
-              Other
+              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_OTHER) ?>
       </option>
     </select>
      License.</br></label>
