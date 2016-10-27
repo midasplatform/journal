@@ -18,7 +18,7 @@
                   <p style="text-align:justify;text-justify:inter-word;"><b>Title:</b> <?php echo iconv("UTF-8", "ISO-8859-1//TRANSLIT",$this->name) ?>. </p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>Authors:</b> <?php echo $this->author ?>. </p>
                   <p style="text-align:justify;text-justify:inter-word;"><b>Revision Notes:</b> <?php echo iconv("UTF-8", "ISO-8859-1//TRANSLIT",$this->revision_notes)?></p>
-                  <p style="text-align:justify;text-justify:inter-word;"><b>Abstract:</b> <?php echo iconv("UTF-8", "ISO-8859-1//TRANSLIT",$this->description) ?></p>
+                  <p style="text-align:justify;text-justify:inter-word;"><b>Abstract:</b> <?php echo str_replace("<br>", "<br/>", nl2br(iconv("UTF-8", "ISO-8859-1//TRANSLIT",$this->description))) ?></p>
                   <br>
                   <p style="text-align:justify;text-justify:inter-word;">Download and review this publication at:
                     <a style="color:#ee5624;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10pt"
