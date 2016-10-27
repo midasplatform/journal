@@ -151,7 +151,7 @@ $(document).ready(function(){
 
 function submitCheck()
   {
-  $('input[type=submit]').attr('disabled',!$('#acceptRights').is(':checked') ||
+  $('input[type=submit]').attr('disabled',!$('#acceptRights').is(':checked') || !$('#acceptLicense').is(':checked') ||
                                         ($('#acceptAttributionPolicy').is(":visible") && !$('#acceptAttributionPolicy').is(':checked')) ||
                                         ($("#otherLicenseInput").is(":visible") && !$("#otherLicenseInput").val() ));
   }
