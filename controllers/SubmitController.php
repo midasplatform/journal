@@ -419,6 +419,12 @@ class Journal_SubmitController extends Journal_AppController
           {
           MidasLoader::loadComponent("Notification", "journal")->updatedArticle($resourceDao);
           }
+
+        // Update search index
+        Zend_Registry::get('notifier')->callback('CALLBACK_CORE_ITEM_SAVED', array(
+          'item' => $resourceDao,
+          'metadataChanged' => true));
+
         $this->_redirect("/journal/view/".$resourceDao->getRevision()->getKey());
         return;
         }
