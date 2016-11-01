@@ -52,6 +52,23 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
 </div>
 
 <?php
+  $disclaimerIndex = MidasLoader::loadModel("Setting")->getValueByName('licenseDisclaimer', "journal");
+  $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($disclaimerIndex);
+  if($disclaimer)
+    {
+    echo '<div id="disclaimerWrapperLicense" style="display:none;width:700px;"><h4>Disclaimer</h4>';
+    echo "<pre style:'white-space:pre-wrap'>".$disclaimer->getDescription()."</pre>";
+    echo "<br>
+      <table style='width:140px;margin:auto;'>
+        <tbody><tr>
+           <td> <a href='#' onclick='$.fancybox.close();'>Acknowledged</a></td>
+              <td>|</td>
+               <td><div align='center'><a href='".$this->webroot."/journal/view/?revisionId=".$this->resource->getRevision()->getKey()."'>Back</a></div></td>
+          </tr>
+        </tbody></table>";
+    echo "</div>";
+    }
+
 if($this->resource->getDisclaimer() != -1)
   {
   $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($this->resource->getDisclaimer());
