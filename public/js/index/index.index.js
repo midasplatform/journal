@@ -55,7 +55,7 @@ $(document).ready(function(){
         idPrefix: "dynatreeEdit-"+key
       });
 
-    if(tree.children.length > 5)
+    if(tree.children.length > 7)
       {
       $("div.categoryTree:last").hide();
       $("div.categoryTree:last").parent().find('img.tooggleButton').attr('src', json.global.webroot+'/privateModules/journal/public/images/arrow-right.png');
@@ -241,6 +241,10 @@ function searchDatabase(append)
         else if(value.indexOf("with_review") != -1)
           {
           fullQuery+= "text-journal.has_reviews:true ";
+          }
+        else if (value.indexOf("license") != -1)
+          {
+          fullQuery+= "text-journal.source_license:"+value.charAt(value.length - 1)+" ";
           }
         else
           {

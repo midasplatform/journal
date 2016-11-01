@@ -363,33 +363,31 @@ class Journal_ResourceDao extends ItemDao
    */
   function getSourceLicenseString()
     {
-    $metadata = $this->getMetaDataByQualifier("source_license");
-    if(!$metadata) return '';
-    switch (intval($metadata->getValue()))
+    $license = $this->getSourceLicense();
+    return $this->sourceLicenseToString($license);
+    }
+  function sourceLicenseToString($license)
+    {
+    switch (intval($license))
       {
-      case 1:
+      case OTJ_SOURCE_LICENSE_APACHE_2:
         return "Apache 2";
-        break;
-      case 2:
+      case OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN:
         return "Public Domain";
-        break;
-      case 3:
+      case OTJ_SOURCE_LICENSE_OTHER:
         $license_string = $this->getMetaDataByQualifier("source_license_string");
         if(!$license_string) return 'Other';
         return htmlentities($license_string->getValue());
-        break;
-      case 4:
+      case OTJ_SOURCE_LICENSE_GPL:
         return "GPL (Any Version)";
-        break;
-      case 5:
+      case OTJ_SOURCE_LICENSE_LGPL:
         return "LGPL (Any Version)";
-        break;
-      case 6:
+      case OTJ_SOURCE_LICENSE_BSD:
         return "BSD";
-        break;
       default:
-        return "None Specified";
+        return "No License Specified";
       }
+    return $str;
     }
 
   /**
