@@ -99,11 +99,11 @@ class Journal_TreeComponent extends AppComponent
       $none = OTJ_SOURCE_LICENSE_NOT_DEFINED;
       $trees[] = array('dao' => new stdClass(), 'select' => 0, 'title' => "License", 'key' => -1,
             'children' => array(
-                array('dao' => new stdClass(), 'select' => 1, 'title' => "Apache 2", 'key' => "license-$apache2",
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Apache 2", 'key' => "license-$apache2",
                 'children' => array()),
-                array('dao' => new stdClass(), 'select' => 1, 'title' => "Public Domain", 'key' => "license-$public_domain",
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Public Domain", 'key' => "license-$public_domain",
                 'children' => array()),
-                array('dao' => new stdClass(), 'select' => 1, 'title' => "Other", 'key' => "license-$other",
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "Other", 'key' => "license-$other",
                 'children' => array()),
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "GPL (Any Version)", 'key' => "license-$gpl",
                 'children' => array()),
@@ -111,7 +111,7 @@ class Journal_TreeComponent extends AppComponent
                 'children' => array()),
                 array('dao' => new stdClass(), 'select' => 0, 'title' => "BSD", 'key' => "license-$bsd",
                 'children' => array()),
-                array('dao' => new stdClass(), 'select' => 1, 'title' => "No License Specified", 'key' => "license-$none",
+                array('dao' => new stdClass(), 'select' => 0, 'title' => "No License Specified", 'key' => "license-$none",
                 'children' => array())
             ));
       }
