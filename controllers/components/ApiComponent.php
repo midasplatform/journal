@@ -60,6 +60,9 @@ class Journal_ApiComponent extends AppComponent
         $index = $solrComponent->getSolrIndex();
         UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
         $factor = 10;
+        $searchOptions = array(
+            'sort' => ' text-journal.revision_id desc',
+            'fl' => '*,score'); //extend limit to allow some room for policy filtering
         if("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query']) 
           {
           $factor = 100000; // Get all the ids when creating the cache
@@ -69,7 +72,7 @@ class Journal_ApiComponent extends AppComponent
           }
         else
           {
-          $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+          $response = $index->search($args['query'], 0, $limit * $factor + $offset, $searchOptions);
           UtilityComponent::endIgnoreWarnings();
           foreach($response->response->docs as $doc)
             {
@@ -79,7 +82,7 @@ class Journal_ApiComponent extends AppComponent
             {
             // Increase the factor to capture all available submissions for searching the target level
             $factor = 100000;
-            $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+            $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, $searchOptions);
             }
           foreach($response->response->docs as $doc)
             {
