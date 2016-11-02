@@ -335,8 +335,6 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
 
 /** Simple templating mechanism */
 function addAndFormatResult(container, values, foundIDs) {
-function addAndFormatResult(container, values) {
-  if (container.html().indexOf(values['title']) == -1) {
   var id = values['id'];
   if (foundIDs.indexOf(id) === -1) {
     foundIDs.push(id);
