@@ -263,6 +263,7 @@ function searchDatabase(append)
 function ajaxSearch(append,fullQuery,allQuery,certLevel) {
   var limit = 25;
   var shown = 0;
+  var foundIDs = new Array();
 
   if(!append) {
     shown = 0;
@@ -290,7 +291,7 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             'authors': value.authors, 'isCertified' : value.isCertified, 'certifiedLevel': value.certifiedLevel,
             'pastCertificationRevisionNum': value.pastCertificationRevisionNum,
             'pastCertificationRevisionKey': value.pastCertificationRevisionKey,
-            'license': value.license})
+            'license': value.license}, foundIDs)
           })
 
           if(shown == (limit + lastIndex))
@@ -333,8 +334,12 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
 }
 
 /** Simple templating mechanism */
+function addAndFormatResult(container, values, foundIDs) {
 function addAndFormatResult(container, values) {
   if (container.html().indexOf(values['title']) == -1) {
+  var id = values['id'];
+  if (foundIDs.indexOf(id) === -1) {
+    foundIDs.push(id);
     var str = document.getElementById('SearchResultTemplate').innerHTML;
       if(values.pastCertificationRevisionKey !== "")
         {
