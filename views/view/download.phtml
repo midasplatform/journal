@@ -57,7 +57,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
   if($disclaimer)
     {
     echo '<div id="disclaimerWrapperLicense" style="display:none;width:700px;"><h4>Disclaimer</h4>';
-    echo "<pre style:'white-space:pre-wrap'>".$disclaimer->getDescription()."</pre>";
+    echo "<pre style='word-break:unset'>".$disclaimer->getDescription()."</pre>";
     echo "<br>
       <table style='width:140px;margin:auto;'>
         <tbody><tr>
@@ -75,7 +75,7 @@ if($this->resource->getDisclaimer() != -1)
   if($disclaimer)
     {
     echo '<div id="disclaimerWrapper" style="display:none;width:700px;"><h4>Disclaimer</h4>';
-    echo "<pre>".$disclaimer->getDescription().'</pre>';
+    echo "<pre style='word-break:unset'>".$disclaimer->getDescription().'</pre>';
     echo "<br>
       <table style='width:140px;margin:auto;'>
         <tbody><tr>
