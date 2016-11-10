@@ -116,7 +116,7 @@ foreach ($cssArray as $module => $list)
       echo join(', ', $categories) ?></li>
       <li>Keywords: <?php
       $tags = $this->resource->getTags();
-      foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=text-journal.tags:'.$tag.'">'.$tag.'</a>';
+      foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=tags:'.$tag.'">'.$tag.'</a>';
       echo join(', ', $tags)
       ?></li>
       <?php

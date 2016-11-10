@@ -163,19 +163,25 @@ function searchDatabase(append)
     var val = re.exec(query);
     if (val != null)
       {
-      if(val[1] == "institution")
+      switch(val[1])
         {
-        query = query.replace(val[1], 'text-journal.insitution');
-        query = query.replace(val[2], "("+val[2]+")");
-        fullQuery += query +" OR ";
+        case "institution":
+          query = query.replace(val[1], 'text-journal.insitution');
+          query = query.replace(val[2], "("+val[2]+")");
+          fullQuery += query +" OR ";
+          break;
+        case "authors":
+          query = query.replace(val[1], 'text-journal.authors');
+          query = query.replace(val[2], "("+val[2]+")");
+          fullQuery += query +" OR ";
+          break
+        case "tags":
+          query = query.replace(val[1], 'text-journal.tags');
+          query = query.replace(val[2], "("+val[2]+")");
+          fullQuery += query +" OR ";
+          break
         }
-      else if (val[1] == "authors")
-        {
-        query = query.replace(val[1], 'text-journal.authors');
-        query = query.replace(val[2], "("+val[2]+")");
-        fullQuery += query +" OR ";
-        }
-       }
+      }
 
     // Remove any empty values
     vals = vals.filter(function(val){
