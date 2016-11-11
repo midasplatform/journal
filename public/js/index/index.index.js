@@ -167,17 +167,17 @@ function searchDatabase(append)
         {
         case "institution":
           query = query.replace(val[1], 'text-journal.insitution');
-          query = query.replace(val[2], "("+val[2]+")");
+          query = query.replace(":"+val[2], ":("+val[2]+")");
           fullQuery += query +" OR ";
           break;
         case "authors":
           query = query.replace(val[1], 'text-journal.authors');
-          query = query.replace(val[2], "("+val[2]+")");
+          query = query.replace(":"+val[2], ":("+val[2]+")");
           fullQuery += query +" OR ";
           break
         case "tags":
           query = query.replace(val[1], 'text-journal.tags');
-          query = query.replace(val[2], "("+val[2]+")");
+          query = query.replace(":"+val[2], ":("+val[2]+")");
           fullQuery += query +" OR ";
           break
         }
