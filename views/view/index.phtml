@@ -46,18 +46,23 @@ foreach ($cssArray as $module => $list)
     <h4>Resources</h4>
     <ul>
       <?php echo "<li><a href='" . $this->webroot . "/journal/view/download?revisionId=" . $this->resource->getRevision()->getKey() . "'>Download</a></li>"; ?>
+    </ul>
       <?php
       $github = $this->resource->getGithub();
       if(!empty($github))
         {
         ?>
+      <p id='githubDisclaimer'> <span style="color: red;">Caution:</span>
+        Github repository may have been updated since submission</p>
+      <ul>
         <li><a href="<?php echo $github ?>" target="_blank">
-             Github <img  style='border:none;position:relative;top:-2px;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/github-small.png" /></a>
+           Github <img  style='border:none;position:relative;top:-2px;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/github-small.png" /></a>
         </li>
-      <?php
-        }
-      ?>
-    </ul>
+      </ul>
+    <?php
+      }
+    ?>
+
 
 
     <h4>Export citation:</h4>

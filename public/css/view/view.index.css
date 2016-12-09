@@ -8,6 +8,11 @@
   color:#666666;
 }
 
+#githubDisclaimer {
+  border: 2px solid grey;
+  background-color: #F2F3F3;
+}
+
 #publication .thumbnail {
   padding-top: 10px;
   /*width:300px;*/
