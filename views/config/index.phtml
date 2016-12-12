@@ -52,6 +52,10 @@ $this->headScript()->appendFile($this->webroot."/privateModules/journal/public/j
               <label for='test'>Index of licensing disclaimer</label>
               <input type='number' name='licenseDisclaimer' value='".$this->licenseDisclaimer."'/>
             </div>
+            <div>
+              <label for='test'>Secret value for RECAPTCHA</label>
+              <input type='text' name='captchaSecret' value='".$this->captchaSecret."'/>
+            </div>
           <div>
             <input type='submit' value='Save Configuration'/>
           </div>
