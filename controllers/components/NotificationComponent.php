@@ -182,6 +182,15 @@ class Journal_NotificationComponent extends AppComponent
   public function updatedArticle($resourceDao)
     {
     $this->getLogger()->info("Article is Updated");
+    $isPrivate = true;
+    foreach($resourceDao->getItempolicygroup() as $policy)
+      {
+      if($policy->getGroupId() == MIDAS_GROUP_ANONYMOUS_KEY)
+        {
+        $isPrivate = false;
+        }
+      }
+    // end determining section
     // @TODO Check user settings, but I do not think it has been implemented yet
     $fc = Zend_Controller_Front::getInstance();
     $baseUrl = UtilityComponent::getServerURL().$fc->getBaseUrl();
@@ -218,7 +227,9 @@ class Journal_NotificationComponent extends AppComponent
     $this->getLogger()->debug("Body Text is " . $bodyText);
     $subject = 'Updated Submission: ' . $name;
     $to = '';
-    $subList = $this->_getNewSubmissionSubscribeList();
+    if (!$isPrivate) {
+        $subList = $this->_getNewSubmissionSubscribeList();
+    }
     $editList = $this->_getSubmissionEditorEmails($resourceDao);
     $adminList = $this->_getSubmissionAdminEmails($resourceDao);
     $emailLstArray = array($subList, $editList, $adminList);
