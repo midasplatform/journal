@@ -131,7 +131,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     <script type="text/template" id="SearchResultTemplate">
       <div class="SearchResultEntry box" id="{id}">
         <table style="width: 99%">
-          <tr>
+          <tr title="{title}">
             <td style="width:100px;height:98px;vertical-align: middle;text-align: center;">
               <img class="ResultLogo" src="<?php echo $this->webroot ?>/journal/view/logo/?revisionId={id}&size=64" />
               <img class="ResultLogo" src="<?php echo $this->webroot ?>/privateModules/journal/public/images/journal.gif" />
