@@ -42,61 +42,69 @@ class Journal_ApiComponent extends AppComponent
     else  $authComponent = $componentLoader->loadComponent('Authentication');
     $userDao = $authComponent->getUser($args,
                                        Zend_Registry::get('userSession')->Dao);
-    $useCache  = !$userDao && "text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query'];  
+    $useCache  = !$userDao && "text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query'];
     $cacheFile = UtilityComponent::getTempDirectory()."/homeSearch.json";
     $limit = array_key_exists('limit', $args) ? (int)$args['limit'] : 25;
     $offset = array_key_exists('offset', $args) ? (int)$args['offset'] : 0;
     $targetLevel = array_key_exists('level', $args) ? $args['level'] : 0;
     $itemIds = array();
     $totalResults = 0;
-    if($useCache && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
-      {
-      $itemIds = JsonComponent::decode(file_get_contents($cacheFile));
-      }
-    else
-      {
-      try
-        {
-        $index = $solrComponent->getSolrIndex();
-        UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
-        $factor = 10;
-        if("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query']) 
-          {
-          $factor = 100000; // Get all the ids when creating the cache
-          $db = Zend_Registry::get('dbAdapter');
-          $query = "SELECT MAX(itemrevision_id) as 'revision_id',item_id from itemrevision GROUP BY item_id ORDER BY revision_id DESC ";
-          $itemIds = $db->query($query)->fetchAll();
-          }
-        else
-          {
-          $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
-          UtilityComponent::endIgnoreWarnings();
-          foreach($response->response->docs as $doc)
-            {
-            $itemIds[] = array("item_id" => $doc->key);
-            }
-          if(!empty($targetLevel))
-            {
-            // Increase the factor to capture all available submissions for searching the target level
-            $factor = 100000;
-            $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
-            }
-          foreach($response->response->docs as $doc)
-            {
-            $itemIds[] = array("item_id" => $doc->key);
-            }
-          }
-        }
-        catch(Exception $e)
-          {
-          throw new Exception('Syntax error in query ', -1);
-          }
 
-        if($useCache)
-          {
-          file_put_contents($cacheFile, JsonComponent::encode($itemIds));
-          }
+    if(isset($_COOKIE["pastSearch"]) && "text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query']) {
+      foreach(json_decode($_COOKIE["pastSearch"], true) as $test) {
+        $itemIds[] = $test;
       }
+    }
+    else {
+      if($useCache && file_exists($cacheFile) &&  (filemtime($cacheFile) > (time() - 60 * 60 * 24 * 1 ))) // 1 day cache
+        {
+        $itemIds = JsonComponent::decode(file_get_contents($cacheFile));
+        }
+      else
+        {
+        try
+          {
+          $index = $solrComponent->getSolrIndex();
+          UtilityComponent::beginIgnoreWarnings(); //underlying library can generate warnings, we need to eat them
+          $factor = 10;
+          if("text-journal.enable:true  AND ( text-journal.community:".$defaultCommunity." )" == $args['query'])
+            {
+            $factor = 100000; // Get all the ids when creating the cache
+            $db = Zend_Registry::get('dbAdapter');
+            $query = "SELECT MAX(itemrevision_id) as 'revision_id',item_id from itemrevision GROUP BY item_id ORDER BY revision_id DESC ";
+            $itemIds = $db->query($query)->fetchAll();
+            }
+          else
+            {
+            $response = $index->search($args['query'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+            UtilityComponent::endIgnoreWarnings();
+            foreach($response->response->docs as $doc)
+              {
+              $itemIds[] = array("item_id" => $doc->key);
+              }
+            if(!empty($targetLevel))
+              {
+              // Increase the factor to capture all available submissions for searching the target level
+              $factor = 100000;
+              $response = $index->search($args['secondQuery'], 0, $limit * $factor + $offset, array('fl' => '*,score')); //extend limit to allow some room for policy filtering
+              }
+            foreach($response->response->docs as $doc)
+              {
+              $itemIds[] = array("item_id" => $doc->key);
+              }
+            }
+          }
+          catch(Exception $e)
+            {
+            throw new Exception('Syntax error in query ', -1);
+            }
+
+          if($useCache)
+            {
+            file_put_contents($cacheFile, JsonComponent::encode($itemIds));
+            }
+        }
+    }
 
     $modelLoader = new MIDAS_ModelLoader();
     $itemModel = $modelLoader->loadModel('Item');
@@ -145,7 +153,7 @@ class Journal_ApiComponent extends AppComponent
           }
         }
       }
-    return $items;
+    return array($items, $itemIds);
     }
     
 
