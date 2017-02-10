@@ -142,13 +142,12 @@ I have the right to distribute these files
               <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_BSD) ?>
       </option>
       <option value="<?php echo OTJ_SOURCE_LICENSE_OTHER ?>"
-              <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER) echo "selected"; ?>>
-              <?php echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_OTHER) ?>
+              <?php if ($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER) echo "selected"; ?>> Other
       </option>
     </select>
      License.</br></label>
     <label style="display:inline;" for='otherLicenseInput' id='otherLicenseInputLabel'>Enter 'Other' License:</label>
-    <input type='text' id='otherLicenseInput' name="source-license-text">
+    <input type='text' id='otherLicenseInput' name="source-license-text" value="<?php if($this->resource->getSourceLicense() == OTJ_SOURCE_LICENSE_OTHER) { echo $this->resource->sourceLicenseToString(OTJ_SOURCE_LICENSE_OTHER); } else { echo '';} ?>">
     <input type="checkbox" <?php if ($this->resource->getAgreedAttributionPolicy()) echo "checked='true'";?>
            class="checkbox" id="acceptAttributionPolicy" value="1">
     <label style="display:inline;" for="acceptAttributionPolicy" id="acceptAttributionPolicyLabel"> 
