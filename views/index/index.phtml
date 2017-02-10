@@ -36,7 +36,7 @@ else
         {
         $hasSubmitterAReview = true;
         }
-      if($r->getType() != $this->reviewPhase) echo "<div class='hiddenReview'>";
+      if($r->getType() != $this->reviewPhase && ($phase!="Complete")) echo "<div class='hiddenReview'>";
       showReviews($r, $this->webroot);
       if($r->getType() != $this->reviewPhase) echo "</div>";
       }
@@ -46,7 +46,7 @@ else
         {
         $hasSubmitterAReview = true;
         }
-      if($r->getType() != $this->reviewPhase) echo "<div class='hiddenReview'>";
+      if($r->getType() != $this->reviewPhase && ( $phase!="Complete")) echo "<div class='hiddenReview'>";
       showReviews($r, $this->webroot);
       if($r->getType() != $this->reviewPhase) echo "</div>";
       }
