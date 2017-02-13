@@ -75,7 +75,7 @@ function showReviews($review, $webroot)
     $contentArray = JsonComponent::decode($review->getContent());
   if(isset($contentArray['list']['certificationLevel']) && is_numeric($contentArray['list']['certificationLevel']))
     {
-    echo "<tr><td>Recommended Certification Level</td><td>".$contentArray['list']['certificationLevel']."</td></tr>";
+    echo "<tr><td>Recommended Certification Level</td><td colspan=2>".$contentArray['list']['certificationLevel']."</td></tr>";
     }
   echo "</table>";
 
