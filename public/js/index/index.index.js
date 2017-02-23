@@ -32,7 +32,10 @@ $(document).ready(function(){
 
   $('.issuePage').fancybox({type: 'ajax'});
 
-
+  function selectCategory (select, node) {
+        $('#infoElement').hide();
+        searchDatabase(false);
+  }
   // Create the root html element of each tree
   $.each(json.trees, function(key, tree)
     {
@@ -42,11 +45,9 @@ $(document).ready(function(){
       debugLevel : 0,
       checkbox: true,
       selectMode: 3,
+      title: tree.title,
       children: tree.children,
-      onSelect: function(select, node) {
-        $('#infoElement').hide();
-        searchDatabase(false);
-      },
+      onSelect: selectCategory,
       onDblClick: function(node, event) {
         node.toggleExpand();
       },
@@ -62,6 +63,40 @@ $(document).ready(function(){
       }
     }
   );
+  var cookieVal= '';
+  var name= "searchParams=";
+  // Find searchParams cookie and capture values if it exists
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            cookieVal = c.substring(name.length, c.indexOf("}")+1);
+        }
+    }
+
+  //Set the search boxes from the search query if the cookie exists
+  if(cookieVal !=name && cookieVal != '') {
+    cval = JSON.parse(cookieVal);
+    $("#treeWrapper div.categoryTree").each(function(i, n){
+      var treeObject = $(this).dynatree("getTree");
+      treeObject.options.onSelect=null;
+      Object.getOwnPropertyNames(cval).forEach(function(item,index) {
+          cval[item].forEach(function( key, index) {
+            treeObject.selectKey(key);
+          });
+      });
+      treeObject.options.onSelect=selectCategory;
+    });
+    var queryString='';
+    cval.query.forEach(function (entry, index) {
+      queryString += entry + " ";
+    })
+    $('#live_search').attr("value",queryString);
+  };
 
   $('.issueButton .issueTitle, .issueButton .issueSubTitle').click(function(){
     var container = $(this).parents('.issueButton');
@@ -95,7 +130,13 @@ $(document).ready(function(){
 
   $('#clear_button').click(function(){
       $('#infoElement').hide();
-      $('#live_search').val("")
+      $('#live_search').val("");
+      document.cookie = 'pastSearch=;expires= Thu, 01 Jan 1970 00:00:01 GMT; path='+$(".webroot").attr("value");
+      $("#treeWrapper div.categoryTree").each(function(i, n){
+         $(this).dynatree("getRoot").visit(function(node) {
+           node.select(false);
+         })
+      })
       searchDatabase(false);
     });
 
@@ -133,6 +174,15 @@ function getSelectedCategories()
 //** Query the api */
 function searchDatabase(append)
   {
+  // Values for capturing the search parameters
+  var selections = {};
+  selections["Category"] = [];
+  selections["License"] = [];
+  selections["Certified"] = [];
+  selections["Code"] = [];
+  selections["query"] = [];
+  selections['OSEHRA VistA'] = [];
+
   var fullQuery = "text-journal.enable:true ";
 
   var query = $('#live_search').val();
@@ -192,8 +242,10 @@ function searchDatabase(append)
     if( vals.length > 0 )
       {
       query = vals[0];
+      selections['query'].push(vals[0]);
       for (i = 1; i < vals.length; i++)
         {
+        selections['query'].push(vals[i]);
         query += " AND ";
         query += vals[i];
         }
@@ -201,6 +253,7 @@ function searchDatabase(append)
       }
     fullQuery += ")"
     }
+
 
   if(selectIssue)
     {
@@ -219,7 +272,10 @@ function searchDatabase(append)
   var certLevel =  [];
   if(categories.length != 0)
     {
+    document.cookie = "pastSearch=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
+    document.cookie = "searchParams=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
     $.each(categories, function(idx, val){
+
       fullQuery+= " AND (";
       $.each(val, function(index, value){
         if(index != 0) fullQuery += " OR ";
@@ -227,39 +283,51 @@ function searchDatabase(append)
           {
           fullQuery+= "text-journal.certification_level:"+value.charAt(value.length - 1)+" ";
           certLevel.push(value.charAt(value.length - 1));
+          selections["Certified"].push(value)
           }
         else if(value.indexOf("submission_type") != -1)
           {
           fullQuery+= "text-journal.submission_type:"+value.charAt(value.length - 1)+" ";
+          selections["OSEHRA VistA"].push(value)
           }
         else if(value.indexOf("code_in_flight") != -1)
           {
           fullQuery+= "name:\"Code in Flight\" ";
+          selections["Code"].push( value);
           }
         else if(value.indexOf("with_code") != -1)
           {
           fullQuery+= "text-journal.has_code:true ";
+          selections["Code"].push( value);
           }
         else if(value.indexOf("with_test_code") != -1)
           {
           fullQuery+= "text-journal.has_test_code:true ";
+          selections["Code"].push( value);
           }
         else if(value.indexOf("with_review") != -1)
           {
           fullQuery+= "text-journal.has_reviews:true ";
+          selections["Certified"].push( value)
           }
         else if (value.indexOf("license") != -1)
           {
           fullQuery+= "text-journal.source_license:"+value.charAt(value.length - 1)+" ";
+          selections["License"].push(value)
           }
         else
           {
           fullQuery+= " text-journal.categories:"+value+" ";
+          selections["Category"].push(value)
           }
       });
       fullQuery+= ")";
     });
+
     }
+  var mydate = new Date();
+  mydate.setMinutes(mydate.getMinutes()+30);
+  document.cookie = "searchParams="+ JSON.stringify(selections) +"; expires= "+ mydate.toString()+ "; path="+$(".webroot").attr("value");
   allQuery= fullQuery.replace(/AND \(text-journal.cer[(text\-journal\.certification\_level:1-4OR ]+ \)/,"")
   $('img#searchLoadingImg').show();
   ajaxSearch(append,fullQuery,allQuery,certLevel);
@@ -273,7 +341,7 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
 
   if(!append) {
     shown = 0;
-    lastIndex = 0;
+    lastIndex = 1;
   }
   else {
     lastIndex = lastIndex + limit;
@@ -286,7 +354,8 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
           $('img#searchLoadingImg').hide();
           if(!append) $('.SearchResults').html("");
           if(!append) $('#noResultElement').show();
-          $.each(retVal.data.slice(lastIndex), function(index, value)
+
+          $.each(retVal.data[0].slice(lastIndex), function(index, value)
           {
           shown = $('.resourceLink').length;
           if(shown >= (limit + lastIndex)) return false;
@@ -299,7 +368,10 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             'pastCertificationRevisionKey': value.pastCertificationRevisionKey,
             'license': value.license}, foundIDs)
           })
+          var mydate = new Date();
 
+          mydate.setMinutes(mydate.getMinutes()+30);
+          document.cookie = "pastSearch="+ JSON.stringify( retVal.data[1]) +"; expires= "+ mydate.toString()+ "; path="+$(".webroot").attr("value");
           if(shown == (limit + lastIndex))
             {
             $('#showMoreResults').show();
@@ -334,7 +406,6 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
             midas.createNotice(retVal.message, 3000, 'error');
         },
         complete: function () {
-
         }
     });
 }

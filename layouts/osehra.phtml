@@ -197,7 +197,7 @@ echo $this->doctype()
         
            </div>
         </div>
-          <div id="topbar"><ul id="Nav" class="nav navbar-nav"><li id='browseLink'><a href="<?php echo $this->webroot ?>/journal">Home</a></li>
+          <div id="topbar"><ul id="Nav" class="nav navbar-nav"><li id='browseLink'><a>Home</a></li>
 
            <li>
              <a  href="<?php echo $this->webroot."/journal/view/journals"?>">Journal</a>
@@ -378,7 +378,23 @@ echo $this->doctype()
       var rawJson="<?php echo addslashes(trim($this->json))?>";
     </script>
 
-    
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#browseLink").click(function ( event) {
+          event.preventDefault()
+          $('#infoElement').hide();
+          $('#live_search').val("");
+          document.cookie = "pastSearch=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
+          document.cookie = "searchParams=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
+          $("#treeWrapper div.categoryTree").each(function(i, n){
+             $(this).dynatree("getRoot").visit(function(node) {
+               node.select(false);
+             })
+          })
+          location.href = $(".webroot").attr("value")+"/journal"
+        })
+      });
+    </script>
     <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
