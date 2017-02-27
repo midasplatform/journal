@@ -143,6 +143,13 @@ function processQuestionUpdate(init){
       html += "<td><a class='selectTopic' value='"+i+"'>"+v.name+"</a></td>";
       if (isFinalReview){
         html += "<td><input type='text' size='1' id='questionLevel_"+i+"' disabled='disabled'/></td>";
+        html += "<td>"
+        Object.keys(json.listArray.topics[i].questions).forEach(function(questionID) {
+          if(typeof json.listArray.topics[i].questions[questionID].commentValue !== 'undefined') {
+            html += "<textarea disabled=true id='questionComment_"+i+"'>"+json.listArray.topics[i].questions[questionID].commentValue.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"'</textarea>";
+          }
+        });
+        html+="</td>";
       }
       else{
         html += "<td><input type='checkbox' disabled='disabled' id='topicComple_"+i+"'/></td>";
@@ -224,6 +231,11 @@ function processQuestionUpdate(init){
       });
     if (isFinalReview){
       $('#questionLevel_'+i).attr('value', levelValue);
+      Object.keys(json.listArray.topics[i].questions).forEach(function(questionID) {
+        if(typeof json.listArray.topics[i].questions[questionID].commentValue !== 'undefined') {
+          $('#questionComment_'+i).html(json.listArray.topics[i].questions[questionID].commentValue.replace(/</g,"&lt;").replace(/>/g,"&gt;"));
+        }
+      });
     }
     else
     {
