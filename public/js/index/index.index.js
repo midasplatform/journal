@@ -327,7 +327,7 @@ function searchDatabase(append)
     }
   var mydate = new Date();
   mydate.setMinutes(mydate.getMinutes()+30);
-  document.cookie = "searchParams="+ JSON.stringify(selections) +"; expires= "+ mydate.toString()+ "; path="+$(".webroot").attr("value");
+  document.cookie = 'searchParams='+ JSON.stringify(selections) +'; expires= '+ mydate.toUTCString()+ '; path='+$(".webroot").attr("value");
   allQuery= fullQuery.replace(/AND \(text-journal.cer[(text\-journal\.certification\_level:1-4OR ]+ \)/,"")
   $('img#searchLoadingImg').show();
   ajaxSearch(append,fullQuery,allQuery,certLevel);
@@ -371,7 +371,7 @@ function ajaxSearch(append,fullQuery,allQuery,certLevel) {
           var mydate = new Date();
 
           mydate.setMinutes(mydate.getMinutes()+30);
-          document.cookie = "pastSearch="+ JSON.stringify( retVal.data[1]) +"; expires= "+ mydate.toString()+ "; path="+$(".webroot").attr("value");
+          document.cookie = 'pastSearch='+ JSON.stringify( retVal.data[1]) +'; expires= '+ mydate.toUTCString()+ '; path='+$(".webroot").attr("value");
           if(shown == (limit + lastIndex))
             {
             $('#showMoreResults').show();
