@@ -53,8 +53,11 @@ def parseSubmission(inputPath,tmpDir):
           print "Processing file: %s" % filepath
           if (zipfile.is_zipfile(filepath)) or filepath.endswith("7z"):
             searchArchive(filepath, unzipPath, tmpDir)
-          elif os.path.isdir(filepath):
-            parseSubmission(filepath,tmpDir)
+          elif (os.path.isdir(filepath)):
+            if (not ("Public_Report" in filepath)):
+              parseSubmission(filepath,tmpDir)
+            else:
+              continue
           else:
             if not (filepath.endswith(OTJ_FILE_EXCLUDES)):
               outline= filepath
