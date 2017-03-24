@@ -95,7 +95,7 @@ $(document).ready(function(){
     cval.query.forEach(function (entry, index) {
       queryString += entry + " ";
     })
-    $('#live_search').attr("value",queryString);
+    //$('#live_search').attr("value",queryString);
   };
 
   $('.issueButton .issueTitle, .issueButton .issueSubTitle').click(function(){
@@ -130,7 +130,7 @@ $(document).ready(function(){
 
   $('#clear_button').click(function(){
       $('#infoElement').hide();
-      $('#live_search').val("");
+      $('#live_search').val("Search...");
       document.cookie = 'pastSearch=;expires= Thu, 01 Jan 1970 00:00:01 GMT; path='+$(".webroot").attr("value");
       $("#treeWrapper div.categoryTree").each(function(i, n){
          $(this).dynatree("getRoot").visit(function(node) {
@@ -230,6 +230,14 @@ function searchDatabase(append)
           query = query.replace(":"+val[2], ":("+val[2]+")");
           fullQuery += query +" OR ";
           break
+        case "submitter":
+          query = query.replace(val[1], 'text-journal.submitter');
+          query = query.replace(":"+val[2], ":("+val[2]+")");
+          fullQuery += query +" OR ";
+          break
+        default:
+          fullQuery += query +" OR ";
+          break
         }
       }
 
@@ -270,9 +278,9 @@ function searchDatabase(append)
   var allQuery = '';
   var categories = getSelectedCategories();
   var certLevel =  [];
+  document.cookie = "pastSearch=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
   if(categories.length != 0)
     {
-    document.cookie = "pastSearch=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
     document.cookie = "searchParams=; expires= Thu, 01 Jan 1970 00:00:01 GMT; path="+$(".webroot").attr("value");
     $.each(categories, function(idx, val){
 

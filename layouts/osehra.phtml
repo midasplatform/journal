@@ -212,7 +212,7 @@ echo $this->doctype()
               <a  href="<?php echo $this->webroot."/journal/user/settings"?>">My Profile</a>
                <ul>
                 <li>
-                  <a class="submm" href="<?php echo $this->webroot."/journal/?q=text-journal.submitter:".$this->userDao->getKey()?>">My Publications</a>
+                  <a class="submm" href="<?php echo $this->webroot."/journal/?q=submitter:".$this->userDao->getKey()?>">My Publications</a>
                 </li>           
                 <li>
                   <a class="submm" href="<?php echo $this->webroot."/journal/user/settings"?>">Edit Profile</a>
