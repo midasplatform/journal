@@ -50,7 +50,7 @@ $(function() {
     }
 
   $('#live_search').focus(function() {
-    if($('#live_search_value').val() == 'init')
+    if(($('#live_search_value').val() == 'init') && ($('#live_search').val() == "Search..."))
       {
       $('#live_search_value').val($('#live_search').val());
       $('#live_search').val('');

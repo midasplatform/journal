@@ -131,6 +131,7 @@ $(document).ready(function(){
   $('#clear_button').click(function(){
       $('#infoElement').hide();
       $('#live_search').val("Search...");
+      $('#live_search_value').val("init");
       document.cookie = 'pastSearch=;expires= Thu, 01 Jan 1970 00:00:01 GMT; path='+$(".webroot").attr("value");
       $("#treeWrapper div.categoryTree").each(function(i, n){
          $(this).dynatree("getRoot").visit(function(node) {
