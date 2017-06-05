@@ -85,6 +85,6 @@ class Journal_IndexController extends Journal_AppController
     $this->view->json['selectedIssue'] = (isset($selectedIssueDao))?$selectedIssueDao->getKey():false;
     $this->view->json['selectedCommunity'] = (isset($community))?$community->getKey():false;
     $this->view->json['treeJournals'] = $this->view->treeJournals;
-    $this->view->json['searchDisableCompletion'] = true;
+    // $this->view->json['searchDisableCompletion'] = true;
     }
 }//end class
