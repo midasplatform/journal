@@ -78,21 +78,18 @@ foreach ($cssArray as $module => $list)
 
     <h4>Information</h4>
     <ul>
-       <?php
-      if($this->isPrivate)
-        {
-        echo "<li>Private article</li>";
-        }
-        ?>
-
       <?php
-      $articleType = array(RESOURCE_TYPE_SOFTWARE => "Software",
-         RESOURCE_TYPE_PLUGIN => "Plugin",
-         RESOURCE_TYPE_PUBLICATION => "Publication",
-         RESOURCE_TYPE_TUTORIAL => "Tutorial",
-         RESOURCE_TYPE_DATASET => "Dataset");?>
+        if($this->isPrivate)
+          {
+          echo "<li>Private article</li>";
+          }
 
-      <?php
+        $articleType = array(RESOURCE_TYPE_SOFTWARE => "Software",
+          RESOURCE_TYPE_PLUGIN => "Plugin",
+          RESOURCE_TYPE_PUBLICATION => "Publication",
+          RESOURCE_TYPE_TUTORIAL => "Tutorial",
+          RESOURCE_TYPE_DATASET => "Dataset");
+
         $level = $this->resource->getCertificationLevel();
         if(is_numeric($level))
           {
@@ -160,48 +157,48 @@ foreach ($cssArray as $module => $list)
     </li></ul>
 
     <?php
-    if($this->isAdmin || $this->isAuthor)
-      {
-      echo '<h4>Manage</h4>';
-      echo "<ul>";
-      if($this->isApproved && ($this->isAdmin || $this->isAuthor))
+      if($this->isAdmin || $this->isAuthor)
         {
-        echo "<li><a href='" . $this->webroot . "/journal/submit?itemId=" . $this->resource->getKey() . "'>New revision</a></li>";
+        echo '<h4>Manage</h4>';
+        echo "<ul>";
+        if($this->isApproved && ($this->isAdmin || $this->isAuthor))
+          {
+          echo "<li><a href='" . $this->webroot . "/journal/submit?itemId=" . $this->resource->getKey() . "'>New revision</a></li>";
+          }
+        if($this->isAdmin)
+          {
+          $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+          $multipleRevisions = $lastRevision->getRevision() != 1;
+          if($multipleRevisions)
+            {
+            echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit current revision</a></li>";
+            }
+          else
+            {
+            echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit publication</a></li>";
+            }
+          if($multipleRevisions)
+            {
+            echo "<li><a onclick=\"return confirm('Do you want to delete the revision?');\" href='" . $this->webroot . "/journal/submit/delete?revisionId=" . $this->resource->getRevision()->getKey() . "'>Delete current revision</a></li>";
+            }
+          echo "<li><a  onclick=\"return confirm('Do you want to delete the publication?');\" href='" . $this->webroot . "/journal/submit/delete?itemId=" . $this->resource->getKey() . "'>Delete publication</a></li>";
+          }
+        $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_MANAGE', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
+        echo join(' ', $elements);
+        echo "</ul>";
         }
-      if($this->isAdmin)
-        {
-        $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
-        $multipleRevisions = $lastRevision->getRevision() != 1;
-        if($multipleRevisions)
-          {
-          echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit current revision</a></li>";
-          }
-        else
-          {
-          echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit publication</a></li>";
-          }
-        if($multipleRevisions)
-          {
-          echo "<li><a onclick=\"return confirm('Do you want to delete the revision?');\" href='" . $this->webroot . "/journal/submit/delete?revisionId=" . $this->resource->getRevision()->getKey() . "'>Delete current revision</a></li>";
-          }
-        echo "<li><a  onclick=\"return confirm('Do you want to delete the publication?');\" href='" . $this->webroot . "/journal/submit/delete?itemId=" . $this->resource->getKey() . "'>Delete publication</a></li>";
-        }
-      $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_MANAGE', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
-      echo join(' ', $elements);
-      echo "</ul>";
-      }
-      ?>
+    ?>
 
     <?php
-    if($this->oldWebsiteUrl)
-      {
-      ?>
-      <div class="linkToArchiveWrapper">
+      if($this->oldWebsiteUrl)
+        {
+    ?>
+    <div class="linkToArchiveWrapper">
       This article was migrated. An archived version is available <a href="<?php echo $this->oldWebsiteUrl?>" class="linkToArchive" target="_blank">here</a>.
-      </div>
+    </div>
     <?php
-      }
-      ?>
+        }
+    ?>
   </div>
 
   <div class="MainContent">
