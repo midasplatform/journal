@@ -61,8 +61,32 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
             ?>
           </td>
         </tr>
+        <tr>
+          <td>
+            <div class="submission">
+              <div class="title">Revision Version</div>
+              <div class="caption"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <?php
+            try
+            {
+              $this->resource->getRevision()->getRevision();    // Check if revision exists...
+              $revisionVersion = $this->resource->getRevisionVersion(); // ... and then get version.
+            }
+            catch(Exception $e)
+            {
+              $revisionVersion = "";  // New revision,hasn't been assigned a revision number or version yet
+            }
+            echo '<input type="text" name="revisionversion" style="width:150px;" value="'.$revisionVersion.'"/>';
+            ?>
+          </td>
+        </tr>
       <?php
-      }
+      } // end revision
       ?>
         <tr>
           <td>

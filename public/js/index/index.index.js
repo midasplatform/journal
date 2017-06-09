@@ -456,12 +456,7 @@ function addAndFormatResult(container, values, foundIDs) {
       }
     else
       {
-      var revisionText = ''
-      if(values.pastCertificationRevisionNum !== "")
-        {
-        revisionText = "Revision " + values.pastCertificationRevisionNum + ": ";
-        }
-      newElement.find('.CertifiedLevel').html(revisionText + "(Level "+values.certifiedLevel+")");
+      newElement.find('.CertifiedLevel').html("(Level "+values.certifiedLevel+")");
       }
 
     newElement.find('.ResultDescription').dotdotdot();
