@@ -249,6 +249,26 @@ class Journal_ResourceDao extends ItemDao
     $this->setMetaDataByQualifier("revision_notes", $notes);
     }
 
+  /** Get Revision Version
+   *
+   * @return
+   */
+  function getRevisionVersion()
+    {
+    $metadata = $this->getMetaDataByQualifier("revision_version");
+    if(!$metadata) return '';
+    return $metadata->getValue();
+    }
+
+   /* Set Revision Version
+   * @param
+   */
+  function setRevisionVersion($version)
+    {
+    if ($version == null) $version = '';
+    $this->setMetaDataByQualifier("revision_version", $version);
+    }
+
    /** Get Submission type
    *
    * @return
