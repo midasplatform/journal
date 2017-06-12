@@ -41,38 +41,32 @@ foreach ($cssArray as $module => $list)
 <link type="text/css" href="<?php echo $this->webroot ?>/privateModules/journal/public/js/lib/jquery-share/jquery.share.css" rel="stylesheet" />
 <div class="ContentWithRightPanel">
   <div class="Panel">
-
-
     <h4>Resources</h4>
     <ul>
-      <?php echo "<li><a href='" . $this->webroot . "/journal/view/download?revisionId=" . $this->resource->getRevision()->getKey() . "'>Download</a></li>"; ?>
+    <?php echo "<li><a href='" . $this->webroot . "/journal/view/download?revisionId=" . $this->resource->getRevision()->getKey() . "'>Download</a></li>";?>
     </ul>
-      <?php
+    <?php
       $github = $this->resource->getGithub();
       if(!empty($github))
         {
-        ?>
-      <p id='githubDisclaimer'> <span style="color: red;">Caution:</span>
-        Github repository may have been updated since submission</p>
-      <ul>
-        <li><a href="<?php echo $github ?>" target="_blank">
-           Github <img  style='border:none;position:relative;top:-2px;' src="<?php echo $this->webroot ?>/privateModules/journal/public/images/github-small.png" /></a>
-        </li>
-      </ul>
-    <?php
-      }
+        echo "<p id='githubDisclaimer'> <span style='color: red;'>Caution:</span>";
+        echo " Github repository may have been updated since submission</p>";
+        echo "<ul>";
+        echo "  <li><a href='".$github."' target='_blank'>";
+        echo "   Github <img  style='border:none;position:relative;top:-2px;' src='".$this->webroot."/privateModules/journal/public/images/github-small.png' /></a>";
+        echo "  </li>";
+        echo "</ul>";
+        }
     ?>
-
-
 
     <h4>Export citation:</h4>
     <ul><li>
     <form action="" method="post" name="form1" id="form1">
-     <select name="exportType">
+    <select name="exportType">
       <option value="bibtex">Bibtex</option>
       <option value="xml">XML</option>
-      </select>
-      <input type="submit"  value="Export"/>
+    </select>
+    <input type="submit"  value="Export"/>
     </form>
     </li></ul>
 
@@ -81,11 +75,6 @@ foreach ($cssArray as $module => $list)
       <li>Views: <?php echo $this->resource->getView() ?></li>
       <li>Aggregate Downloads: <?php echo $this->resource->getDownload() ?></li>
     </ul>
-    <?php
-    echo '<div id="ratingContainer">';
-   // echo $this->element("rating", "ratings");
-    echo '</div>';
-    ?>
 
     <h4>Information</h4>
     <ul>
@@ -95,6 +84,7 @@ foreach ($cssArray as $module => $list)
         echo "<li>Private article</li>";
         }
         ?>
+
       <?php
       $articleType = array(RESOURCE_TYPE_SOFTWARE => "Software",
          RESOURCE_TYPE_PLUGIN => "Plugin",
@@ -103,75 +93,67 @@ foreach ($cssArray as $module => $list)
          RESOURCE_TYPE_DATASET => "Dataset");?>
 
       <?php
-      $level = $this->resource->getCertificationLevel();
-      if(is_numeric($level))
-        {
-        echo "<li><b>Certified</b> (level ".$level.")</li>";
-        }
+        $level = $this->resource->getCertificationLevel();
+        if(is_numeric($level))
+          {
+          echo "<li><b>Certified</b> (level ".$level.")</li>";
+          }
       ?>
 
       <li>Type: <?php echo $articleType[$this->resource->getType()] ?></li>
-      <li>Categories: <?php
-      $categories = $this->resource->getCategories();
-      foreach($categories as &$category)
-        {
-        $tmpCat = MidasLoader::loadModel('Category', 'journal')->load($category);
-        if($tmpCat) $category = '<a href="'.$this->webroot.'/journal/?category='.$tmpCat->getKey().'">'.$tmpCat->getName().'</a>';
-        }
-      echo join(', ', $categories) ?></li>
-      <li>Keywords: <?php
-      $tags = $this->resource->getTags();
-      foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=tags:'.$tag.'">'.$tag.'</a>';
-      echo join(', ', $tags)
-      ?></li>
+
+      <li>Categories:
       <?php
-      $grant = $this->resource->getGrant();
-      if(!empty($grant))
-        {
-        ?>
-        <li>Grant: <?php echo $grant ?></li>
-      <?php
-        }
-      $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
-      if($lastRevision->getRevision() != 1)
-        {
-        echo "<li>Current revision: <select id='revisionSelector'>";
-        $currentRevision = $this->resource->getRevision()->getRevision();
-        for($i = $lastRevision->getRevision(); $i > 0; $i--)
+        $categories = $this->resource->getCategories();
+        foreach($categories as &$category)
           {
-          $revision = MidasLoader::loadModel("Item")->getRevision($this->resource, $i);
-          if($revision)
-            {
-            echo "<option value='".$revision->getKey()."'";
-            if($currentRevision == $i) echo "selected ";
-            echo ">".$i."</option>";
-            }
+          $tmpCat = MidasLoader::loadModel('Category', 'journal')->load($category);
+          if($tmpCat) $category = '<a href="'.$this->webroot.'/journal/?category='.$tmpCat->getKey().'">'.$tmpCat->getName().'</a>';
           }
-        echo "</select></li>";
-        }
-      $sourceLicense = $this->resource->getSourceLicense();
-      $sourceLicenseString = $this->resource->sourceLicenseToString($sourceLicense);
-      switch (intval($sourceLicense))
-        {
-        case OTJ_SOURCE_LICENSE_APACHE_2:
-          echo "<li>License: <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>$sourceLicenseString</a></li>";
-          break;
-        case OTJ_SOURCE_LICENSE_GPL:
-          echo "<li>License: <a href='https://opensource.org/licenses/gpl-license'>$sourceLicenseString</a></li>";
-          break;
-        case OTJ_SOURCE_LICENSE_LGPL:
-          echo "<li>License: <a href='https://opensource.org/licenses/lgpl-license'>$sourceLicenseString</a></li>";
-          break;
-        case OTJ_SOURCE_LICENSE_OTHER:
-        case OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN:
-        case OTJ_SOURCE_LICENSE_BSD:
-        default:
-          echo "<li>License: $sourceLicenseString</li>";
-          break;
+        echo join(', ', $categories);
+      ?>
+      </li>
+
+      <li>Keywords:
+      <?php
+        $tags = $this->resource->getTags();
+        foreach($tags as &$tag)   $tag = '<a href="'.$this->webroot.'/journal/?q=tags:'.$tag.'">'.$tag.'</a>';
+        echo join(', ', $tags);
+      ?>
+      </li>
+
+      <?php
+        $grant = $this->resource->getGrant();
+        if(!empty($grant))
+          {
+          echo "<li>Grant: ".$grant."</li>";
+          }
+
+        $sourceLicense = $this->resource->getSourceLicense();
+        $sourceLicenseString = $this->resource->sourceLicenseToString($sourceLicense);
+        switch (intval($sourceLicense))
+          {
+          case OTJ_SOURCE_LICENSE_APACHE_2:
+            echo "<li>License: <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>$sourceLicenseString</a></li>";
+            break;
+          case OTJ_SOURCE_LICENSE_GPL:
+            echo "<li>License: <a href='https://opensource.org/licenses/gpl-license'>$sourceLicenseString</a></li>";
+            break;
+          case OTJ_SOURCE_LICENSE_LGPL:
+            echo "<li>License: <a href='https://opensource.org/licenses/lgpl-license'>$sourceLicenseString</a></li>";
+            break;
+          case OTJ_SOURCE_LICENSE_OTHER:
+          case OTJ_SOURCE_LICENSE_PUBLIC_DOMAIN:
+          case OTJ_SOURCE_LICENSE_BSD:
+          default:
+            echo "<li>License: $sourceLicenseString</li>";
+            break;
           }
       ?>
-      <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
+
+    <?php if ($this->resource->getPrivacyStatus() == MIDAS_PRIVACY_PRIVATE) echo '<li>This publication is private.</li>'; ?>
     </ul>
+
     <h4>Share</h4>
     <ul style="list-style: none;"><li>
     <div id="shareDiv"></div>
@@ -188,9 +170,21 @@ foreach ($cssArray as $module => $list)
         }
       if($this->isAdmin)
         {
-        echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit resource</a></li>";
-        echo "<li><a  onclick=\"return confirm('Do you want to delete the resource?');\" href='" . $this->webroot . "/journal/submit/delete?itemId=" . $this->resource->getKey() . "'>Delete resource</a></li>";
-        if($this->resource->getRevision()->getRevision() > 1) echo "<li><a onclick=\"return confirm('Do you want to delete the revision?');\" href='" . $this->webroot . "/journal/submit/delete?revisionId=" . $this->resource->getRevision()->getKey() . "'>Delete current revision</a></li>";
+        $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+        $multipleRevisions = $lastRevision->getRevision() != 1;
+        if($multipleRevisions)
+          {
+          echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit current revision</a></li>";
+          }
+        else
+          {
+          echo "<li><a href='" . $this->webroot . "/journal/submit?revisionId=" . $this->resource->getRevision()->getKey() . "'>Edit publication</a></li>";
+          }
+        if($multipleRevisions)
+          {
+          echo "<li><a onclick=\"return confirm('Do you want to delete the revision?');\" href='" . $this->webroot . "/journal/submit/delete?revisionId=" . $this->resource->getRevision()->getKey() . "'>Delete current revision</a></li>";
+          }
+        echo "<li><a  onclick=\"return confirm('Do you want to delete the publication?');\" href='" . $this->webroot . "/journal/submit/delete?itemId=" . $this->resource->getKey() . "'>Delete publication</a></li>";
         }
       $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_MANAGE', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
       echo join(' ', $elements);
@@ -209,8 +203,6 @@ foreach ($cssArray as $module => $list)
       }
       ?>
   </div>
-
-
 
   <div class="MainContent">
     <div id="publication">
@@ -243,7 +235,16 @@ foreach ($cssArray as $module => $list)
           ?>
       </center>
       <div class="journal">
-      Submitted by <?php echo $this->resource->getRevision()->getUser()->getFullName() ?> on <?php echo date("m-d-Y", strtotime($this->resource->getRevision()->getDate())) ?>.
+      <?php
+        $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+        $multipleRevisions = $lastRevision->getRevision() != 1;
+        if(!$multipleRevisions)
+          {
+          $submitter = $this->resource->getRevision()->getUser()->getFullName();
+          $submissionDate = date("m-d-Y", strtotime($this->resource->getRevision()->getDate()));
+          echo "Submitted by ".$submitter." on ".$submissionDate.".";
+          }
+      ?>
       </div>
       <div class="submittedby">
         Originally published in <a href="<?php echo $this->webroot ?>/journal?community=<?php echo $this->community->getKey() ?>"
@@ -253,44 +254,93 @@ foreach ($cssArray as $module => $list)
       <div class="abstract" style="text-align: justify;"><?php echo str_replace("<br>", "<br/>", nl2br($this->resource->getDescription())) ?></div>
 
       <?php
-      $currentRevision = $this->resource->getRevision()->getRevision();
-      if ($currentRevision != 1)
-        {
-        echo '<h4>Revision Notes</h4>';
-        echo '<div class="abstract" style="text-align: justify;">';
-        echo str_replace("<br>", "<br/>", nl2br($this->resource->getRevisionNotes())) ;
-        }
+        $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+        $multipleRevisions = $lastRevision->getRevision() != 1;
+        if($multipleRevisions)
+          {
+          echo "<div>";
+          echo '<table width="100%" id="revisionTable">';
+          echo "<tr>";
+          echo '  <td><div align="center"><strong>Revision</strong></div></td>';
+          echo '  <td><div align="center"><strong>Submitted By</strong></div></td>';
+          echo '  <td><div align="center"><strong>Submission Date</strong></div></td>';
+          echo '  <td><div align="center"><strong>Certified</strong></div></td>';
+          echo '  <td><div align="center"><strong>Notes</strong></div></td>';
+          echo "</tr>";
+          $currentRevision = $this->resource->getRevision();
+          $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+          for($i = $lastRevision->getRevision(); $i > 0; $i--)
+            {
+            $revision = MidasLoader::loadModel("Item")->getRevision($this->resource, $i);
+            $this->resource->setRevision($revision);
+            if($revision)
+              {
+              if ($revision->getKey() != $currentRevision->getKey())
+                {
+                echo "<tr class='clickable-row' data-href='".$this->webroot."/journal/view/?revisionId=".$revision->getKey()."'>";
+                }
+              else
+                {
+                echo "<tr class='selected' data-href='".$this->webroot."/journal/view/?revisionId=".$revision->getKey()."'>";
+                }
+              echo "<td>";
+              echo "<a href='".$this->webroot."/journal/view/?revisionId=".$revision->getKey()."'>".$i."</a>";
+              echo "</td>";
+              echo "<td>".$revision->getUser()->getFullName()."</td>";
+              echo "<td>".date("m-d-Y", strtotime($revision->getDate()))."</td>";
+              echo "<td>";
+              $level = $this->resource->getCertificationLevel();
+              if(is_numeric($level))
+                {
+                echo "Level ".$level;
+                }
+              echo "</td><td>";
+              echo str_replace("<br>", "<br/>", nl2br($this->resource->getRevisionNotes())) ;
+              echo "</td>";
+              echo "</tr>";
+              }
+            }
+          $this->resource->setRevision($currentRevision);
+          }
+        ?>
+       </table>
+       </div>
+
+      <?php
+        $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+        $multipleRevisions = $lastRevision->getRevision() != 1;
+        if($multipleRevisions)
+          {
+          echo '<h4>Revision Notes</h4>';
+          echo '<div class="abstract" style="text-align: justify;">';
+          echo str_replace("<br>", "<br/>", nl2br($this->resource->getRevisionNotes())) ;
+          }
+
+        // Reviews
+        $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_REVIEW', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
+        $element = end($elements);
+        if(is_array($element))
+          {
+          echo $this->action($element['action'], $element['controller'], $element['module'], $element['params']);
+          }
+
+        if($this->hasOldReview)
+          {
+          echo "<br/>";
+          echo "<br/>";
+          echo '<div class="linkToArchiveWrapper">';
+          echo 'This article contains additional reviews available <a href="<?php echo $this->oldWebsiteUrl?>" class="linkToArchive" target="_blank">here</a>.';
+          echo '</div>';
+          }
       ?>
 
-    </div> <!-- End publication -->
-
-    <!-- Reviews -->
-    <?php
-    $elements = Zend_Registry::get('notifier')->callback('CALLBACK_JOURNAL_REVIEW', array('resource' => $this->resource, 'isAdmin' => $this->isAdmin));
-    $element = end($elements);
-    if(is_array($element))
-      {
-      echo $this->action($element['action'], $element['controller'], $element['module'], $element['params']);
-      }?>
-
-    <?php
-    if($this->hasOldReview)
-      {
-      ?>
-      <br/>
-      <br/>
-      <div class="linkToArchiveWrapper">
-      This article contains additionnal reviews available <a href="<?php echo $this->oldWebsiteUrl?>" class="linkToArchive" target="_blank">here</a>.
-      </div>
-    <?php
-      }
-      ?>
-
+    <!-- Comments -->
     <h4>Comments</h4>
     <?php
-    echo '<div id="commentsContainer" >';
-    echo $this->element("comment", "comments");
-    echo '</div>';
+      echo '<div id="commentsContainer" >';
+      echo $this->element("comment", "comments");
+      echo '</div>';
     ?>
+    </div> <!-- End publication -->
   </div>
 </div>
