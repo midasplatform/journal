@@ -207,6 +207,22 @@ foreach ($cssArray as $module => $list)
       <div class="title" >
         <?php echo $this->resource->getName() ?>
       </div>
+      <div class="revision" >
+        <?php
+        $lastRevision = MidasLoader::loadModel('Item')->getLastRevision($this->resource);
+        $multipleRevisions = $lastRevision->getRevision() != 1;
+        if($multipleRevisions)
+          {
+          $version = $this->resource->getRevisionVersion();
+          if (!$version)
+            {
+            $currentRevision = $this->resource->getRevision();
+            $version = $currentRevision->getRevision();
+            }
+          echo "<center><b>Revision: ".$version."</b></center>";
+          }
+        ?>
+      </div>
       <div class="authors"><?php
       $authors = $this->resource->getAuthors();
       foreach($authors as &$author) $author = '<a href="'.$this->webroot.'/journal/?q=authors:'.$author[0].' '.$author[1].'">'.ucfirst($author[1]).' '.ucfirst($author[0][0]).'.</a>';
@@ -258,7 +274,7 @@ foreach ($cssArray as $module => $list)
           echo "<div>";
           echo '<table width="100%" id="revisionTable">';
           echo "<tr>";
-          echo '  <td><div align="center"><strong>Version</strong></div></td>';
+          echo '  <td><div align="center"><strong>Revision Version</strong></div></td>';
           echo '  <td><div align="center"><strong>Submitted By</strong></div></td>';
           echo '  <td><div align="center"><strong>Submission Date</strong></div></td>';
           echo '  <td><div align="center"><strong>Certified</strong></div></td>';
@@ -280,7 +296,12 @@ foreach ($cssArray as $module => $list)
                 {
                 echo "<tr class='selected' data-href='".$this->webroot."/journal/view/?revisionId=".$revision->getKey()."'>";
                 }
-              echo "<td>".$this->resource->getRevisionVersion()."</td>";
+              $version = $this->resource->getRevisionVersion();
+              if (!$version)
+                {
+                $version = $i;
+                }
+              echo "<td>".$version."</td>";
               echo "<td>".$revision->getUser()->getFullName()."</td>";
               echo "<td>".date("m-d-Y", strtotime($revision->getDate()))."</td>";
               echo "<td>";
