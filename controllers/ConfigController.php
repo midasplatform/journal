@@ -29,6 +29,9 @@ class Journal_ConfigController extends Journal_AppController
     $this->view->baseHandle = MidasLoader::loadModel("Setting")->getValueByName('baseHandle', "journal");
     $this->view->oldWebsiteUrl = MidasLoader::loadModel("Setting")->getValueByName('oldWebsiteUrl', "journal");
     $this->view->licenseDisclaimer = MidasLoader::loadModel("Setting")->getValueByName('licenseDisclaimer', "journal");
+    $this->view->pgsqlDB = MidasLoader::loadModel("Setting")->getValueByName('pgsqlDB', "journal");
+    $this->view->pgsqlPW = MidasLoader::loadModel("Setting")->getValueByName('pgsqlPW', "journal");
+    $this->view->pgsqlPort = MidasLoader::loadModel("Setting")->getValueByName('pgsqlPort', "journal");
     $this->view->json['isConfigSaved'] = 0;
 
     if($this->_request->isPost() && is_numeric($_POST['defaultJournal']))
@@ -40,12 +43,18 @@ class Journal_ConfigController extends Journal_AppController
       $this->view->adminEmail = $_POST['adminEmail'];
       $this->view->oldWebsiteUrl = $_POST['oldWebsiteUrl'];
       $this->view->licenseDisclaimer = $_POST['licenseDisclaimer'];
+      $this->view->pgsqlDB = $_POST['pgsqlDB'];
+      $this->view->pgsqlPW = $_POST['pgsqlPW'];
+      $this->view->pgsqlPort = $_POST['pgsqlPort'];
       MidasLoader::loadModel("Setting")->setConfig('adminEmail', $this->view->adminEmail, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultJournal', $this->view->defaultJournal, "journal");
       MidasLoader::loadModel("Setting")->setConfig('defaultLayout', $this->view->defaultLayout, "journal");
       MidasLoader::loadModel("Setting")->setConfig('baseHandle', $this->view->baseHandle, "journal");
       MidasLoader::loadModel("Setting")->setConfig('oldWebsiteUrl', $this->view->oldWebsiteUrl, "journal");
       MidasLoader::loadModel("Setting")->setConfig('licenseDisclaimer', $this->view->licenseDisclaimer, "journal");
+      MidasLoader::loadModel("Setting")->setConfig('pgsqlDB', $this->view->pgsqlDB, "journal");
+      MidasLoader::loadModel("Setting")->setConfig('pgsqlPW', $this->view->pgsqlPW, "journal");
+      MidasLoader::loadModel("Setting")->setConfig('pgsqlPort', $this->view->pgsqlPort, "journal");
       if(is_numeric($this->view->baseHandle))
         {
         // This is a hack allowing us to use the Zend dispatch mechanisum to resolve the handles
