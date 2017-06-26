@@ -1,6 +1,5 @@
 // When page ready
 $(document).ready(function(){
-
   if($('#disclaimerWrapperLicense').length != 0)
   {
     $.fancybox.open([

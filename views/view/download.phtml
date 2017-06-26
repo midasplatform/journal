@@ -28,33 +28,68 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
   <a href="<?php echo $this->webroot?>/journal/view/?revisionId=<?php echo $this->resource->getRevision()->getKey()?>">Back to article</a>
   <br/>
   <br/>
-  <ul>
-    <?php
-    $size = 0;
-    $bitstreams = $this->resource->getRevision()->getBitstreams();
-    foreach ($bitstreams as $bitstream)
-      {
-      $size += $bitstream->getSizebytes();
+
+  <?php
+     // Check for the presence of a completed recaptcha in
+     //  the form of a g-recaptcha-response parameter
+     // if none, show the recaptcha
+    if(!$_POST['g-recaptcha-response']) {
+        echo '  <form id="captchaform" method="POST" action="" name="input">
+                   <div class="g-recaptcha" data-sitekey="6LdgUw4UAAAAAAFQWVY8dLlwvnGaiEu7YCDIw51s"></div>
+                   <input id="verifyHuman" type="submit" value="Verify"></submit>
+                </form>';
+    }
+    // If it does exist
+    else {
+      // Query the google server for verification
+      $url = "https://www.google.com/recaptcha/api/siteverify";
+      $url = $url."?secret=".MidasLoader::loadModel("Setting")->getValueByName('captchaSecret', "journal");;
+      $url = $url."&response=".$_POST['g-recaptcha-response'];
+      // Use cURL to query Google for validation.
+      $curl = curl_init();
+      curl_setopt($curl, CURLOPT_URL, $url);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+      curl_setopt($curl, CURLOPT_TIMEOUT, 15);
+      curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, TRUE);
+      curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, TRUE);
+      $curlData = curl_exec($curl);
+      curl_close($curl);
+      $res = json_decode($curlData, TRUE);
+
+      if($res['success'] == TRUE) {
+        // TRUE means that the query was verified and we have a user, show them the links
+        $size = 0;
+        $bitstreams = $this->resource->getRevision()->getBitstreams();
+        foreach ($bitstreams as $bitstream)
+          {
+          $size += $bitstream->getSizebytes();
+          }
+        echo '<ul style="display">
+                <li><a href='.$this->webroot.'/download?items='.$this->resource->getKey().','.$this->resource->getRevision()->getRevision().'>Download All</a>
+                ('.MidasLoader::loadComponent("Utility")->formatSize($size).')</li>';
+        if($this->paper)
+          {
+          echo '<li><a href='.$this->webroot.'/download?bitstream='.$this->paper->getKey() /'">Download Paper</a>
+        </li>';
+          }
+        echo '</ul>';
       }
-    ?>
-    <li><a href="<?php echo $this->webroot ?>/download?items=<?php echo $this->resource->getKey() ?>, <?php echo $this->resource->getRevision()->getRevision() ?>">Download All</a>
-      (<?php echo MidasLoader::loadComponent("Utility")->formatSize($size); ?>)</li>
-    <?php
-    if($this->paper)
-      {
-      ?>
-    <li><a href="<?php echo $this->webroot ?>/download?bitstream=<?php echo $this->paper->getKey() ?>">Download Paper</a>
-    </li>
-    <?php
+      else {
+          // Something didn't work right, try again
+          echo "The RECAPTCHA was unable to be verified.  Please try again:";
+          echo '  <form id="captchaform" method="POST" action="" name="input">
+                   <div class="g-recaptcha" data-sitekey="6LdgUw4UAAAAAAFQWVY8dLlwvnGaiEu7YCDIw51s"></div>
+                   <input id="verifyHuman" type="submit" value="Verify"></submit>
+                </form>';
       }
-      ?>
-  </ul>
+};
+ ?>
 </div>
 
 <?php
   $disclaimerIndex = MidasLoader::loadModel("Setting")->getValueByName('licenseDisclaimer', "journal");
   $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($disclaimerIndex);
-  if($disclaimer)
+  if($disclaimer && $_POST['g-recaptcha-response'] )
     {
     echo '<div id="disclaimerWrapperLicense" style="display:none;width:700px;"><h4>Disclaimer</h4>';
     echo "<pre style='word-break:unset'>".$disclaimer->getDescription()."</pre>";
@@ -69,7 +104,7 @@ $this->headScript()->appendFile($this->webroot . '/privateModules/journal/public
     echo "</div>";
     }
 
-if($this->resource->getDisclaimer() != -1)
+if(($this->resource->getDisclaimer() != -1) && $_POST['g-recaptcha-response'])
   {
   $disclaimer = MidasLoader::loadModel("Disclaimer", "journal")->load($this->resource->getDisclaimer());
   if($disclaimer)
