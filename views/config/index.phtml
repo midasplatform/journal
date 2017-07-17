@@ -33,7 +33,7 @@ $this->headScript()->appendFile($this->webroot."/privateModules/journal/public/j
               <input type='text' name='adminEmail' value='".$this->adminEmail."'/>
             </div>
             <div>
-              <label for='test'>Default Jounal</label>
+              <label for='test'>Default Journal</label>
               <input type='number' name='defaultJournal' value='".$this->defaultJournal."'/>
             </div>
             <div>
@@ -51,6 +51,19 @@ $this->headScript()->appendFile($this->webroot."/privateModules/journal/public/j
             <div>
               <label for='test'>Index of licensing disclaimer</label>
               <input type='number' name='licenseDisclaimer' value='".$this->licenseDisclaimer."'/>
+            </div>
+            <br/>
+            <div>
+              <label for='test'>PostgreSQL Database Name</label>
+              <input type='text' name='pgsqlDB' value='".$this->pgsqlDB."'/>
+            </div>
+            <div>
+              <label for='test'>PostgreSQL password('postgres' user)</label>
+              <input type='text' name='pgsqlPW' value='".$this->pgsqlPW."'/>
+            </div>
+            <div>
+              <label for='test'>PostgreSQL port on the local machine</label>
+              <input type='text' name='pgsqlPort' value='".$this->pgsqlPort."'/>
             </div>
           <div>
             <input type='submit' value='Save Configuration'/>

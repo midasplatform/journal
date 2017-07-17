@@ -197,7 +197,26 @@ class Journal_ResourceDao extends ItemDao
   function setHandle($handle)
     {
     $this->setMetaDataByQualifier("handle", $handle);
+    // go to postgreSQL again to add the value back in.
+    try {
+      $postgresDB = MidasLoader::loadModel("Setting")->getValueByName('pgsqlDB', "journal");
+      $postgresPWD = MidasLoader::loadModel("Setting")->getValueByName('pgsqlPW', "journal");
+      $postgresPort = MidasLoader::loadModel("Setting")->getValueByName('pgsqlPort', "journal");
+      $params = array("dbname"   => $postgresDB,
+                      "username" => "postgres",
+                      "password" => $postgresPWD,
+                      "host"     => "localhost",
+                      "port"     => $postgresPort);
+      $database = Zend_Db::factory("Pdo_Pgsql", $params);
+      $database->getConnection();
+      $handleVal=explode('/',$handle)[1];
+      $psqlRet = $database->query("INSERT INTO handle (handle_id,handle,resource_type_id,resource_id)
+                  select $handleVal, '$handle',2,0 where not exists (select handle_id from handle where handle_id=$handleVal);");
     }
+    catch (Zend_Exception $e) {
+        throw new Zend_Exception($e);
+    }
+  }
 
   /** Get Certification level
    *
