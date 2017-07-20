@@ -124,32 +124,35 @@ class Journal_ApiComponent extends AppComponent
         $resourceDao = MidasLoader::loadModel("Item")->initDao("Resource", $item->toArray(), "journal");
         $rating = MidasLoader::loadModel("Itemrating", 'ratings')->getAggregateInfo($item);
         $authors = join(", ", $resourceDao->getAuthorsFullNames());
+        // Check that the submission isn't under the "Private" folder of the given issue
+        $parentFolder = $item->getFolders();
+        if($parentFolder[0]->getName() != "Private") {
+          if($args['level'] !== '')
+            {
+            list($level,$foundRevisionID,$foundRevisionKey) = $resourceDao->getAllCertificationLevel($args['level']);
+            }
+          else
+            {
+            $level = $resourceDao->getCertificationLevel();
+            }
+          $isCertified = 0;
+          if(!empty($level) && is_numeric($level))
+            {
+            $isCertified = 1;
+            }
 
-        if($args['level'] !== '')
-          {
-          list($level,$foundRevisionID,$foundRevisionKey) = $resourceDao->getAllCertificationLevel($args['level']);
-          }
-        else
-          {
-          $level = $resourceDao->getCertificationLevel();
-          }
-        $isCertified = 0;
-        if(!empty($level) && is_numeric($level))
-          {
-          $isCertified = 1;
-          }
-
-        $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
-        if($targetLevel == 0 || (strpos($targetLevel,$level) !== false))
-          {
-          $totalResults++;
-          $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
-            'rating' => (float)$rating['average'], 'type' => $item->getType(), 'logo' => $resourceDao->getLogo(),
-            'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
-            'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
-            'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'pastCertificationRevisionNum' => $foundRevisionID, "certifiedLevel" => $level,
-            'pastCertificationRevisionKey' => $foundRevisionKey, 'license' => $resourceDao->getSourceLicenseString());
-          $count++;
+          $statistics = "Download ".$item->getDownload()." ".(($item->getDownload() > 1)?"times":"time").", viewed ".$item->getView()." ".(($item->getView() > 1)?"times":"time");
+          if($targetLevel == 0 || (strpos($targetLevel,$level) !== false) )
+            {
+            $totalResults++;
+            $items[] = array('total' => $totalResults, 'title' => htmlentities($item->getName(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
+              'rating' => (float)$rating['average'], 'type' => $item->getType(), 'logo' => $resourceDao->getLogo(),
+              'id' => $item->getKey(), 'description' => htmlentities($item->getDescription(), ENT_COMPAT | ENT_HTML401, "UTF-8" ),
+              'authors' => $authors, 'view' => $item->getView() ,'downloads' => $resourceDao->getDownload(), 'statistics' => $statistics,
+              'revisionId' => $resourceDao->getRevision()->getKey(), "isCertified" => $isCertified, 'pastCertificationRevisionNum' => $foundRevisionID, "certifiedLevel" => $level,
+              'pastCertificationRevisionKey' => $foundRevisionKey, 'license' => $resourceDao->getSourceLicenseString());
+            $count++;
+            }
           }
         }
       }
