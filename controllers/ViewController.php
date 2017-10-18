@@ -47,6 +47,11 @@ class Journal_ViewController extends Journal_AppController
     /** List available downloads */
     function downloadAction()
       {
+      if(!$this->logged)
+        {
+        $this->renderScript("login.phtml");
+        return;
+        }
       $revisionId = $this->_getParam("revisionId");
       if(!isset($revisionId) || !is_numeric($revisionId))
         {
