@@ -187,24 +187,24 @@ var midas = midas || {};
 midas.user = midas.user || {};
 midas.user.login = midas.user.login || {};
 
-midas.user.login.validateLoginForm = function () {
-    $('input[name=previousuri]').val(json.global.currentUri);
+midas.user.login.validateLoginForm = function (formData) {
+    'use strict';
     if($('#password').val() == '') {
         midas.createNotice('Password field must not be empty', 3500, 'error');
         return false;
     }
+    formData.push({ name: 'previousuri', value: json.global.currentUri });
     $('#loginForm input[type=submit]').attr('disabled', 'disabled');
-    $('#loginWaiting').show();
 };
 
 midas.user.login.loginResult = function (responseText) {
     'use strict';
-    $('#loginWaiting').hide();
     $('#loginForm input[type=submit]').removeAttr('disabled');
+
     try {
         var resp = $.parseJSON(responseText);
         if(resp.status && resp.redirect) {
-            window.location.href = json.global.webroot+"/journal";
+            window.location.href = resp.redirect;
         }
         else if(resp.dialog) {
             midas.loadDialog('loginOverride', resp.dialog);
