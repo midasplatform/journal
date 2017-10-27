@@ -239,5 +239,7 @@ $(document).ready(function () {
           midas.loadAjaxDynamicBar('register', '/user/register');
       });
       }
-
+    var mydate = new Date();
+    mydate.setMinutes(mydate.getMinutes()+30);
+    document.cookie = 'redirectURL='+ window.location.href +'; expires= '+ mydate.toUTCString()+ '; path='+$(".webroot").attr("value");
 });
