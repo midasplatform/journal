@@ -34,21 +34,28 @@ class Googleoauth_UserController extends Googleoauth_AppController {
         if($userDao === false)
           {
           $password = uniqid();
-          $userDao = MidasLoader::loadModel("User")->createUser(trim($email), 
-                  $password, 
-                  trim($firstname), 
+          $userDao = MidasLoader::loadModel("User")->createUser(trim($email),
+                  $password,
+                  trim($firstname),
                   trim($lastname));
           }
 
-          
+
         setcookie('midasUtil', null, time() + 60 * 60 * 24 * 30, '/'); //30 days
         Zend_Session::start();
         $user = new Zend_Session_Namespace('Auth_User');
         $user->setExpirationSeconds(60 * Zend_Registry::get('configGlobal')->session->lifetime);
         $user->Dao = $userDao;
         $user->lock();
-        
-        $this->_redirect("/");
+        if(isset($_COOKIE["redirectURL"]))
+          {
+          $redirectURL = $_COOKIE["redirectURL"];
+          }
+        else
+          {
+          $redirectURL = "/";
+          }
+        $this->_redirect($redirectURL);
         }
       else
         {
@@ -56,7 +63,7 @@ class Googleoauth_UserController extends Googleoauth_AppController {
         }
       }
     else
-      { // Normal login page          
+      { // Normal login page
       // We only use google
       $this->_redirect(TBS\Auth\Adapter\Google::getAuthorizationUrl());
       }
